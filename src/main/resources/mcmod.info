@@ -1,0 +1,29 @@
+{
+  "modListVersion": "2",
+  "modList": [
+    {
+      "modid": "ematter",
+      "name": "Energy's Matter",
+      "description": "A mod to convert matter to Ampere and back. Inspired by Einstein's Theorem of Conservation of Energy and Matter",
+      "version": "${version}",
+      "mcversion": "${mc_version}",
+      "url": "Https://thesilkminer.net/mc-mods/ematter",
+      "updateUrl": "Curse",
+      "authorList": [
+        "TheSilkMiner"
+      ],
+      "credits": "Redfire for the idea for this mod, Ace Muffins for textures",
+      "logoFile": "ematter_logo.png",
+      "screenshots": [
+      ],
+      "parent": "",
+      "requiredMods": [
+      ],
+      "dependencies": [
+      ],
+      "dependants": [
+      ],
+      "useDependencyInformation": "false"
+    }
+  ]
+}

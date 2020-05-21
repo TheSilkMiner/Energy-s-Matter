@@ -96,7 +96,7 @@ compileTestKotlin {
 }
 
 version = "0.1.0" + getBuildString()
-group = "net.thesilkminer.mc.energysmatter" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+group = "net.thesilkminer.mc.ematter" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "energysmatter"
 
 sourceCompatibility = targetCompatibility = '1.8'
@@ -157,7 +157,7 @@ configurations {
 // compile, provided, deobfCompile, deobfProvided
 dependencies {
     /* ======================= COMPILE TIME ONLY ======================= */
-    
+
     // Boson
     compile(group: 'net.thesilkminer.mc', name: 'boson')
 
