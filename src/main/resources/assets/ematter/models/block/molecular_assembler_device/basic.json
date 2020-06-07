@@ -1,0 +1,7 @@
+{
+  "parent": "ematter:block/molecular_assembler_device/base",
+  "textures": {
+    "base": "ematter:blocks/molecular_assembler_device/basic_base",
+    "particle": "ematter:blocks/molecular_assembler_device/basic_base"
+  }
+}

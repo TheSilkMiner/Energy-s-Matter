@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "tier=basic": {
+      "model": "ematter:molecular_assembler_device/basic"
+    },
+    "tier=standard": {
+      "model": "ematter:molecular_assembler_device/standard"
+    },
+    "tier=advanced": {
+      "model": "ematter:molecular_assembler_device/advanced"
+    },
+    "tier=elite": {
+      "model": "ematter:molecular_assembler_device/elite"
+    }
+  }
+}
