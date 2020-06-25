@@ -57,9 +57,8 @@ class SbgTileEntity : TileEntity(), Producer, Holder, ITickable {
     override fun update() {
         if( !super.world.isRemote ) {
             if( this.tempDifference != 0u ) {
-                //if the threshold is greater than 0 it gets reduced and no power will be generated
                 if( this.threshold > 0u ) {
-                    --this.threshold
+                    this.threshold--
                 }
                 else {
                     if( this.storedPower < MAX_CAPACITY ) {
@@ -78,15 +77,16 @@ class SbgTileEntity : TileEntity(), Producer, Holder, ITickable {
         val nextPowerProduced: Double = this.tempDifference.toDouble() * 0.005 * this.effectiveness * POWER_MULTIPLIER
 
         //is outside the (below) if statement to always show the correct value and not only update every two seconds
-        //if you think that's inefficient we can move everything in this fun inside the if statement
         this.powerProduced = nextPowerProduced.roundToInt().toULong()
         if( --this.burstTimer == 0u ) {
-            if( this.powerStored + nextPowerProduced.roundToInt().toULong() * BURST_TIME >= MAX_CAPACITY ) {
-                this.powerStored += MAX_CAPACITY - this.powerStored
+            //if an increase of the stored power by the nextPowerProduced value would be greater than the max capacity
+            //the storedPower gets set to the max value
+            if( this.powerStored + ( nextPowerProduced * BURST_TIME.toDouble() ).roundToInt().toULong() > MAX_CAPACITY ) {
+                this.powerStored = MAX_CAPACITY
                 this.powerProduced = 0uL
             }
             else {
-                this.powerStored += nextPowerProduced.roundToInt().toULong() * BURST_TIME
+                this.powerStored += ( nextPowerProduced * BURST_TIME.toDouble() ).roundToInt().toULong()
             }
 
             this.burstTimer = BURST_TIME
@@ -109,7 +109,7 @@ class SbgTileEntity : TileEntity(), Producer, Holder, ITickable {
     }
 
     /**
-     * To (re)calculate [tempDifference] and [effectiveness] on block placement or on chunk loading
+     * To (re)calculate [tempDifference] and [effectiveness] on block placement or on chunk loading.
      */
     override fun onLoad() {
         if( !super.world.isRemote ) {
@@ -141,10 +141,12 @@ class SbgTileEntity : TileEntity(), Producer, Holder, ITickable {
         var coolants = 0
 
         for( direction in Direction.values() ) {
+            //the top is only for energy so don't have to be checked here
             if( direction != Direction.UP ) {
                 val neighbor: Block = this.getNeighborAtDir( direction )
                 for( temperatureSource in TemperatureSources.values() ) {
                     if( neighbor == temperatureSource.block ) {
+                        //calculates the actual temperature value like shown in Silk's examples
                         val value = temperatureSource.value - ROOM_TEMPERATURE
                         //if the value is positive it must be a heat source, if it's negative it must be a coolant
                         if( value > 0 ) {
@@ -160,18 +162,21 @@ class SbgTileEntity : TileEntity(), Producer, Holder, ITickable {
                 }
             }
         }
+        //if all neighbors are either a heat source or a coolant there is no temperature difference at all
         if( heatSources == 5 || coolants == 5 ) {
             this.tempDifference = 0u
             this.burstTimer = BURST_TIME
             this.powerProduced = 0u
         }
         else {
+            //for every heat source that has no coolant the effectiveness gets reduced (one coolant for two heat sources)
             if( heatSources > coolants * 2 ) {
                 for( i in 1..( heatSources - coolants * 2 ) ) {
                     this.effectiveness -= 0.2
                 }
             }
         }
+        //every time a block gets changed the sbg needs a short amount of time to restart
         this.threshold = THRESHOLD_TIME
     }
 
