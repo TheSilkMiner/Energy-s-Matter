@@ -11,6 +11,7 @@ import net.thesilkminer.mc.boson.api.log.L
 import net.thesilkminer.mc.ematter.MOD_ID
 import net.thesilkminer.mc.ematter.MOD_NAME
 import net.thesilkminer.mc.ematter.common.feature.mad.MadTileEntity
+import net.thesilkminer.mc.ematter.common.feature.sbg.SbgTileEntity
 
 internal object TileEntities
 
@@ -21,5 +22,6 @@ internal object TileEntityRegistration {
     fun onBlockRegistration(e: RegistryEvent.Register<Block>) {
         l.info("Hijacking block registry event for tile entity registration")
         GameRegistry.registerTileEntity(MadTileEntity::class.java, ResourceLocation(MOD_ID, "molecular_assembler_device"))
+        GameRegistry.registerTileEntity( SbgTileEntity::class.java , ResourceLocation( MOD_ID , "seebeck_generator" ) )
     }
 }

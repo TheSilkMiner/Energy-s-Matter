@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "particle": "ematter:blocks/seebeck_generator/side",
+    "up": "ematter:blocks/seebeck_generator/up",
+    "down": "ematter:blocks/seebeck_generator/up",
+    "north": "ematter:blocks/seebeck_generator/side",
+    "east": "ematter:blocks/seebeck_generator/side",
+    "south": "ematter:blocks/seebeck_generator/side",
+    "west": "ematter:blocks/seebeck_generator/side"
+  }
+}
