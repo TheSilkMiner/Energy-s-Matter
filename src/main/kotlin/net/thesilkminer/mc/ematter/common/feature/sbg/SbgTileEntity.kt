@@ -11,10 +11,9 @@ import net.thesilkminer.kotlin.commons.lang.uncheckedCast
 import net.thesilkminer.mc.boson.api.direction.Direction
 import net.thesilkminer.mc.boson.api.energy.Holder
 import net.thesilkminer.mc.boson.api.energy.Producer
-import net.thesilkminer.mc.boson.api.log.L
+import net.thesilkminer.mc.boson.prefab.energy.consumerCapability
 import net.thesilkminer.mc.boson.prefab.energy.holderCapability
 import net.thesilkminer.mc.boson.prefab.energy.producerCapability
-import net.thesilkminer.mc.ematter.MOD_ID
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -25,15 +24,19 @@ class SbgTileEntity: TileEntity(), Producer, Holder, ITickable {
         private const val ROOM_TEMPERATURE: Int = 295
         private const val MAX_CAPACITY: ULong = 3_141uL //same storage the basic mad has
 
+        private const val TRANSFER_RATE: ULong = 3uL
+
         //TODO move this into a config file
         private const val POWER_MULTIPLIER: Double = 1.0
 
         private const val THRESHOLD_TIME: UInt = 60u
         private const val BURST_TIME: UInt = 40u
 
+        //nbt keys
         private const val POWER_KEY = "power"
         private const val THRESHOLD_KEY = "threshold_time"
-        private const val BURST_KEY = "burst_time"
+        private const val PRODUCING_BURST_KEY = "producing_time"
+        private const val PUSHING_BURST_KEY = "pushing_time"
     }
 
     //temperature fields
@@ -42,7 +45,8 @@ class SbgTileEntity: TileEntity(), Producer, Holder, ITickable {
 
     //timer fields
     private var threshold: UInt = THRESHOLD_TIME
-    private var burstTimer: UInt = BURST_TIME
+    private var producingBurst: UInt = BURST_TIME
+    private var pushingBurst: UInt = BURST_TIME
 
     //power fields
     private var powerProduced: ULong = 0uL
@@ -59,12 +63,8 @@ class SbgTileEntity: TileEntity(), Producer, Holder, ITickable {
     override fun update() {
         if (this.world.isRemote) return
 
-        if (this.effectiveness > 0.0) {
-            if (this.threshold > 0u) --this.threshold
-            else if (this.storedPower < MAX_CAPACITY) {
-                this.generatePower()
-            }
-        }
+        this.generatePower()
+        this.pushPower()
     }
 
     /**
@@ -72,35 +72,57 @@ class SbgTileEntity: TileEntity(), Producer, Holder, ITickable {
      * Ampere gets generated every [BURST_TIME] but in an amount that equals generation every tick.
      */
     private fun generatePower() {
-        val nextPowerProduced = this.tempDifference.toDouble() * 0.005 * this.effectiveness * POWER_MULTIPLIER
+        if (this.effectiveness > 0.0) {
+            if (this.threshold > 0u) --this.threshold
+            else if (this.storedPower < MAX_CAPACITY) {
+                val nextPowerProduced = this.tempDifference.toDouble() * 0.001 * this.effectiveness * POWER_MULTIPLIER
 
-        //is outside the (below) if statement to always show the correct value and not only update every two seconds
-        this.powerProduced = nextPowerProduced.roundToInt().toULong()
+                //is outside the (below) if statement to always show the correct value and not only update every two seconds
+                this.powerProduced = nextPowerProduced.roundToInt().toULong()
 
-        if (--this.burstTimer == 0u) {
-            //if an increase of the stored power by the nextPowerProduced value would be greater than the max capacity
-            //the storedPower gets set to the max value
-            ((nextPowerProduced * BURST_TIME.toDouble()).roundToInt().toULong()).let {
-                if (this.powerStored + it > MAX_CAPACITY) {
-                    this.powerStored = MAX_CAPACITY
-                    this.powerProduced = 0uL
-                } else this.powerStored += it
+                if (--this.producingBurst == 0u) {
+                    //if an increase of the stored power by the nextPowerProduced value would be greater than the max capacity
+                    //the storedPower gets set to the max value
+                    ((nextPowerProduced * BURST_TIME.toDouble()).roundToInt().toULong()).let {
+                        if (this.powerStored + it > MAX_CAPACITY) {
+                            this.powerStored = MAX_CAPACITY
+                            this.powerProduced = 0uL
+                        } else this.powerStored += it
+                    }
+                    this.producingBurst = BURST_TIME
+                }
             }
-            this.burstTimer = BURST_TIME
+        }
+    }
+
+    /**
+     * Tries to push power to a (on the top located) consumer. Pushed every [BURST_TIME] but in an amount that equals
+     * pushing every tick. How much gets pushed is based on [TRANSFER_RATE]
+     */
+    private fun pushPower() {
+        if (--this.pushingBurst == 0u) {
+            if (this.storedPower >= TRANSFER_RATE * BURST_TIME) {
+                this.world.getTileEntity(this.pos.up())?.getCapability(consumerCapability, EnumFacing.DOWN)?.let {
+                    this.powerStored -= it.tryAccept(TRANSFER_RATE * BURST_TIME, Direction.DOWN)
+                }
+            }
+            this.pushingBurst = BURST_TIME
         }
     }
 
     override fun readFromNBT(compound: NBTTagCompound) {
         this.powerStored = compound.getLong(POWER_KEY).toULong()
         this.threshold = compound.getInteger(THRESHOLD_KEY).toUInt()
-        this.burstTimer = compound.getInteger(BURST_KEY).toUInt()
+        this.producingBurst = compound.getInteger(PRODUCING_BURST_KEY).toUInt()
+        this.pushingBurst = compound.getInteger(PUSHING_BURST_KEY).toUInt()
         super.readFromNBT(compound)
     }
 
     override fun writeToNBT(compound: NBTTagCompound): NBTTagCompound {
         compound.setLong(POWER_KEY, this.powerStored.toLong())
         compound.setInteger(THRESHOLD_KEY, this.threshold.toInt())
-        compound.setInteger(BURST_KEY, this.burstTimer.toInt())
+        compound.setInteger(PRODUCING_BURST_KEY, this.producingBurst.toInt())
+        compound.setInteger(PUSHING_BURST_KEY, this.pushingBurst.toInt())
         return super.writeToNBT(compound)
     }
 
@@ -150,13 +172,11 @@ class SbgTileEntity: TileEntity(), Producer, Holder, ITickable {
         this.effectiveness = 1.0 - 0.2 * (heatSources - coolants * 2).let { if (it >= 0) it else if (coolants == 5) 5 else 0 }
         if (this.effectiveness == 0.0) {
             this.powerProduced = 0uL
-            this.burstTimer = BURST_TIME
+            this.producingBurst = BURST_TIME
         }
 
         //every time a block gets changed the sbg needs a short amount of time to restart
         this.threshold = THRESHOLD_TIME
-
-        L(MOD_ID,"SbgTE").info("tempDifference = $tempDifference | effectiveness = $effectiveness | heatSources = $heatSources | coolants = §coolants")
     }
 
     /**
