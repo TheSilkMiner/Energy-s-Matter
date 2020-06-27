@@ -22,6 +22,6 @@ internal object TileEntityRegistration {
     fun onBlockRegistration(e: RegistryEvent.Register<Block>) {
         l.info("Hijacking block registry event for tile entity registration")
         GameRegistry.registerTileEntity(MadTileEntity::class.java, ResourceLocation(MOD_ID, "molecular_assembler_device"))
-        GameRegistry.registerTileEntity( SbgTileEntity::class.java , ResourceLocation( MOD_ID , "seebeck_generator" ) )
+        GameRegistry.registerTileEntity(SbgTileEntity::class.java, ResourceLocation(MOD_ID, "seebeck_generator"))
     }
 }

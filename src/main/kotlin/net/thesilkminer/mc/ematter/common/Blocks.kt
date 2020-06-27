@@ -19,8 +19,8 @@ internal object Blocks {
         MadBlock().setCreativeTab(mainItemGroup).setTranslationKey("ematter.molecular_assembler_device").setHardness(8.0F).apply { this.setHarvestLevel("pickaxe", 2) }
     }
     //I guess that's how one is supposed to do it? At least it works :)
-    val seebeckGenerator = register( "seebeck_generator" ) {
-        SbgBlock().setCreativeTab( mainItemGroup ).setTranslationKey( "ematter.seebeck_generator" ).setHardness( 8.0F ).apply { this.setHarvestLevel( "pickaxe" , 2 ) }
+    val seebeckGenerator = register("seebeck_generator") {
+        SbgBlock().setCreativeTab(mainItemGroup).setTranslationKey("ematter.seebeck_generator").setHardness(8.0F).apply { this.setHarvestLevel("pickaxe", 2) }
     }
 }
 
