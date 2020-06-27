@@ -17,6 +17,7 @@ import net.thesilkminer.mc.ematter.common.attachBlocksListener
 import net.thesilkminer.mc.ematter.common.attachItemsListener
 import net.thesilkminer.mc.ematter.common.recipe.mad.capability.MadRecipeCapabilityHandler
 import net.thesilkminer.mc.ematter.common.recipe.mad.step.attachSteppingFunctionListener
+import net.thesilkminer.mc.ematter.compatibility.CompatibilityProviderHandler
 
 @Mod(modid = MOD_ID, name = MOD_NAME, version = MOD_VERSION, dependencies = MOD_DEPENDENCIES,
         acceptedMinecraftVersions = MOD_MC_VERSION, certificateFingerprint = MOD_CERTIFICATE_FINGERPRINT,
@@ -33,6 +34,7 @@ object EnergyIsMatter {
             attachItemsListener(it)
             attachSteppingFunctionListener(it)
             it.register(TileEntityRegistration)
+            it.register(CompatibilityProviderHandler)
         }
     }
 
