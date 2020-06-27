@@ -12,7 +12,7 @@ import net.thesilkminer.mc.ematter.MOD_ID
 import net.thesilkminer.mc.ematter.common.feature.mad.MadBlock
 
 private val blockList = mutableListOf<RegistryObject<out Block>>()
-private val blockRegistry = DeferredRegister(ForgeRegistries.BLOCKS, MOD_ID)
+private val blockRegistry = DeferredRegister(MOD_ID, ForgeRegistries.BLOCKS)
 
 internal object Blocks {
     val molecularAssemblerDevice = register("molecular_assembler_device") {
@@ -20,7 +20,7 @@ internal object Blocks {
     }
 }
 
-internal fun attachBlocksListener(bus: EventBus) = blockRegistry.subscribeOnto(bus)
+internal fun attachBlocksListener(bus: EventBus) = blockRegistry.subscribeOnto(bus).also { Blocks.toString() } // Statically initialize blocks
 internal val blocks get() = blockList.toList()
 
 private fun <T : Block> register(name: String, supplier: () -> T) = blockRegistry.register(name, supplier).also { blockList += it }

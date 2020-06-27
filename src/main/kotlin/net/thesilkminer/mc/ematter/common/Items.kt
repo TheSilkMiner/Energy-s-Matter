@@ -16,7 +16,7 @@ import net.thesilkminer.mc.ematter.common.feature.mad.MadTier
 private val customItemBlocks = listOf<RegistryObject<out Block>>(Blocks.molecularAssemblerDevice)
 
 private val itemList = mutableListOf<RegistryObject<out Item>>()
-private val itemRegistry = DeferredRegister(ForgeRegistries.ITEMS, MOD_ID).also { registerItemBlocks(it) }
+private val itemRegistry = DeferredRegister(MOD_ID, ForgeRegistries.ITEMS).also { registerItemBlocks(it) }
 
 internal object Items
 
@@ -26,7 +26,7 @@ internal object ItemBlocks {
     }
 }
 
-internal fun attachItemsListener(bus: EventBus) = itemRegistry.subscribeOnto(bus)
+internal fun attachItemsListener(bus: EventBus) = itemRegistry.subscribeOnto(bus).also { sequenceOf(Items, ItemBlocks).forEach { it.toString() } } // Statically initialize items
 internal val items get() = itemList.toList()
 
 private fun <T : Item> register(name: String, supplier: () -> T) = register(itemRegistry, name, supplier)
