@@ -1,6 +1,6 @@
 @file:JvmName("CE")
 
-package net.thesilkminer.mc.ematter.common
+package net.thesilkminer.mc.ematter.common.shared
 
 import net.minecraft.inventory.IInventory
 import net.minecraft.inventory.Slot
