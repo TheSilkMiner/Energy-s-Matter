@@ -32,6 +32,7 @@ internal const val MOD_NAME = "Energy's Matter"
 internal const val MOD_VERSION = "@ENERGY_IS_MATTER_VERSION@"
 internal const val MOD_MC_VERSION = "1.12.2"
 internal const val MOD_CERTIFICATE_FINGERPRINT = "@FINGERPRINT@"
+internal const val MOD_CHANNEL_ID = MOD_ID
 
 internal const val MOD_DEPENDENCIES = "required-after:forge@[14.23.5.2768,);" +
         "required-after:$BOSON" /*+ "@[@BOSON_VERSION@,)"*/

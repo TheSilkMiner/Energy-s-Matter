@@ -2,6 +2,7 @@ package net.thesilkminer.mc.ematter.common.recipe.mad.capability
 
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraft.nbt.NBTBase
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
@@ -15,6 +16,10 @@ import net.minecraftforge.event.entity.player.PlayerEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.thesilkminer.kotlin.commons.lang.uncheckedCast
 import net.thesilkminer.mc.ematter.MOD_ID
+import net.thesilkminer.mc.ematter.common.feature.mad.MadContainer
+import net.thesilkminer.mc.ematter.common.network.mad.MadRecipeCapabilitySyncPacket
+import net.thesilkminer.mc.ematter.common.network.sendPacket
+import net.thesilkminer.mc.ematter.common.shared.CraftingInventoryWrapper
 
 internal object MadRecipeCapabilityHandler {
     private class MadRecipeCapabilityPlayerProvider : ICapabilityProvider, ICapabilitySerializable<NBTTagCompound> {
@@ -65,18 +70,33 @@ internal object MadRecipeCapabilityHandler {
     @SubscribeEvent
     @Suppress("unused")
     fun onPlayerLoggedIn(event: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent) {
-        print("Send packet to sync capabilities")
+        this.syncCapabilities(event.player)
     }
 
     @SubscribeEvent
     @Suppress("unused")
     fun onPlayerChangedDimension(event: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent) {
-        print("Send packet to sync capabilities")
+        this.syncCapabilities(event.player)
     }
 
     @SubscribeEvent
     @Suppress("unused")
     fun onPlayerRespawn(event: net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent) {
-        print("Send packet to sync capabilities")
+        this.syncCapabilities(event.player)
+    }
+
+    @SubscribeEvent
+    @Suppress("unused")
+    fun onItemCrafted(event: net.minecraftforge.fml.common.gameevent.PlayerEvent.ItemCraftedEvent) {
+        // The below explicit equality is needed due to nullable checks being in place
+        if (event.craftMatrix?.let { it !is CraftingInventoryWrapper || it.containerClass != MadContainer::class } == true) return
+        this.syncCapabilities(event.player)
+    }
+
+    private fun syncCapabilities(player: EntityPlayer) {
+        if (player !is EntityPlayerMP) return
+        val cap = player.getCapability(craftedMadRecipesAmountCapability, null) ?: return
+        val compound = cap.serializeNBT()
+        player.sendPacket(MadRecipeCapabilitySyncPacket(compound))
     }
 }
