@@ -15,8 +15,9 @@ import net.minecraft.item.crafting.CraftingManager
 import net.minecraft.item.crafting.IRecipe
 import net.minecraft.network.play.server.SPacketSetSlot
 import net.minecraft.world.World
-import net.thesilkminer.mc.ematter.common.bindPlayerInventory
+import net.thesilkminer.mc.ematter.common.shared.bindPlayerInventory
 import net.thesilkminer.mc.ematter.common.recipe.mad.MadRecipe
+import net.thesilkminer.mc.ematter.common.recipe.mad.capability.craftedMadRecipesAmountCapability
 import net.thesilkminer.mc.ematter.common.shared.CraftingInventoryWrapper
 
 internal class MadContainer(private val te: MadTileEntity, private val playerInventory: InventoryPlayer) : Container() {
@@ -28,7 +29,12 @@ internal class MadContainer(private val te: MadTileEntity, private val playerInv
     private class PoweredCraftingSlot(private val te: MadTileEntity, private val recipe: () -> IRecipe?, private val player: EntityPlayer, matrix: InventoryCrafting,
                                       craftResult: InventoryCraftResult, index: Int, x: Int, y: Int) : SlotCrafting(player, matrix, craftResult, index, x, y) {
         @Suppress("EXPERIMENTAL_API_USAGE")
-        override fun canTakeStack(playerIn: EntityPlayer) = this.recipe().let { it != null && (it !is MadRecipe || it.getPowerRequiredFor(player) <= this.te.storedPower) }
+        override fun canTakeStack(playerIn: EntityPlayer) = this.recipe().let { it != null && (it !is MadRecipe || it.getPowerRequiredFor(this.player) <= this.te.storedPower) }
+
+        override fun onCrafting(stack: ItemStack) {
+            (this.inventory as? InventoryCraftResult)?.recipeUsed?.let { this.player.getCapability(craftedMadRecipesAmountCapability, null)!!.increaseAmountFor(it) }
+            super.onCrafting(stack)
+        }
     }
 
     private val craftingMatrix = CraftingInventoryWrapper(MadContainer::class, this, this.te.inventory, 5, 5)
@@ -38,6 +44,8 @@ internal class MadContainer(private val te: MadTileEntity, private val playerInv
 
     private val foundRecipes = mutableListOf<IRecipe>()
     private var currentMain = 0
+
+    internal val currentRecipe get() = this.foundRecipes.getOrNull(0)
 
     init {
         this.addSlotToContainer(PoweredCraftingSlot(this.te, { this.foundRecipes.getOrElse(0) { null } }, playerInventory.player, this.craftingMatrix,
@@ -71,7 +79,7 @@ internal class MadContainer(private val te: MadTileEntity, private val playerInv
 
             stack = when (index) {
                 0 -> this.transferCraftingStack(playerIn, stack, stackInSlot, slot)
-                1, 2 -> ItemStack.EMPTY
+                1, 2 -> null
                 in 3..27 -> this.transferMatrixStack( stack, stackInSlot)
                 in 28..54 -> this.transferInventoryStack( stack, stackInSlot)
                 in 55..63 -> this.transferHotStack(stack, stackInSlot)

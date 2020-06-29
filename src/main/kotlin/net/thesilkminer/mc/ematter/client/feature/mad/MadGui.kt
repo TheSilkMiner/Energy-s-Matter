@@ -5,6 +5,7 @@ import net.minecraft.client.gui.GuiButtonImage
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.InventoryPlayer
+import net.minecraft.item.crafting.IRecipe
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.common.MinecraftForge
@@ -13,12 +14,16 @@ import net.thesilkminer.mc.boson.prefab.energy.toUserFriendlyAmount
 import net.thesilkminer.mc.ematter.MOD_ID
 import net.thesilkminer.mc.ematter.common.feature.mad.MadContainer
 import net.thesilkminer.mc.ematter.common.feature.mad.MadTileEntity
+import net.thesilkminer.mc.ematter.common.recipe.mad.MadRecipe
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 internal class MadGui(private val te: MadTileEntity, playerInventory: InventoryPlayer) : GuiContainer(MadContainer(te, playerInventory)) {
     private companion object {
         private val BACKGROUND = ResourceLocation(MOD_ID, "textures/gui/container/molecular_assembler_device.png")
     }
+
+    private val container get() = this.inventorySlots!! as MadContainer
 
     init {
         this.xSize = 182
@@ -48,23 +53,63 @@ internal class MadGui(private val te: MadTileEntity, playerInventory: InventoryP
         this.setRecipeChangeButtonStatus()
     }
 
+    @Suppress("EXPERIMENTAL_API_USAGE")
     private fun renderPowerBar() {
-        @Suppress("EXPERIMENTAL_API_USAGE") val actualSize = this.te.storedPower.toDouble() * 79.0 / this.te.maximumCapacity.toDouble()
+        this.renderNeededPowerBar()
+
+        if (this.container.currentRecipe.power > this.te.maximumCapacity) return
+
+        this.renderActualPowerBar()
+        this.renderCurrentStatusPowerBar()
+    }
+
+    @Suppress("EXPERIMENTAL_API_USAGE")
+    private fun renderNeededPowerBar() {
+        val hasEnough = this.container.currentRecipe.power <= this.te.maximumCapacity
+
+        GlStateManager.color(if (hasEnough) 0.8F else 1.0F, 0.0F, 0.0F, 1.0F)
+
+        val actualSize = min(this.container.currentRecipe.power, this.te.maximumCapacity).toDouble() * 79.0 / this.te.maximumCapacity.toDouble()
         val adjusted = actualSize.roundToInt()
         val xBegin = this.guiLeft + 91 - adjusted
-        val xEnd = this.guiLeft + 92 + adjusted
-        this.drawTexturedModalRect(xBegin, this.guiTop + 146, xBegin, 251, xEnd - xBegin, 3)
-        this.drawTexturedModalRect(xBegin + 1, this.guiTop + 146, xBegin + 1, 248, xEnd - xBegin - 2, 3)
+        val xEnd = this.guiLeft + 91 + adjusted
+
+        val times = if (hasEnough) 1 else 3
+        (0 until times).forEach { _ -> this.drawTexturedModalRect(xBegin, this.guiTop + 146, xBegin - this.guiLeft, 245, xEnd - xBegin, 3) }
+
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F)
+    }
+
+    @Suppress("EXPERIMENTAL_API_USAGE")
+    private fun renderActualPowerBar() {
+        val actualSize = this.te.storedPower.toDouble() * 79.0 / this.te.maximumCapacity.toDouble()
+        val adjusted = actualSize.roundToInt()
+        val xBegin = this.guiLeft + 91 - adjusted
+        val xEnd = this.guiLeft + 91 + adjusted
+        this.drawTexturedModalRect(xBegin, this.guiTop + 146, xBegin - this.guiLeft, 251, xEnd - xBegin, 3)
+        this.drawTexturedModalRect(xBegin + 1, this.guiTop + 146, xBegin - this.guiLeft, 248, xEnd - xBegin - 1, 3)
+    }
+
+    @Suppress("EXPERIMENTAL_API_USAGE")
+    private fun renderCurrentStatusPowerBar() {
+        GlStateManager.color(0.0F, 0.8F, 0.0F, 1.0F)
+
+        val targetPower = min(this.container.currentRecipe.power, this.te.storedPower)
+        val actualSize = targetPower.toDouble() * 79.0 / this.te.maximumCapacity.toDouble()
+        val adjusted = actualSize.roundToInt()
+        val xBegin = this.guiLeft + 91 - adjusted
+        val xEnd = this.guiLeft + 91 + adjusted
+        this.drawTexturedModalRect(xBegin, this.guiTop + 146, xBegin - this.guiLeft, 245, xEnd - xBegin, 3)
+
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F)
     }
 
     private fun setRecipeChangeButtonStatus() {
-        (this.inventorySlots!! as MadContainer).let { container ->
-            container.alternativeCraftResultLeft.getStackInSlot(0).let { left ->
-                this.buttonList.first { it.id == 41 }.visible = !left.isEmpty
-            }
-            container.alternativeCraftResultRight.getStackInSlot(0).let { right ->
-                this.buttonList.first { it.id == 43 }.visible = !right.isEmpty
-            }
+        this.container.alternativeCraftResultLeft.getStackInSlot(0).let { left ->
+            this.buttonList.first { it.id == 41 }.visible = !left.isEmpty
+        }
+        this.container.alternativeCraftResultRight.getStackInSlot(0).let { right ->
+            this.buttonList.first { it.id == 43 }.visible = !right.isEmpty
         }
     }
 
@@ -84,8 +129,11 @@ internal class MadGui(private val te: MadTileEntity, playerInventory: InventoryP
 
     // TODO("Send a packet from client to server to perform the operation")
     override fun actionPerformed(button: GuiButton) = when (button.id) {
-        41 -> (this.inventorySlots!! as MadContainer).switchToNextRecipe()
-        43 -> (this.inventorySlots!! as MadContainer).apply { this.switchToNextRecipe() }.switchToNextRecipe()
+        41 -> Unit //this.container.switchToNextRecipe()
+        43 -> Unit // this.container.apply { this.switchToNextRecipe() }.switchToNextRecipe()
         else -> Unit
     }
+
+    @Suppress("EXPERIMENTAL_API_USAGE") // TODO("It does not make sense to get data from the client player")
+    private val IRecipe?.power get() = if (this is MadRecipe) this.getPowerRequiredFor(this@MadGui.mc.player) else 0.toULong()
 }

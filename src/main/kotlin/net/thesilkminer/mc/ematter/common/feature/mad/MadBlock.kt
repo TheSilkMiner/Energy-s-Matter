@@ -19,7 +19,7 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.world.IBlockAccess
 import net.minecraft.world.World
 import net.thesilkminer.mc.ematter.EnergyIsMatter
-import net.thesilkminer.mc.ematter.GuiHandler
+import net.thesilkminer.mc.ematter.common.network.GuiHandler
 
 internal class MadBlock : Block(Material.IRON) {
     internal companion object {
