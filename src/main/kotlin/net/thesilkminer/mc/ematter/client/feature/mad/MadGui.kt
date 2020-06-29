@@ -14,6 +14,8 @@ import net.thesilkminer.mc.boson.prefab.energy.toUserFriendlyAmount
 import net.thesilkminer.mc.ematter.MOD_ID
 import net.thesilkminer.mc.ematter.common.feature.mad.MadContainer
 import net.thesilkminer.mc.ematter.common.feature.mad.MadTileEntity
+import net.thesilkminer.mc.ematter.common.network.mad.MadRecipeSwitchButtonClickPacket
+import net.thesilkminer.mc.ematter.common.network.sendToServer
 import net.thesilkminer.mc.ematter.common.recipe.mad.MadRecipe
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -127,13 +129,11 @@ internal class MadGui(private val te: MadTileEntity, playerInventory: InventoryP
         }
     }
 
-    // TODO("Send a packet from client to server to perform the operation")
     override fun actionPerformed(button: GuiButton) = when (button.id) {
-        41 -> Unit //this.container.switchToNextRecipe()
-        43 -> Unit // this.container.apply { this.switchToNextRecipe() }.switchToNextRecipe()
+        41, 43 -> MadRecipeSwitchButtonClickPacket(if (button.id == 43) 1 else 0).sendToServer()
         else -> Unit
     }
 
-    @Suppress("EXPERIMENTAL_API_USAGE") // TODO("It does not make sense to get data from the client player")
+    @Suppress("EXPERIMENTAL_API_USAGE") // Note we are taking data from the client rather than the server: this means that the cap has to always be in sync
     private val IRecipe?.power get() = if (this is MadRecipe) this.getPowerRequiredFor(this@MadGui.mc.player) else 0.toULong()
 }
