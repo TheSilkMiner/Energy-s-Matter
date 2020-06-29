@@ -15,6 +15,8 @@ import net.thesilkminer.mc.ematter.client.SidedEventHandler
 import net.thesilkminer.mc.ematter.common.TileEntityRegistration
 import net.thesilkminer.mc.ematter.common.attachBlocksListener
 import net.thesilkminer.mc.ematter.common.attachItemsListener
+import net.thesilkminer.mc.ematter.common.network.GuiHandler
+import net.thesilkminer.mc.ematter.common.network.setUpNetworkChannel
 import net.thesilkminer.mc.ematter.common.recipe.mad.capability.MadRecipeCapabilityHandler
 import net.thesilkminer.mc.ematter.common.recipe.mad.step.attachSteppingFunctionListener
 import net.thesilkminer.mc.ematter.compatibility.CompatibilityProviderHandler
@@ -51,6 +53,7 @@ object EnergyIsMatter {
     @Mod.EventHandler
     fun onInitialization(e: FMLInitializationEvent) {
         MadRecipeCapabilityHandler.registerCapability()
+        setUpNetworkChannel()
         GuiHandler().register()
     }
 
