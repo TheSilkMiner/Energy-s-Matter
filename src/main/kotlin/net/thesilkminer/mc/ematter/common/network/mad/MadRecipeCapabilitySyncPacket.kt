@@ -38,10 +38,11 @@ internal class MadRecipeCapabilitySyncPacketHandler : IMessageHandler<MadRecipeC
 
         onlyOn(Distribution.CLIENT) {
             {
-                val cap = Minecraft.getMinecraft().player.getCapability(craftedMadRecipesAmountCapability, null)
-                        ?: throw IllegalStateException("Capability was not attached to client player")
-                cap.deserializeNBT(message.tag)
-                println(cap.serializeNBT())
+                Minecraft.getMinecraft().addScheduledTask {
+                    val cap = Minecraft.getMinecraft().player.getCapability(craftedMadRecipesAmountCapability, null)
+                            ?: throw IllegalStateException("Capability was not attached to client player")
+                    cap.deserializeNBT(message.tag)
+                }
             }
         }
 
