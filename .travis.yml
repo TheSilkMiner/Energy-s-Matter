@@ -25,13 +25,13 @@ before_install:
   - chmod +x gradlew
   - ./gradlew
 install:
-  - ./gradlew setupCIWorkspace --stacktrace
+  - ./gradlew setupDecompWorkspace --stacktrace
 
 before_script:
   - 'echo "Build-testing commit $TRAVIS_BRANCH / $TRAVIS_COMMIT"'
   - 'if [ "$TRAVIS_PULL_REQUEST" -ne "false" ]; then echo "PR being tested: $TRAVIS_PULL_REQUEST"; else echo "No PR being tested"; fi'
   - 'echo "Current build id: $TRAVIS_BUILD_ID"'
 script:
-  - ./gradlew build --stacktrace
   - ./gradlew check --info --stacktrace
   - ./gradlew test --stacktrace
+  - ./gradlew build --stacktrace
