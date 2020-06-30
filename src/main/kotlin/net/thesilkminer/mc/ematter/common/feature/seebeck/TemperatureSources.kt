@@ -1,12 +1,11 @@
-package net.thesilkminer.mc.ematter.common.feature.sbg
+package net.thesilkminer.mc.ematter.common.feature.seebeck
 
 import net.minecraft.block.Block
 import net.minecraft.init.Blocks
 
-//this is more or less temporary until there is a better solution for this
-//also: I guess this is the right folder for this?
 @Suppress("EXPERIMENTAL_API_USAGE", "EXPERIMENTAL_UNSIGNED_LITERALS")
 internal enum class TemperatureSources(val block: Block, val value: Int) {
+    // TODO("Move to temperature tables")
 
     //coolants
     WATER(Blocks.WATER, 280),

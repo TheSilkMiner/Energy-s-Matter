@@ -9,18 +9,18 @@ import net.thesilkminer.mc.boson.api.registry.DeferredRegister
 import net.thesilkminer.mc.boson.api.registry.RegistryObject
 import net.thesilkminer.mc.ematter.MOD_ID
 import net.thesilkminer.mc.ematter.common.feature.mad.MadBlock
-import net.thesilkminer.mc.ematter.common.feature.sbg.SbgBlock
+import net.thesilkminer.mc.ematter.common.feature.seebeck.SeebeckBlock
 
 private val blockList = mutableListOf<RegistryObject<out Block>>()
 private val blockRegistry = DeferredRegister(MOD_ID, ForgeRegistries.BLOCKS)
 
+@Suppress("unused")
 internal object Blocks {
     val molecularAssemblerDevice = register("molecular_assembler_device") {
         MadBlock().setCreativeTab(mainItemGroup).setTranslationKey("ematter.molecular_assembler_device").setHardness(8.0F).apply { this.setHarvestLevel("pickaxe", 2) }
     }
-    //I guess that's how one is supposed to do it? At least it works :)
     val seebeckGenerator = register("seebeck_generator") {
-        SbgBlock().setCreativeTab(mainItemGroup).setTranslationKey("ematter.seebeck_generator").setHardness(8.0F).apply { this.setHarvestLevel("pickaxe", 2) }
+        SeebeckBlock().setCreativeTab(mainItemGroup).setTranslationKey("ematter.seebeck_generator").setHardness(8.0F).apply { this.setHarvestLevel("pickaxe", 2) }
     }
 }
 
