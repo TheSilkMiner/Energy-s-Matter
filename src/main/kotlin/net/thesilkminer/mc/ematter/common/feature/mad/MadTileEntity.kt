@@ -27,13 +27,9 @@ internal class MadTileEntity : TileEntity(), Consumer, Holder {
     }
 
     internal val inventory = object : ItemStackHandler(5 * 5) {
-        override fun onContentsChanged(slot: Int) {
+        override fun onContentsChanged(slot: Int) = this@MadTileEntity.andNotify {
             super.onContentsChanged(slot)
             this@MadTileEntity.markDirty()
-
-            with (this@MadTileEntity.world.getBlockState(this@MadTileEntity.pos)) {
-                this@MadTileEntity.world.notifyBlockUpdate(this@MadTileEntity.pos, this, this, Constants.BlockFlags.DEFAULT)
-            }
         }
     }
 
@@ -72,16 +68,16 @@ internal class MadTileEntity : TileEntity(), Consumer, Holder {
             this.world.getTileEntity(this.pos) === this && player.getDistanceSq(this.pos.add(0.5, 0.5, 0.5)) <=64.0
 
     @ExperimentalUnsignedTypes
-    override fun tryAccept(power: ULong, from: Direction): ULong {
-        if (from != Direction.DOWN) return 0UL
+    override fun tryAccept(power: ULong, from: Direction) = this.andNotify {
+        if (from != Direction.DOWN) return@andNotify 0UL
         val after = this.currentPower + power
         if (after <= this.maxPower) {
             this.currentPower = after
-            return power
+            return@andNotify power
         }
         val diff = after - this.maxPower
         this.currentPower = this.maxPower
-        return power - diff
+        return@andNotify power - diff
     }
 
     override fun readFromNBT(compound: NBTTagCompound) {
@@ -92,13 +88,24 @@ internal class MadTileEntity : TileEntity(), Consumer, Holder {
 
     override fun writeToNBT(compound: NBTTagCompound): NBTTagCompound {
         super.writeToNBT(compound)
-        compound.setLong(POWER_KEY, this@MadTileEntity.currentPower.toLong())
-        compound.setTag(INVENTORY_KEY, this@MadTileEntity.inventory.serializeNBT())
+        compound.setLong(POWER_KEY, this.currentPower.toLong())
+        compound.setTag(INVENTORY_KEY, this.inventory.serializeNBT())
         return compound
     }
 
-    override fun getUpdateTag(): NBTTagCompound = NBTTagCompound().apply { this.setTag(INVENTORY_KEY, this@MadTileEntity.inventory.serializeNBT()) }
-    override fun handleUpdateTag(tag: NBTTagCompound) = this.inventory.deserializeNBT(tag.getCompoundTag(INVENTORY_KEY))
+    override fun getUpdateTag(): NBTTagCompound = NBTTagCompound().apply {
+        this.setLong(POWER_KEY, this@MadTileEntity.currentPower.toLong())
+        this.setTag(INVENTORY_KEY, this@MadTileEntity.inventory.serializeNBT())
+    }
+
+    override fun handleUpdateTag(tag: NBTTagCompound) {
+        this.currentPower = tag.getLong(POWER_KEY).toULong()
+        this.inventory.deserializeNBT(tag.getCompoundTag(INVENTORY_KEY))
+    }
+
     override fun onDataPacket(net: NetworkManager, pkt: SPacketUpdateTileEntity) = this.handleUpdateTag(pkt.nbtCompound)
     override fun getUpdatePacket() = SPacketUpdateTileEntity(this.pos, -1, this.updateTag)
+
+    private inline fun <T> andNotify(block: () -> T) = block().also { this.markDirty() }.also { this.notifyUpdate() }
+    private fun notifyUpdate() = this.world.getBlockState(this.pos).let { this.world.notifyBlockUpdate(this.pos, it, it, Constants.BlockFlags.DEFAULT) }
 }
