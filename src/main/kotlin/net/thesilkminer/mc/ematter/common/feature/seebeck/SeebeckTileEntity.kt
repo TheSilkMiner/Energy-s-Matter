@@ -24,13 +24,13 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
         private const val MAX_CAPACITY = 3_141UL //same storage the basic mad has
         // TODO("See if the actual capacity should be amped up by a small margin")
 
-        private const val TRANSFER_RATE = 3UL
+        private const val TRANSFER_RATE = 3L
         private const val SEEBECK_CONVERSION_DATA = 0.001
 
         // TODO("move this into a config file")
         private const val POWER_MULTIPLIER = 1.0
-        private const val WARM_UP_TIME = 60U
-        private const val BURST_TIME = 40U
+        private const val WARM_UP_TIME = 60
+        private const val BURST_TIME = 40
 
         private const val NBT_POWER_KEY = "power"
         private const val NBT_THRESHOLD_KEY = "threshold_time"
@@ -69,7 +69,7 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
         if (this.effectiveness <= 0.0) return
 
         // Warmup Time
-        if (this.warmUp > 0U) {
+        if (this.warmUp > 0) {
             --this.warmUp
             return
         }
@@ -82,7 +82,7 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
         this.powerProduced = nextPower.roundToInt().toULong() // This way the value is always updated regardless of burst
 
         --this.producingBurst
-        if (this.producingBurst > 0U) return
+        if (this.producingBurst > 0) return
 
         (nextPower * BURST_TIME.toDouble()).roundToInt().toULong().let {
             if (this.powerStored + it > MAX_CAPACITY) {
@@ -99,13 +99,13 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
     private fun pushPower() {
         // Pushes every burst time the same amount of power that it would be pushed every tick according to transfer rate
         --this.pushingBurst
-        if (this.pushingBurst > 0U) return
+        if (this.pushingBurst > 0) return
 
-        val powerToPush = TRANSFER_RATE * BURST_TIME
+        val powerToPush = (TRANSFER_RATE * BURST_TIME.toLong()).toULong()
         if (this.storedPower < powerToPush) return
 
         this.world.getTileEntity(this.pos.up())?.getCapability(consumerCapability, Direction.DOWN.toFacing())?.let {
-            this.powerStored -= it.tryAccept(TRANSFER_RATE * BURST_TIME, Direction.DOWN)
+            this.powerStored -= it.tryAccept(powerToPush, Direction.DOWN)
         }
         this.pushingBurst = BURST_TIME
     }
@@ -114,18 +114,18 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
     override fun readFromNBT(compound: NBTTagCompound) {
         super.readFromNBT(compound)
         this.powerStored = compound.getLong(NBT_POWER_KEY).toULong()
-        this.warmUp = compound.getInteger(NBT_THRESHOLD_KEY).toUInt()
-        this.producingBurst = compound.getInteger(NBT_PRODUCING_BURST_KEY).toUInt()
-        this.pushingBurst = compound.getInteger(NBT_PUSHING_BURST_KEY).toUInt()
+        this.warmUp = compound.getInteger(NBT_THRESHOLD_KEY)
+        this.producingBurst = compound.getInteger(NBT_PRODUCING_BURST_KEY)
+        this.pushingBurst = compound.getInteger(NBT_PUSHING_BURST_KEY)
     }
 
     // TODO("Do we really need to save the producing and pushing burst values?")
     override fun writeToNBT(compound: NBTTagCompound): NBTTagCompound {
         super.writeToNBT(compound)
         compound.setLong(NBT_POWER_KEY, this.powerStored.toLong())
-        compound.setInteger(NBT_THRESHOLD_KEY, this.warmUp.toInt())
-        compound.setInteger(NBT_PRODUCING_BURST_KEY, this.producingBurst.toInt())
-        compound.setInteger(NBT_PUSHING_BURST_KEY, this.pushingBurst.toInt())
+        compound.setInteger(NBT_THRESHOLD_KEY, this.warmUp)
+        compound.setInteger(NBT_PRODUCING_BURST_KEY, this.producingBurst)
+        compound.setInteger(NBT_PUSHING_BURST_KEY, this.pushingBurst)
         return compound
     }
 
