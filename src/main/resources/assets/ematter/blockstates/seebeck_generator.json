@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "ematter:seebeck_generator"
+    }
+  }
+}
