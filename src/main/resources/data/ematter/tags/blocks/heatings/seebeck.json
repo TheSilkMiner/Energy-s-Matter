@@ -1,0 +1,8 @@
+{
+  "values": [
+    "minecraft:lit_furnace",
+    "minecraft:fire",
+    "#minecraft:lava",
+    "minecraft:magma"
+  ]
+}

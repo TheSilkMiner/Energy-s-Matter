@@ -6,21 +6,27 @@ import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.ITickable
 import net.minecraftforge.common.capabilities.Capability
+import net.thesilkminer.kotlin.commons.lang.reloadableLazy
 import net.thesilkminer.kotlin.commons.lang.uncheckedCast
+import net.thesilkminer.mc.boson.api.bosonApi
 import net.thesilkminer.mc.boson.api.direction.Direction
 import net.thesilkminer.mc.boson.api.energy.Holder
 import net.thesilkminer.mc.boson.api.energy.Producer
+import net.thesilkminer.mc.boson.api.id.NameSpacedString
 import net.thesilkminer.mc.boson.prefab.direction.toFacing
 import net.thesilkminer.mc.boson.prefab.energy.consumerCapability
 import net.thesilkminer.mc.boson.prefab.energy.holderCapability
 import net.thesilkminer.mc.boson.prefab.energy.producerCapability
+import net.thesilkminer.mc.boson.prefab.tag.blockTagType
+import net.thesilkminer.mc.boson.prefab.tag.isInTag
+import net.thesilkminer.mc.ematter.common.temperature.TemperatureContext
+import net.thesilkminer.mc.ematter.common.temperature.TemperatureTableProcessor
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
 @Suppress("EXPERIMENTAL_API_USAGE", "EXPERIMENTAL_OVERRIDE", "EXPERIMENTAL_UNSIGNED_LITERALS")
 internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
     private companion object {
-        private const val ROOM_TEMPERATURE = 295
         private const val MAX_CAPACITY = 3_141UL //same storage the basic mad has
         // TODO("See if the actual capacity should be amped up by a small margin")
 
@@ -36,6 +42,10 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
         private const val NBT_THRESHOLD_KEY = "threshold_time"
         private const val NBT_PRODUCING_BURST_KEY = "producing_time"
         private const val NBT_PUSHING_BURST_KEY = "pushing_time"
+    }
+
+    private var airTemp = reloadableLazy {
+        TemperatureTableProcessor.map[Blocks.AIR]?.invoke(this.world.getBlockState(this.pos), TemperatureContext()) ?: throw Exception("No Temperature Table for ${Blocks.AIR} were found. This shouldn't be possible.")
     }
 
     private var tempDifference = 0U
@@ -160,9 +170,15 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
                 .asSequence()
                 .minus(Direction.UP)
                 .map { this.findNeighborIn(it) }
-                .filter { it.block != Blocks.AIR }
-                .map { (TemperatureSources.values().find { source -> it.block == source.block }?.value ?: ROOM_TEMPERATURE) }
-                .map { it - ROOM_TEMPERATURE }
+                .map {
+                    when {
+                        it isInTag bosonApi.tagRegistry[blockTagType, NameSpacedString("ematter", "coolants/seebeck")] -> it.block
+                        it isInTag bosonApi.tagRegistry[blockTagType, NameSpacedString("ematter", "heatings/seebeck")] -> it.block
+                        else -> Blocks.AIR
+                    }
+                }
+                .map { TemperatureTableProcessor.map[it]?.invoke(this.world.getBlockState(this.pos), TemperatureContext()) ?: this.airTemp.value }
+                .map { it - this.airTemp.value }
                 .filterNot { it == 0 }
                 .onEach { if (it > 0) ++heatSources else ++coolants }
                 .map { abs(it).toUInt() }
