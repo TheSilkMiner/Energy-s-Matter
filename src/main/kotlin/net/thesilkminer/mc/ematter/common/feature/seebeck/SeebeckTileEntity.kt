@@ -169,6 +169,9 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
         var heatSources = 0
         var coolants = 0
 
+        // Run recalculation prior to usage, otherwise this is pretty stupid
+        this.airTemperature.reload()
+
         this.tempDifference = Direction.values()
                 .asSequence()
                 .minus(Direction.UP)
@@ -192,9 +195,6 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
 
         // Every time a block gets changed the sbg needs a short amount of time to restart
         this.warmUp = WARM_UP_TIME
-
-        // And also we trigger the recalculation for the default loot table, just in case something happened
-        this.airTemperature.reload()
 
         this.recalculationNeeded = false
     }
