@@ -1,10 +1,12 @@
 package net.thesilkminer.mc.ematter.common.feature.seebeck
 
+import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.ITickable
+import net.minecraft.util.math.BlockPos
 import net.minecraftforge.common.capabilities.Capability
 import net.thesilkminer.kotlin.commons.lang.reloadableLazy
 import net.thesilkminer.kotlin.commons.lang.uncheckedCast
@@ -19,8 +21,9 @@ import net.thesilkminer.mc.boson.prefab.energy.holderCapability
 import net.thesilkminer.mc.boson.prefab.energy.producerCapability
 import net.thesilkminer.mc.boson.prefab.tag.blockTagType
 import net.thesilkminer.mc.boson.prefab.tag.isInTag
+import net.thesilkminer.mc.ematter.MOD_ID
 import net.thesilkminer.mc.ematter.common.temperature.TemperatureContext
-import net.thesilkminer.mc.ematter.common.temperature.TemperatureTableProcessor
+import net.thesilkminer.mc.ematter.common.temperature.TemperatureTables
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -44,9 +47,9 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
         private const val NBT_PUSHING_BURST_KEY = "pushing_time"
     }
 
-    private var airTemp = reloadableLazy {
-        TemperatureTableProcessor.map[Blocks.AIR]?.invoke(this.world.getBlockState(this.pos), TemperatureContext()) ?: throw Exception("No Temperature Table for ${Blocks.AIR} were found. This shouldn't be possible.")
-    }
+    private val airTemperature = reloadableLazy { TemperatureTables[Blocks.AIR](this.pos.createTemperatureContext()) }
+    private val coolants by lazy { bosonApi.tagRegistry[blockTagType, NameSpacedString(MOD_ID, "coolants/seebeck")] }
+    private val heaters by lazy { bosonApi.tagRegistry[blockTagType, NameSpacedString(MOD_ID, "heaters/seebeck")] }
 
     private var tempDifference = 0U
     private var effectiveness = 0.0
@@ -169,16 +172,11 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
         this.tempDifference = Direction.values()
                 .asSequence()
                 .minus(Direction.UP)
-                .map { this.findNeighborIn(it) }
-                .map {
-                    when {
-                        it isInTag bosonApi.tagRegistry[blockTagType, NameSpacedString("ematter", "coolants/seebeck")] -> it.block
-                        it isInTag bosonApi.tagRegistry[blockTagType, NameSpacedString("ematter", "heatings/seebeck")] -> it.block
-                        else -> Blocks.AIR
-                    }
-                }
-                .map { TemperatureTableProcessor.map[it]?.invoke(this.world.getBlockState(this.pos), TemperatureContext()) ?: this.airTemp.value }
-                .map { it - this.airTemp.value }
+                .map { this.pos.offset(it.toFacing()) }
+                .map { this.world.getBlockState(it) to it.createTemperatureContext() }
+                .map { it.first.let { state -> if (state.isRecognized()) state.block else Blocks.AIR } to it.second }
+                .map { TemperatureTables[it.first](it.second) }
+                .map { it - this.airTemperature.value }
                 .filterNot { it == 0 }
                 .onEach { if (it > 0) ++heatSources else ++coolants }
                 .map { abs(it).toUInt() }
@@ -194,8 +192,13 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
 
         // Every time a block gets changed the sbg needs a short amount of time to restart
         this.warmUp = WARM_UP_TIME
+
+        // And also we trigger the recalculation for the default loot table, just in case something happened
+        this.airTemperature.reload()
+
         this.recalculationNeeded = false
     }
 
-    private fun findNeighborIn(direction: Direction) = this.world.getBlockState(this.pos.offset(direction.toFacing()))
+    private fun IBlockState.isRecognized() = this isInTag this@SeebeckTileEntity.coolants || this isInTag this@SeebeckTileEntity.heaters
+    private fun BlockPos.createTemperatureContext() = TemperatureContext(this@SeebeckTileEntity.world, this)
 }
