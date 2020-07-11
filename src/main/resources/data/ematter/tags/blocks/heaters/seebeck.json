@@ -1,0 +1,9 @@
+{
+  "values": [
+    "$minecraft:fire[]",
+    "$minecraft:flowing_lava[]",
+    "$minecraft:lava[]",
+    "$minecraft:lit_furnace[]",
+    "minecraft:magma"
+  ]
+}

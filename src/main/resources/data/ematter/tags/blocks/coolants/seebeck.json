@@ -1,7 +1,10 @@
 {
   "values": [
-    "#minecraft:water",
+    "$minecraft:flowing_water[]",
     "minecraft:ice",
-    "minecraft:packed_ice"
+    "minecraft:packed_ice",
+    "minecraft:snow",
+    "$minecraft:snow_layer[]",
+    "$minecraft:water[]"
   ]
 }
