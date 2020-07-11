@@ -62,17 +62,22 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
     private var powerProduced = 0UL
     private var powerStored = 0UL
 
+    private var currentDayMoment: TemperatureContext.DayMoment = TemperatureContext.DayMoment.DAY
+
     override val producedPower get() = this.powerProduced
     override val storedPower get() = this.powerStored
     override val maximumCapacity get() = MAX_CAPACITY
 
     override fun update() {
         if (this.world.isRemote) return
-        if (this.recalculationNeeded) return this.recalculateNeighbors() // We waste one tick on the recalculation: this is intended
+        if (!this.recalculationNeeded) this.queryWorldTime() // By querying the world time, we check whether we need to recalculate something or not
+        if (this.recalculationNeeded) return this.recalculateData() // We waste one tick on the recalculation: this is intended
 
         this.generatePower()
         this.pushPower()
     }
+
+    private fun queryWorldTime() = if (currentDayMoment != TemperatureContext.DayMoment[this.world.worldTime]) this.requestRecalculation() else Unit
 
     private fun generatePower() {
         // Power is generated every burst time, in an amount that matches the tick rate
@@ -165,11 +170,17 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
      * Recalculates the [tempDifference] and the [effectiveness]. Should be called every time a neighbor changes or the block
      * gets (first) loaded.
      */
-    private fun recalculateNeighbors() {
+    private fun recalculateData() {
         var heatSources = 0
         var coolants = 0
 
-        // Run recalculation prior to usage, otherwise this is pretty stupid
+        val previousDifference = this.tempDifference
+        val previousEffectiveness = this.effectiveness
+
+        // Set the day moment to the correct one
+        this.currentDayMoment = TemperatureContext.DayMoment[this.world.worldTime]
+
+        // Run air recalculation prior to usage, otherwise this is pretty stupid
         this.airTemperature.reload()
 
         this.tempDifference = Direction.values()
@@ -194,11 +205,18 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
         }
 
         // Every time a block gets changed the sbg needs a short amount of time to restart
-        this.warmUp = WARM_UP_TIME
+        // It's also true that the time of day changing really shouldn't affect this
+        // Therefore we consider it a block change if the effectiveness or the temperature difference has changed
+        // The latter in any case, the second only if it's major (>= 15 K)
+        // Only in such a case would the warm-up be reset
+        val hasEffectivenessChanged = abs(this.effectiveness - previousEffectiveness) <= 0.0001
+        val hasTemperatureChanged = abs(previousDifference.toLong() - this.tempDifference.toLong()) < 15L
+        if (hasEffectivenessChanged || hasTemperatureChanged) this.warmUp = WARM_UP_TIME
 
+        // Disable the need for a recalculation
         this.recalculationNeeded = false
     }
 
     private fun IBlockState.isRecognized() = this isInTag this@SeebeckTileEntity.coolants || this isInTag this@SeebeckTileEntity.heaters
-    private fun BlockPos.createTemperatureContext() = TemperatureContext(this@SeebeckTileEntity.world, this)
+    private fun BlockPos.createTemperatureContext() = TemperatureContext(this@SeebeckTileEntity.world, this, this@SeebeckTileEntity.currentDayMoment)
 }
