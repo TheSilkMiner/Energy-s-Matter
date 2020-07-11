@@ -35,6 +35,7 @@ object EnergyIsMatter {
             attachBlocksListener(it)
             attachItemsListener(it)
             attachSteppingFunctionListener(it)
+            attachTemperatureTableConditionSerializersListener(it)
             it.register(TileEntityRegistration)
             it.register(CompatibilityProviderHandler)
         }
@@ -52,9 +53,11 @@ object EnergyIsMatter {
 
     @Mod.EventHandler
     fun onInitialization(e: FMLInitializationEvent) {
+        l.info("Initialization")
         MadRecipeCapabilityHandler.registerCapability()
         setUpNetworkChannel()
         GuiHandler().register()
+        loadTemperatureTables()
     }
 
     @Mod.EventHandler
