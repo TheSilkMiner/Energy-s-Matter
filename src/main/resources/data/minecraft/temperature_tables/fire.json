@@ -1,3 +1,7 @@
 {
-  "temperature": 800
+  "entries": [
+    {
+      "temperature": 800
+    }
+  ]
 }
