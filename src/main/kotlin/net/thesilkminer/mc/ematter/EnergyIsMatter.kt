@@ -52,6 +52,7 @@ object EnergyIsMatter {
             it.register(MadRecipeCapabilityHandler)
             onlyOn(Distribution.CLIENT) { { it.register(SidedEventHandler) } }
         }
+        CompatibilityProviderHandler.firePreInitializationEvent()
     }
 
     @Mod.EventHandler
