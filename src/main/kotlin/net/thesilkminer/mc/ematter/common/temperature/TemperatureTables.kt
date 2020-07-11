@@ -48,10 +48,16 @@ internal object TemperatureTables {
         this.locked = true
     }
 
-    internal operator fun get(block: Block) = this.tables[block] ?: this.tables[Blocks.AIR] ?: this.defaultTable
+    internal operator fun get(block: Block) = this.tables[block] ?: this.warnOnMissing(block)
 
-    internal operator fun set(block: Block, table: (TemperatureContext) -> Int) {
+    internal operator fun set(block: Block, table: (TemperatureContext) -> Kelvin) {
         if (this.locked)  throw IllegalStateException("Unable to modify temperature tables after loading has completed")
         this.tables[block] = table
+    }
+
+    private fun warnOnMissing(block: Block): (TemperatureContext) -> Kelvin {
+        l.warn("The temperature table for '${block}' is currently missing! It will be replaced with air")
+        this.tables[block] = this.tables[Blocks.AIR] ?: this.defaultTable
+        return this.tables.getValue(block)
     }
 }
