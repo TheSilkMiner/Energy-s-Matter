@@ -36,7 +36,7 @@ private val temperatureLoader = loader {
     globalContextBuilder = BaseContextBuilder()
     identifierBuilder = DefaultIdentifierBuilder(removeExtension = true)
     locators {
-        locator { DataPackLikeModContainerLocator(targetDirectory = "temperature_tables")}
+        locator { DataPackLikeModContainerLocator(targetDirectory = "temperature_tables") }
         locator { ResourcesDirectoryLocator(targetDirectory = "temperature_tables") }
     }
     phases {

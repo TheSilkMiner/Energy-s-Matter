@@ -21,7 +21,7 @@ private val crtSteppingFunctionSerializerRegistry = DeferredRegister(CRAFT_TWEAK
 @ExperimentalUnsignedTypes
 @Suppress("unused")
 internal object CraftTweakerSteppingFunctionSerializers {
-    val zs = crtSteppingFunctionSerializerRegistry.register("zenscript") { ZenScriptBasedSteppingFunctionSerializer() }
+    val zs = crtSteppingFunctionSerializerRegistry.register("zenscript", ::ZenScriptBasedSteppingFunctionSerializer)
 }
 
 @ExperimentalUnsignedTypes
@@ -36,7 +36,7 @@ internal class ZenScriptBasedSteppingFunctionSerializer : IForgeRegistryEntry.Im
         if (!json.has("expression")) throw JsonSyntaxException("Missing 'expression': this is required for a ZS-based stepping function")
         val expressionElement = json["expression"]
         val expression = this.findExpression(expressionElement)
-        TODO()
+        return ZenScriptBasedSteppingFunction(expression.compile())
     }
 
     private fun findExpression(json: JsonElement): String =
@@ -45,6 +45,10 @@ internal class ZenScriptBasedSteppingFunctionSerializer : IForgeRegistryEntry.Im
     private fun JsonArray.stringify() = this.asSequence()
             .mapIndexed { index, element -> JsonUtils.getString(element, "$index") }
             .joinToString(separator = "\n")
+
+    private fun String.compile(): Expression {
+        TODO()
+    }
 }
 
 @Suppress("EXPERIMENTAL_API_USAGE")

@@ -16,11 +16,11 @@ private val steppingFunctionSerializersDeferredRegister = DeferredRegister(MOD_I
 @ExperimentalUnsignedTypes
 @Suppress("unused")
 internal object SteppingFunctionSerializers {
-    val constant = steppingFunctionSerializersDeferredRegister.register("constant") { ConstantSteppingFunctionSerializer() }
-    val exponential = steppingFunctionSerializersDeferredRegister.register("exponential") { ExponentialSteppingFunctionSerializer() }
-    val linear = steppingFunctionSerializersDeferredRegister.register("linear") { LinearSteppingFunctionSerializer() }
-    val piecewise = steppingFunctionSerializersDeferredRegister.register("piecewise") { LinearSteppingFunctionSerializer() }
-    val quadratic = steppingFunctionSerializersDeferredRegister.register("quadratic") { QuadraticSteppingFunctionSerializer() }
+    val constant = steppingFunctionSerializersDeferredRegister.register("constant", ::ConstantSteppingFunctionSerializer)
+    val exponential = steppingFunctionSerializersDeferredRegister.register("exponential", ::ExponentialSteppingFunctionSerializer)
+    val linear = steppingFunctionSerializersDeferredRegister.register("linear", ::LinearSteppingFunctionSerializer)
+    val piecewise = steppingFunctionSerializersDeferredRegister.register("piecewise", ::PiecewiseSteppingFunctionSerializer)
+    val quadratic = steppingFunctionSerializersDeferredRegister.register("quadratic", ::QuadraticSteppingFunctionSerializer)
 }
 
 @Suppress("EXPERIMENTAL_API_USAGE")
