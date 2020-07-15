@@ -13,8 +13,16 @@ private val temperatureTableConditionSerializerDeferredRegister =
             this.setMaxID(67_108_863).disableSaving().allowModification()
         }
 
+@Suppress("unused")
 internal object TemperatureTableConditionSerializers {
-
+    val biome = temperatureTableConditionSerializerDeferredRegister.register("biome", ::BiomeConditionSerializer)
+    @Suppress("SpellCheckingInspection")
+    val blockStateProperty = temperatureTableConditionSerializerDeferredRegister.register("blockstate_property", ::BlockStatePropertyConditionSerializer)
+    val dimension = temperatureTableConditionSerializerDeferredRegister.register("dimension", ::DimensionConditionSerializer)
+    val not = temperatureTableConditionSerializerDeferredRegister.register("not", ::NotConditionSerializer)
+    val or = temperatureTableConditionSerializerDeferredRegister.register("or", ::OrConditionSerializer)
+    val position = temperatureTableConditionSerializerDeferredRegister.register("position", ::PositionConditionSerializer)
+    val timeOfDay = temperatureTableConditionSerializerDeferredRegister.register("time_of_day", ::DayTimeConditionSerializer)
 }
 
 internal fun attachTemperatureTableConditionSerializersListener(bus: EventBus) =
