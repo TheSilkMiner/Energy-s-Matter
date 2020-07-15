@@ -48,8 +48,8 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
     }
 
     private val airTemperature = reloadableLazy { TemperatureTables[Blocks.AIR](this.pos.createTemperatureContext()) }
-    private val coolants by lazy { bosonApi.tagRegistry[blockTagType, NameSpacedString(MOD_ID, "coolants/seebeck")] }
-    private val heaters by lazy { bosonApi.tagRegistry[blockTagType, NameSpacedString(MOD_ID, "heaters/seebeck")] }
+    private val coolants by lazy { bosonApi.tagRegistry[blockTagType, NameSpacedString(MOD_ID, "coolants/seebeck_generator")] }
+    private val heaters by lazy { bosonApi.tagRegistry[blockTagType, NameSpacedString(MOD_ID, "heaters/seebeck_generator")] }
 
     private var tempDifference = 0U
     private var effectiveness = 0.0
