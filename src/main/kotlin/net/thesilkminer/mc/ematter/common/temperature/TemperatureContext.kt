@@ -13,7 +13,7 @@ data class TemperatureContext(val world: World, val pos: BlockPos, val dayMoment
 
         companion object {
             private val values = values()
-            internal operator fun get(time: Int) = this.values.first { it.begin <= time && time < it.end }
+            internal operator fun get(time: Int) = (time % DAWN.end).let { modTime -> this.values.first { it.begin <= modTime && modTime < it.end } }
             internal operator fun get(time: Long) = this[time.toInt()]
         }
     }
