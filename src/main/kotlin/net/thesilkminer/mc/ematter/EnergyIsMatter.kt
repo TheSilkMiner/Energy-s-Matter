@@ -53,6 +53,9 @@ object EnergyIsMatter {
             onlyOn(Distribution.CLIENT) { { it.register(SidedEventHandler) } }
         }
         CompatibilityProviderHandler.firePreInitializationEvent()
+        // Since model loading happens between pre-init and init, I'm assuming this is where model loaders
+        // should be registered
+        onlyOn(Distribution.CLIENT) { SidedEventHandler::registerCustomModelLoaders }
     }
 
     @Mod.EventHandler

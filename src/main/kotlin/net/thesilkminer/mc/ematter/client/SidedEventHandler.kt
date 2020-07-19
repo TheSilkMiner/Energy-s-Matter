@@ -7,12 +7,17 @@ import net.minecraftforge.client.event.ModelRegistryEvent
 import net.minecraftforge.client.model.ModelLoader
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.thesilkminer.mc.boson.api.registry.RegistryObject
+import net.thesilkminer.mc.ematter.client.shared.TriangleBasedModelLoader
 import net.thesilkminer.mc.ematter.common.ItemBlocks
 import net.thesilkminer.mc.ematter.common.feature.mad.MadTier
 import net.thesilkminer.mc.ematter.common.items
 
 object SidedEventHandler {
     private val customModelItems = listOf<RegistryObject<out Item>>(ItemBlocks.molecularAssemblerDevice)
+
+    internal fun registerCustomModelLoaders() {
+        TriangleBasedModelLoader().register()
+    }
 
     @SubscribeEvent
     fun onModelRegistration(e: ModelRegistryEvent) {

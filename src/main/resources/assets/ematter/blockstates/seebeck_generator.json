@@ -1,7 +1,14 @@
 {
-  "variants": {
-    "": {
-      "model": "ematter:seebeck_generator"
+  "multipart": [
+    {
+      "apply": {
+        "model": "ematter:seebeck_generator/base"
+      }
+    },
+    {
+      "apply": {
+        "model": "ematter:seebeck_generator/core"
+      }
     }
-  }
+  ]
 }

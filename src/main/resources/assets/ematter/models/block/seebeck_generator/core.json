@@ -1,0 +1,253 @@
+{
+  "loader": "ematter:raw_triangles",
+  "comment": [
+    "We assume it's a tetrahedron with ABCD as a square base resting on the plane, E the vertex of the top pyramid, F the vertex of the bottom one",
+    "A rests on the positive X axis, B on the positive Z axis, C on the negative X axis, D on the negative Z axis",
+    "(In this context, we're assuming Y as the vertical axis, because Minecraft is weird and uses this convention, normally that would be the Z axis)"
+  ],
+  "points": {
+    "A": [
+      0.677,
+      0.5,
+      0.5
+    ],
+    "B": [
+      0.5,
+      0.5,
+      0.677
+    ],
+    "C": [
+      0.323,
+      0.5,
+      0.5
+    ],
+    "D": [
+      0.5,
+      0.5,
+      0.323
+    ],
+    "E": [
+      0.5,
+      0.677,
+      0.5
+    ],
+    "F": [
+      0.5,
+      0.323,
+      0.5
+    ]
+  },
+  "faces": [
+    {
+      "name": "ABE",
+      "vertices": [
+        {
+          "point": "B",
+          "uv": [
+            16,
+            16
+          ]
+        },
+        {
+          "point": "A",
+          "uv": [
+            0,
+            16
+          ]
+        },
+        {
+          "point": "E",
+          "uv": [
+            8,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BCE",
+      "vertices": [
+        {
+          "point": "C",
+          "uv": [
+            16,
+            16
+          ]
+        },
+        {
+          "point": "B",
+          "uv": [
+            0,
+            16
+          ]
+        },
+        {
+          "point": "E",
+          "uv": [
+            8,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CDE",
+      "vertices": [
+        {
+          "point": "D",
+          "uv": [
+            16,
+            16
+          ]
+        },
+        {
+          "point": "C",
+          "uv": [
+            0,
+            16
+          ]
+        },
+        {
+          "point": "E",
+          "uv": [
+            8,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "DAE",
+      "vertices": [
+        {
+          "point": "A",
+          "uv": [
+            16,
+            16
+          ]
+        },
+        {
+          "point": "D",
+          "uv": [
+            0,
+            16
+          ]
+        },
+        {
+          "point": "E",
+          "uv": [
+            8,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ABF",
+      "vertices": [
+        {
+          "point": "A",
+          "uv": [
+            0,
+            16
+          ]
+        },
+        {
+          "point": "B",
+          "uv": [
+            16,
+            16
+          ]
+        },
+        {
+          "point": "F",
+          "uv": [
+            8,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BCF",
+      "vertices": [
+        {
+          "point": "B",
+          "uv": [
+            0,
+            16
+          ]
+        },
+        {
+          "point": "C",
+          "uv": [
+            16,
+            16
+          ]
+        },
+        {
+          "point": "F",
+          "uv": [
+            8,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CDF",
+      "vertices": [
+        {
+          "point": "C",
+          "uv": [
+            0,
+            16
+          ]
+        },
+        {
+          "point": "D",
+          "uv": [
+            16,
+            16
+          ]
+        },
+        {
+          "point": "F",
+          "uv": [
+            8,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "DAF",
+      "vertices": [
+        {
+          "point": "D",
+          "uv": [
+            0,
+            16
+          ]
+        },
+        {
+          "point": "A",
+          "uv": [
+            16,
+            16
+          ]
+        },
+        {
+          "point": "F",
+          "uv": [
+            8,
+            0
+          ]
+        }
+      ]
+    }
+  ],
+  "textures": {
+    "all": "ematter:blocks/seebeck_generator/core"
+  }
+}
