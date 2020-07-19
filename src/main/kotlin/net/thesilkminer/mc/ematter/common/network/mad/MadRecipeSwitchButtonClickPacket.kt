@@ -29,17 +29,19 @@ internal class MadRecipeSwitchButtonClickPacketHandler : IMessageHandler<MadReci
     override fun onMessage(message: MadRecipeSwitchButtonClickPacket, ctx: MessageContext): IMessage? {
         if (ctx.side != Side.SERVER) throw IllegalArgumentException("Expected to receive packet on the server, but instead it was received on the client!")
         if (message.button < 0 || message.button > 1) throw IndexOutOfBoundsException("Button ID was not valid: ${message.button} is not in [0, 2)")
-        val openContainer = ctx.serverHandler.player?.openContainer
-        if (openContainer == null) {
-            l.warn("The player that sent this packet ($message) does not have a container open! This is illegal!")
-            return null
+        ctx.serverHandler.player?.serverWorld?.addScheduledTask {
+            val openContainer = ctx.serverHandler.player?.openContainer
+            if (openContainer == null) {
+                l.warn("The player that sent this packet ($message) does not have a container open! This is illegal!")
+                return@addScheduledTask
+            }
+            if (openContainer !is MadContainer) {
+                l.warn("The container currently open by the player that sent this packet ($message) is not a MAD container! This is illegal!")
+                return@addScheduledTask
+            }
+            val amounts = 1 + message.button.toInt()
+            (0 until amounts).forEach { _ -> openContainer.switchToNextRecipe() }
         }
-        if (openContainer !is MadContainer) {
-            l.warn("The container currently open by the player that sent this packet ($message) is not a MAD container! This is illegal!")
-            return null
-        }
-        val amounts = 1 + message.button.toInt()
-        (0 until amounts).forEach { _ -> openContainer.switchToNextRecipe() }
         return null
     }
 }
