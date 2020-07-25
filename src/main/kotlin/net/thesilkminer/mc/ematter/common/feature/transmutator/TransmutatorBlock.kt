@@ -7,6 +7,7 @@ import net.minecraft.block.state.BlockStateContainer
 import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumHand
 import net.minecraft.util.math.BlockPos
@@ -43,6 +44,9 @@ class TransmutatorBlock : Block(Material.IRON) {
     internal fun getFacing(state: IBlockState): EnumFacing {
         return state.getValue(FACING)
     }
+
+    override fun hasTileEntity(state: IBlockState): Boolean = true
+    override fun createTileEntity(world: World, state: IBlockState): TileEntity? = TransmutatorTileEntity()
 
     override fun createBlockState(): BlockStateContainer = BlockStateContainer(this, FACING)
     override fun getStateForPlacement(world: World, pos: BlockPos, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float,
