@@ -45,7 +45,11 @@ private val customItemBlocks = listOf<RegistryObject<out Block>>(Blocks.molecula
 private val itemList = mutableListOf<RegistryObject<out Item>>()
 private val itemRegistry = DeferredRegister(MOD_ID, ForgeRegistries.ITEMS).also { registerItemBlocks(it) }
 
-internal object Items
+internal object Items {
+    val waste = register("waste") {
+        Item().setCreativeTab(mainItemGroup).setTranslationKey("ematter.waste")
+    }
+}
 
 internal object ItemBlocks {
     val molecularAssemblerDevice = register(Blocks.molecularAssemblerDevice.name.path) {

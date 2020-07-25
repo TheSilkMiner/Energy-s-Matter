@@ -37,6 +37,7 @@ import net.thesilkminer.mc.boson.api.registry.RegistryObject
 import net.thesilkminer.mc.ematter.MOD_ID
 import net.thesilkminer.mc.ematter.common.feature.mad.MadBlock
 import net.thesilkminer.mc.ematter.common.feature.seebeck.SeebeckBlock
+import net.thesilkminer.mc.ematter.common.feature.transmutator.TransmutatorBlock
 
 private val blockList = mutableListOf<RegistryObject<out Block>>()
 private val blockRegistry = DeferredRegister(MOD_ID, ForgeRegistries.BLOCKS)
@@ -48,6 +49,9 @@ internal object Blocks {
     }
     val seebeckGenerator = register("seebeck_generator") {
         SeebeckBlock().setCreativeTab(mainItemGroup).setTranslationKey("ematter.seebeck_generator").setHardness(8.0F).apply { this.setHarvestLevel("pickaxe", 2) }
+    }
+    val molecularTransmutator = register("molecular_transmutator") {
+        TransmutatorBlock().setCreativeTab(mainItemGroup).setTranslationKey("ematter.molecular_transmutator").setHardness(8.0F).apply { this.setHarvestLevel("pickaxe", 2) }
     }
 }
 
