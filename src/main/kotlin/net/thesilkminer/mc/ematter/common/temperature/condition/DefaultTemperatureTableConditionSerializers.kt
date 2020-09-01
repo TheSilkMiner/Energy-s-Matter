@@ -10,7 +10,8 @@ import net.minecraft.block.properties.IProperty
 import net.minecraft.block.state.IBlockState
 import net.minecraft.util.JsonUtils
 import net.minecraft.util.math.BlockPos
-import net.minecraft.world.DimensionType
+import net.minecraft.world.biome.Biome
+import net.minecraftforge.common.BiomeDictionary
 import net.minecraftforge.fml.common.registry.ForgeRegistries
 import net.minecraftforge.registries.IForgeRegistryEntry
 import net.thesilkminer.kotlin.commons.lang.uncheckedCast
@@ -18,6 +19,8 @@ import net.thesilkminer.mc.boson.prefab.naming.toNameSpacedString
 import net.thesilkminer.mc.boson.prefab.naming.toResourceLocation
 import net.thesilkminer.mc.ematter.common.temperature.TemperatureContext
 import java.lang.ClassCastException
+import java.util.Locale
+import kotlin.math.abs
 import kotlin.reflect.full.isSubclassOf
 
 internal class BiomeConditionSerializer : IForgeRegistryEntry.Impl<TemperatureTableConditionSerializer>(), TemperatureTableConditionSerializer {
@@ -29,10 +32,60 @@ internal class BiomeConditionSerializer : IForgeRegistryEntry.Impl<TemperatureTa
     }
 }
 
+internal class BiomeDictionaryTypeConditionSerializer : IForgeRegistryEntry.Impl<TemperatureTableConditionSerializer>(), TemperatureTableConditionSerializer {
+    override fun read(json: JsonObject) = if (json.has("dictionary_types")) this.parseTypes(json) else this.parseType(json)
+
+    private fun parseTypes(json: JsonObject): (TemperatureContext) -> Boolean =
+            JsonUtils.getJsonArray(json, "dictionary_types")
+                    .asSequence()
+                    .mapIndexed { index, element -> JsonUtils.getString(element, "dictionary_types[$index]") }
+                    .map(this::parseType)
+                    .toList()
+                    .let { list -> { context -> list.all { function -> function(context) } } }
+
+    private fun parseType(json: JsonObject): (TemperatureContext) -> Boolean = this.parseType(JsonUtils.getString(json, "dictionary_type"))
+
+    private fun parseType(type: String): (TemperatureContext) -> Boolean {
+        val targetType = BiomeDictionary.Type.getAll().find { it.name.toLowerCase(Locale.ROOT) == type } ?: throw JsonParseException("No such biome type '$type' exists")
+
+        return { targetType in BiomeDictionary.getTypes(it.world.getBiome(it.pos)) }
+    }
+}
+
+internal class BiomePropertiesConditionSerializer : IForgeRegistryEntry.Impl<TemperatureTableConditionSerializer>(), TemperatureTableConditionSerializer {
+    companion object {
+        private val temperatureCategoryByName =
+                mapOf("ocean" to Biome.TempCategory.OCEAN, "warm" to Biome.TempCategory.WARM, "medium" to Biome.TempCategory.MEDIUM, "cold" to Biome.TempCategory.COLD)
+    }
+
+    override fun read(json: JsonObject): (TemperatureContext) -> Boolean {
+        val temperature = if (json.has("base_temperature")) JsonUtils.getFloat(json, "base_temperature") else null
+        val temperatureCategoryName = if (json.has("temperature_category")) JsonUtils.getString(json, "temperature_category") else null
+        val rain = if (json.has("rainfall_level")) JsonUtils.getFloat(json, "rain") else null
+
+        val temperatureCategory = temperatureCategoryName?.let { temperatureCategoryByName[it] }
+
+        if (listOfNotNull(temperature, rain, temperatureCategory).isEmpty()) {
+            throw JsonSyntaxException("You must specify at least one biome parameter between 'base_temperature', 'temperature_category', 'rainfall_level'")
+        }
+
+        return {
+            val biome = it.world.getBiome(it.pos)
+            var isValid = true
+
+            if (temperature != null) isValid = isValid && abs(biome.defaultTemperature - temperature) <= 0.0001 // damn you floating points
+            if (rain != null) isValid = isValid && abs(biome.rainfall - rain) <= 0.0001
+            if (temperatureCategory != null) isValid = isValid && biome.tempCategory == temperatureCategory
+
+            isValid
+        }
+    }
+}
+
 internal class BlockStatePropertyConditionSerializer : IForgeRegistryEntry.Impl<TemperatureTableConditionSerializer>(), TemperatureTableConditionSerializer {
     override fun read(json: JsonObject): (TemperatureContext) -> Boolean {
         val propertyName = JsonUtils.getString(json, "name")
-        val value = json["value"] ?: throw JsonParseException("Expected to find either 'value' or 'values', but instead found nothing")
+        val value = json["value"] ?: throw JsonParseException("Expected to find either 'value', but instead found nothing")
 
         if (value.isJsonObject || value.isJsonNull || value.isJsonArray) throw JsonParseException("Property value must be a primitive")
 
