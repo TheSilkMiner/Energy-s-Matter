@@ -5,6 +5,7 @@ package net.thesilkminer.mc.ematter.common.temperature
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParseException
+import com.google.gson.JsonSyntaxException
 import net.minecraft.util.JsonUtils
 import net.minecraftforge.fml.common.registry.ForgeRegistries
 import net.thesilkminer.mc.boson.api.id.NameSpacedString
@@ -23,6 +24,7 @@ import net.thesilkminer.mc.boson.prefab.loader.preprocessor.CatchingPreprocessor
 import net.thesilkminer.mc.boson.prefab.loader.preprocessor.JsonConverterPreprocessor
 import net.thesilkminer.mc.boson.prefab.loader.processor.CatchingProcessor
 import net.thesilkminer.mc.boson.prefab.loader.progress.ProgressBarVisitor
+import net.thesilkminer.mc.boson.prefab.naming.toNameSpacedString
 import net.thesilkminer.mc.boson.prefab.naming.toResourceLocation
 import net.thesilkminer.mc.ematter.MOD_NAME
 import net.thesilkminer.mc.ematter.common.temperature.condition.get
@@ -69,17 +71,34 @@ private class TemperatureTableProcessor : Processor<JsonObject> {
 
     override fun process(content: JsonObject, identifier: NameSpacedString, globalContext: Context?, phaseContext: Context?) {
         val target = ForgeRegistries.BLOCKS.getValue(identifier.toResourceLocation()) ?: return l.warn("Found temperature table for unrecognized target '$identifier': ignoring")
-        val entries = JsonUtils.getJsonArray(content, "entries")
-        val entryFunctions = entries.asSequence()
-                .mapIndexed { index, entry -> JsonUtils.getJsonObject(entry, "entries[$index]") }
-                .map(this::processEntry)
-                .toList()
-        val temperatureTable = this.merge(entryFunctions)
+
+        val isNormal = content.has("entries")
+        val isRedirect = content.has("from")
+        if (isNormal && isRedirect) throw JsonSyntaxException("Expected either 'entries' or 'from' but got both")
+        if (!isNormal && !isRedirect) throw JsonSyntaxException("Expected either 'entries' or 'from' but got none")
+
+        val temperatureTable = if (isNormal) this.processNormalLootTable(content) else this.processRedirectLootTable(content)
         try {
             TemperatureTables[target] = temperatureTable
         } catch (e: IllegalStateException) {
             throw JsonParseException("Unable to set the parsed temperature table as the temperature table for '$identifier': ${e.message}", e)
         }
+    }
+
+    private fun processNormalLootTable(data: JsonObject): (TemperatureContext) -> Kelvin {
+        val entries = JsonUtils.getJsonArray(data, "entries")
+        val entryFunctions = entries.asSequence()
+                .mapIndexed { index, entry -> JsonUtils.getJsonObject(entry, "entries[$index]") }
+                .map(this::processEntry)
+                .toList()
+        return this.merge(entryFunctions)
+    }
+
+    private fun processRedirectLootTable(data: JsonObject): (TemperatureContext) -> Kelvin {
+        val from = JsonUtils.getString(data, "from").toNameSpacedString()
+        val targetBlock = ForgeRegistries.BLOCKS.getValue(from.toResourceLocation()) ?: throw JsonParseException("Unable to find block '$from'")
+
+        return { TemperatureTables[targetBlock](it) }
     }
 
     private fun processEntry(data: JsonObject): Pair<() -> Int, List<(TemperatureContext) -> Boolean>> {
