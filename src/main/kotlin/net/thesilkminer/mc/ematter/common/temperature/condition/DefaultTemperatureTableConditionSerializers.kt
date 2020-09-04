@@ -18,8 +18,8 @@ import net.thesilkminer.kotlin.commons.lang.uncheckedCast
 import net.thesilkminer.mc.boson.prefab.naming.toNameSpacedString
 import net.thesilkminer.mc.boson.prefab.naming.toResourceLocation
 import net.thesilkminer.mc.ematter.common.temperature.TemperatureContext
-import java.lang.ClassCastException
 import java.util.Locale
+import kotlin.ClassCastException
 import kotlin.math.abs
 import kotlin.reflect.full.isSubclassOf
 
@@ -127,6 +127,10 @@ internal class BlockStatePropertyConditionSerializer : IForgeRegistryEntry.Impl<
 
     private fun checkNumberProperty(state: IBlockState, property: IProperty<*>, value: Number): Boolean {
         if (!property.getValueClass().kotlin.isSubclassOf(Number::class)) this.invalidQuery("numerical", property)
+        return try { this.checkNumberProperty(state, property, value.toInt()) } catch (e: NumberFormatException) { this.invalidQuery("non-integral", property) }
+    }
+
+    private fun checkNumberProperty(state: IBlockState, property: IProperty<*>, value: Int): Boolean {
         val propertyValue = state.getValue(property.toComparable()).uncheckedCast<Comparable<Number>>()
         return this.checkWithCompare(propertyValue, value)
     }
