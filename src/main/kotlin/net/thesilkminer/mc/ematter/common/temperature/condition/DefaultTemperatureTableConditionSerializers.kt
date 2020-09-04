@@ -23,6 +23,18 @@ import java.util.Locale
 import kotlin.math.abs
 import kotlin.reflect.full.isSubclassOf
 
+internal class AndConditionSerializer : IForgeRegistryEntry.Impl<TemperatureTableConditionSerializer>(), TemperatureTableConditionSerializer {
+    override fun read(json: JsonObject): (TemperatureContext) -> Boolean {
+        val conditionsArray = JsonUtils.getJsonArray(json, "conditions")
+        val conditions = conditionsArray.asSequence()
+                .mapIndexed { index, array -> JsonUtils.getJsonObject(array, "conditions[$index]") }
+                .map { temperatureTableConditionSerializerRegistry[it].read(it) }
+                .toList()
+
+        return { conditions.all { condition -> condition(it) } }
+    }
+}
+
 internal class BiomeConditionSerializer : IForgeRegistryEntry.Impl<TemperatureTableConditionSerializer>(), TemperatureTableConditionSerializer {
     override fun read(json: JsonObject): (TemperatureContext) -> Boolean {
         val biomeName = JsonUtils.getString(json, "registry_name")

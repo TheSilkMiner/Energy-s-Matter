@@ -15,6 +15,7 @@ private val temperatureTableConditionSerializerDeferredRegister =
 
 @Suppress("unused")
 internal object TemperatureTableConditionSerializers {
+    val and = temperatureTableConditionSerializerDeferredRegister.register("and", ::AndConditionSerializer)
     val biome = temperatureTableConditionSerializerDeferredRegister.register("biome", ::BiomeConditionSerializer)
     val biomeDictionaryType = temperatureTableConditionSerializerDeferredRegister.register("biome_dictionary_type", ::BiomeDictionaryTypeConditionSerializer)
     val biomeProperties = temperatureTableConditionSerializerDeferredRegister.register("biome_properties", ::BiomePropertiesConditionSerializer)
