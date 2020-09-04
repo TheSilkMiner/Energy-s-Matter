@@ -5,6 +5,10 @@
     "minecraft:packed_ice",
     "minecraft:snow",
     "$minecraft:snow_layer[]",
-    "$minecraft:water[]"
+    "$minecraft:water[]",
+    "$minecraft:fire[]",
+    "$minecraft:flowing_lava[]",
+    "$minecraft:lava[]",
+    "minecraft:magma"
   ]
 }

@@ -48,8 +48,7 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
     }
 
     private val airTemperature = reloadableLazy { TemperatureTables[Blocks.AIR](this.pos.createTemperatureContext()) }
-    private val coolants by lazy { bosonApi.tagRegistry[blockTagType, NameSpacedString(MOD_ID, "coolants/seebeck_generator")] }
-    private val heaters by lazy { bosonApi.tagRegistry[blockTagType, NameSpacedString(MOD_ID, "heaters/seebeck_generator")] }
+    private val sources by lazy { bosonApi.tagRegistry[blockTagType, NameSpacedString(MOD_ID, "seebeck_generator_sources")] }
 
     private var tempDifference = 0U
     private var effectiveness = 0.0
@@ -194,13 +193,13 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
                 .filterNot { it == 0 }
                 .onEach { if (it > 0) ++heatSources else ++coolants }
                 .map { abs(it).toUInt() }
-                .plus(0u)
+                .plus(0U)
                 .reduce { acc, it -> acc + it }
 
         // For every non cooled heat source the effectiveness reduces; if there are 5 heat sources or coolants the effectiveness is 0
         this.effectiveness = 1.0 - 0.2 * (heatSources - coolants * 2).let { if (it >= 0) it else if (coolants == 5) 5 else 0 }
         if (this.effectiveness == 0.0) {
-            this.powerProduced = 0uL
+            this.powerProduced = 0UL
             this.producingBurst = BURST_TIME
         }
 
@@ -217,6 +216,6 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
         this.recalculationNeeded = false
     }
 
-    private fun IBlockState.isRecognized() = this isInTag this@SeebeckTileEntity.coolants || this isInTag this@SeebeckTileEntity.heaters
+    private fun IBlockState.isRecognized() = this isInTag this@SeebeckTileEntity.sources
     private fun BlockPos.createTemperatureContext() = TemperatureContext(this@SeebeckTileEntity.world, this, this@SeebeckTileEntity.currentDayMoment)
 }
