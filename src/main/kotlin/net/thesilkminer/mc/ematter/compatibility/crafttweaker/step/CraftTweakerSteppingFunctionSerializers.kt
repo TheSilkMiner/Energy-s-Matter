@@ -2,9 +2,8 @@
 
 package net.thesilkminer.mc.ematter.compatibility.crafttweaker.step
 
-import com.google.gson.JsonArray
-import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import com.google.gson.JsonParseException
 import com.google.gson.JsonSyntaxException
 import net.minecraft.util.JsonUtils
 import net.minecraftforge.fml.common.eventhandler.EventBus
@@ -13,7 +12,7 @@ import net.thesilkminer.mc.boson.api.modid.CRAFT_TWEAKER_2
 import net.thesilkminer.mc.boson.api.registry.DeferredRegister
 import net.thesilkminer.mc.ematter.common.recipe.mad.step.SteppingFunction
 import net.thesilkminer.mc.ematter.common.recipe.mad.step.SteppingFunctionSerializer
-import stanhebben.zenscript.expression.Expression
+import net.thesilkminer.mc.ematter.compatibility.crafttweaker.compiler.compileFunction
 
 @ExperimentalUnsignedTypes
 private val crtSteppingFunctionSerializerRegistry = DeferredRegister(CRAFT_TWEAKER_2, SteppingFunctionSerializer::class)
@@ -26,28 +25,22 @@ internal object CraftTweakerSteppingFunctionSerializers {
 
 @ExperimentalUnsignedTypes
 internal class ZenScriptBasedSteppingFunctionSerializer : IForgeRegistryEntry.Impl<SteppingFunctionSerializer>(), SteppingFunctionSerializer {
-    private class ZenScriptBasedSteppingFunction(val expression: Expression) : SteppingFunction {
-        override fun getPowerCostAt(x: Long): ULong {
-            TODO("Not yet implemented")
-        }
+    private class ZenScriptBasedSteppingFunction(val expression: (Long) -> ULong) : SteppingFunction {
+        override fun getPowerCostAt(x: Long): ULong = this.expression(x)
     }
 
     override fun read(json: JsonObject): SteppingFunction {
         if (!json.has("expression")) throw JsonSyntaxException("Missing 'expression': this is required for a ZS-based stepping function")
-        val expressionElement = json["expression"]
-        val expression = this.findExpression(expressionElement)
-        return ZenScriptBasedSteppingFunction(expression.compile())
+        val expression = JsonUtils.getString(json, "expression").fixUp()
+        return ZenScriptBasedSteppingFunction(expression.compile().let { function -> { value: Long -> function(value).toULong() } })
     }
 
-    private fun findExpression(json: JsonElement): String =
-            if (json.isJsonPrimitive) JsonUtils.getString(json, "expression") else JsonUtils.getJsonArray(json, "expression").stringify()
+    private fun String.fixUp() = "function __(x as double) as double { return $this ;}"
 
-    private fun JsonArray.stringify() = this.asSequence()
-            .mapIndexed { index, element -> JsonUtils.getString(element, "$index") }
-            .joinToString(separator = "\n")
-
-    private fun String.compile(): Expression {
-        TODO()
+    private fun String.compile() = try {
+        compileFunction(this)
+    } catch (e: Exception) {
+        throw JsonParseException("An error has occurred while trying to compile the given expression '$this'", e)
     }
 }
 
