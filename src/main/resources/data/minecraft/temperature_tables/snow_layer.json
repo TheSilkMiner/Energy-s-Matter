@@ -1,7 +1,80 @@
 {
+  "__comment0": "Much like liquids, to account for the different variants of snow layers, we are going to use a formula.",
+  "__comment1": "Assuming L is the current layer of snow, and knowing L is always between 1 and 8 inclusive, we can come up with the following:",
+  "__comment2": "targetTemperature = ((L * snowTemperature) + ((8 - L) * airTemperature)) / 8",
   "entries": [
     {
-      "temperature": 268
+      "conditions": [
+        {
+          "type": "ematter:blockstate_property",
+          "name": "layers",
+          "value": 1
+        }
+      ],
+      "temperature": 292
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:blockstate_property",
+          "name": "layers",
+          "value": 2
+        }
+      ],
+      "temperature": 290
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:blockstate_property",
+          "name": "layers",
+          "value": 3
+        }
+      ],
+      "temperature": 287
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:blockstate_property",
+          "name": "layers",
+          "value": 4
+        }
+      ],
+      "temperature": 284
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:blockstate_property",
+          "name": "layers",
+          "value": 5
+        }
+      ],
+      "temperature": 281
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:blockstate_property",
+          "name": "layers",
+          "value": 6
+        }
+      ],
+      "temperature": 279
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:blockstate_property",
+          "name": "layers",
+          "value": 7
+        }
+      ],
+      "temperature": 276
+    },
+    {
+      "temperature": 273
     }
   ]
 }

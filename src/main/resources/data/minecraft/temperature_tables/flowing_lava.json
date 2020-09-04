@@ -1,7 +1,3 @@
 {
-  "entries": [
-    {
-      "temperature": 1000
-    }
-  ]
+  "from": "minecraft:lava"
 }

@@ -1,7 +1,17 @@
 {
+  "__comment0": "Note: this isn't the actual flame temperature, which is much higher, even higher than lava",
   "entries": [
     {
-      "temperature": 800
+      "conditions": [
+        {
+          "type": "ematter:biome",
+          "registry_name": "minecraft:hell"
+        }
+      ],
+      "temperature": 1163
+    },
+    {
+      "temperature": 873
     }
   ]
 }

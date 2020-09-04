@@ -1,7 +1,1475 @@
 {
+  "__comment0": "Welcome to Minecraft lore day! So, the Nether is full of ultramafic lava. On the other hand, placed lava is going to be... mafic",
+  "__comment1": "For everything else, lava can either be felsic, intermediate, or mafic. This is determined as follows",
+  "__comment2": "- Oceans are expanding, so their lava is mafic",
+  "__comment3": "- Mountains have femic lava, especially if they're near the coast.",
+  "__comment4": "- Everything else is intermediate, except for sky and void, where lava is room temperature because I can",
+  "__comment5": "Send all complaints to your nearest 'fuck you' hole. Realistically, I don't want to rewrite half of Minecraft just for this feature",
+  "__comment6": "If you have any other cool ideas, on the other hand... PLEASE I BEG YOU LET ME KNOW!",
+  "__comment7": "Regarding levels, on the other hand, we take a weighted average of the form ((level * lavaTemp) + ((maxLevels - level) * roomTemp)) / maxLevels",
+  "__comment8": "In the above, level is defined as (7 - valueOf(levelProperty))",
   "entries": [
     {
-      "temperature": 1000
+      "conditions": [
+        {
+          "type": "ematter:or",
+          "conditions": [
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:ocean"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:frozen_ocean"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:deep_ocean"
+            }
+          ]
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 0
+        }
+      ],
+      "temperature": 1223
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:or",
+          "conditions": [
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:ocean"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:frozen_ocean"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:deep_ocean"
+            }
+          ]
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 1
+        }
+      ],
+      "temperature": 1107
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:or",
+          "conditions": [
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:ocean"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:frozen_ocean"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:deep_ocean"
+            }
+          ]
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 2
+        }
+      ],
+      "temperature": 991
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:or",
+          "conditions": [
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:ocean"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:frozen_ocean"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:deep_ocean"
+            }
+          ]
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 3
+        }
+      ],
+      "temperature": 875
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:or",
+          "conditions": [
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:ocean"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:frozen_ocean"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:deep_ocean"
+            }
+          ]
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 4
+        }
+      ],
+      "temperature": 759
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:or",
+          "conditions": [
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:ocean"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:frozen_ocean"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:deep_ocean"
+            }
+          ]
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 5
+        }
+      ],
+      "temperature": 643
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:or",
+          "conditions": [
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:ocean"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:frozen_ocean"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:deep_ocean"
+            }
+          ]
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 6
+        }
+      ],
+      "temperature": 527
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:or",
+          "conditions": [
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:ocean"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:frozen_ocean"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:deep_ocean"
+            }
+          ]
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 7
+        }
+      ],
+      "temperature": 411
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:or",
+          "conditions": [
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:ocean"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:frozen_ocean"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:deep_ocean"
+            }
+          ]
+        }
+      ],
+      "temperature": 295
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:or",
+          "conditions": [
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:extreme_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:ice_mountains"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:smaller_extreme_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:extreme_hills_with_trees"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mesa"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_extreme_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_taiga"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_birch_forest_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_roofed_forest"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_taiga_cold"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_extreme_hills_with_trees"
+            }
+          ]
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 0
+        }
+      ],
+      "temperature": 923
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:or",
+          "conditions": [
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:extreme_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:ice_mountains"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:smaller_extreme_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:extreme_hills_with_trees"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mesa"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_extreme_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_taiga"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_birch_forest_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_roofed_forest"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_taiga_cold"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_extreme_hills_with_trees"
+            }
+          ]
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 1
+        }
+      ],
+      "temperature": 845
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:or",
+          "conditions": [
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:extreme_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:ice_mountains"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:smaller_extreme_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:extreme_hills_with_trees"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mesa"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_extreme_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_taiga"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_birch_forest_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_roofed_forest"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_taiga_cold"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_extreme_hills_with_trees"
+            }
+          ]
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 2
+        }
+      ],
+      "temperature": 766
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:or",
+          "conditions": [
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:extreme_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:ice_mountains"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:smaller_extreme_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:extreme_hills_with_trees"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mesa"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_extreme_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_taiga"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_birch_forest_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_roofed_forest"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_taiga_cold"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_extreme_hills_with_trees"
+            }
+          ]
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 3
+        }
+      ],
+      "temperature": 688
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:or",
+          "conditions": [
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:extreme_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:ice_mountains"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:smaller_extreme_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:extreme_hills_with_trees"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mesa"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_extreme_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_taiga"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_birch_forest_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_roofed_forest"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_taiga_cold"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_extreme_hills_with_trees"
+            }
+          ]
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 4
+        }
+      ],
+      "temperature": 609
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:or",
+          "conditions": [
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:extreme_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:ice_mountains"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:smaller_extreme_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:extreme_hills_with_trees"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mesa"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_extreme_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_taiga"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_birch_forest_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_roofed_forest"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_taiga_cold"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_extreme_hills_with_trees"
+            }
+          ]
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 5
+        }
+      ],
+      "temperature": 531
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:or",
+          "conditions": [
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:extreme_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:ice_mountains"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:smaller_extreme_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:extreme_hills_with_trees"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mesa"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_extreme_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_taiga"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_birch_forest_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_roofed_forest"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_taiga_cold"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_extreme_hills_with_trees"
+            }
+          ]
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 6
+        }
+      ],
+      "temperature": 452
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:or",
+          "conditions": [
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:extreme_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:ice_mountains"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:smaller_extreme_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:extreme_hills_with_trees"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mesa"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_extreme_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_taiga"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_birch_forest_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_roofed_forest"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_taiga_cold"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_extreme_hills_with_trees"
+            }
+          ]
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 7
+        }
+      ],
+      "temperature": 374
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:or",
+          "conditions": [
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:extreme_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:ice_mountains"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:smaller_extreme_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:extreme_hills_with_trees"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mesa"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_extreme_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_taiga"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_birch_forest_hills"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_roofed_forest"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_taiga_cold"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:mutated_extreme_hills_with_trees"
+            }
+          ]
+        }
+      ],
+      "temperature": 295
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:or",
+          "conditions": [
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:sky"
+            },
+            {
+              "type": "ematter:biome",
+              "registry_name": "minecraft:void"
+            }
+          ]
+        }
+      ],
+      "temperature": 295
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:biome",
+          "registry_name": "minecraft:hell"
+        },
+        {
+          "type": "ematter:position",
+          "condition": "matches_or_less",
+          "axis": "y",
+          "value": 31
+        },
+        {
+          "type": "ematter:position",
+          "condition": "matches_or_more",
+          "axis": "y",
+          "value": 22
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 0
+        }
+      ],
+      "temperature": 1873
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:biome",
+          "registry_name": "minecraft:hell"
+        },
+        {
+          "type": "ematter:position",
+          "condition": "matches_or_less",
+          "axis": "y",
+          "value": 31
+        },
+        {
+          "type": "ematter:position",
+          "condition": "matches_or_more",
+          "axis": "y",
+          "value": 22
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 1
+        }
+      ],
+      "temperature": 1676
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:biome",
+          "registry_name": "minecraft:hell"
+        },
+        {
+          "type": "ematter:position",
+          "condition": "matches_or_less",
+          "axis": "y",
+          "value": 31
+        },
+        {
+          "type": "ematter:position",
+          "condition": "matches_or_more",
+          "axis": "y",
+          "value": 22
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 2
+        }
+      ],
+      "temperature": 1479
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:biome",
+          "registry_name": "minecraft:hell"
+        },
+        {
+          "type": "ematter:position",
+          "condition": "matches_or_less",
+          "axis": "y",
+          "value": 31
+        },
+        {
+          "type": "ematter:position",
+          "condition": "matches_or_more",
+          "axis": "y",
+          "value": 22
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 3
+        }
+      ],
+      "temperature": 1281
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:biome",
+          "registry_name": "minecraft:hell"
+        },
+        {
+          "type": "ematter:position",
+          "condition": "matches_or_less",
+          "axis": "y",
+          "value": 31
+        },
+        {
+          "type": "ematter:position",
+          "condition": "matches_or_more",
+          "axis": "y",
+          "value": 22
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 4
+        }
+      ],
+      "temperature": 1084
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:biome",
+          "registry_name": "minecraft:hell"
+        },
+        {
+          "type": "ematter:position",
+          "condition": "matches_or_less",
+          "axis": "y",
+          "value": 31
+        },
+        {
+          "type": "ematter:position",
+          "condition": "matches_or_more",
+          "axis": "y",
+          "value": 22
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 5
+        }
+      ],
+      "temperature": 887
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:biome",
+          "registry_name": "minecraft:hell"
+        },
+        {
+          "type": "ematter:position",
+          "condition": "matches_or_less",
+          "axis": "y",
+          "value": 31
+        },
+        {
+          "type": "ematter:position",
+          "condition": "matches_or_more",
+          "axis": "y",
+          "value": 22
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 6
+        }
+      ],
+      "temperature": 690
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:biome",
+          "registry_name": "minecraft:hell"
+        },
+        {
+          "type": "ematter:position",
+          "condition": "matches_or_less",
+          "axis": "y",
+          "value": 31
+        },
+        {
+          "type": "ematter:position",
+          "condition": "matches_or_more",
+          "axis": "y",
+          "value": 22
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 7
+        }
+      ],
+      "temperature": 492
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:biome",
+          "registry_name": "minecraft:hell"
+        },
+        {
+          "type": "ematter:position",
+          "condition": "matches_or_less",
+          "axis": "y",
+          "value": 31
+        },
+        {
+          "type": "ematter:position",
+          "condition": "matches_or_more",
+          "axis": "y",
+          "value": 22
+        }
+      ],
+      "temperature": 295
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:biome_dictionary_type",
+          "dictionary_type": "ocean"
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 0
+        }
+      ],
+      "temperature": 1223
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:biome_dictionary_type",
+          "dictionary_type": "ocean"
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 1
+        }
+      ],
+      "temperature": 1107
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:biome_dictionary_type",
+          "dictionary_type": "ocean"
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 2
+        }
+      ],
+      "temperature": 991
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:biome_dictionary_type",
+          "dictionary_type": "ocean"
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 3
+        }
+      ],
+      "temperature": 875
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:biome_dictionary_type",
+          "dictionary_type": "ocean"
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 4
+        }
+      ],
+      "temperature": 759
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:biome_dictionary_type",
+          "dictionary_type": "ocean"
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 5
+        }
+      ],
+      "temperature": 643
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:biome_dictionary_type",
+          "dictionary_type": "ocean"
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 6
+        }
+      ],
+      "temperature": 527
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:biome_dictionary_type",
+          "dictionary_type": "ocean"
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 7
+        }
+      ],
+      "temperature": 411
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:biome_dictionary_type",
+          "dictionary_type": "ocean"
+        }
+      ],
+      "temperature": 295
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:biome_dictionary_type",
+          "dictionary_type": "mountain"
+        },
+        {
+          "type": "ematter:not",
+          "condition": {
+            "type": "ematter:biome",
+            "registry_name": "minecraft:mutated_jungle"
+          }
+        },
+        {
+          "type": "ematter:not",
+          "condition": {
+            "type": "ematter:biome",
+            "registry_name": "minecraft:mutated_savanna"
+          }
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 0
+        }
+      ],
+      "temperature": 923
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:biome_dictionary_type",
+          "dictionary_type": "mountain"
+        },
+        {
+          "type": "ematter:not",
+          "condition": {
+            "type": "ematter:biome",
+            "registry_name": "minecraft:mutated_jungle"
+          }
+        },
+        {
+          "type": "ematter:not",
+          "condition": {
+            "type": "ematter:biome",
+            "registry_name": "minecraft:mutated_savanna"
+          }
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 1
+        }
+      ],
+      "temperature": 845
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:biome_dictionary_type",
+          "dictionary_type": "mountain"
+        },
+        {
+          "type": "ematter:not",
+          "condition": {
+            "type": "ematter:biome",
+            "registry_name": "minecraft:mutated_jungle"
+          }
+        },
+        {
+          "type": "ematter:not",
+          "condition": {
+            "type": "ematter:biome",
+            "registry_name": "minecraft:mutated_savanna"
+          }
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 2
+        }
+      ],
+      "temperature": 766
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:biome_dictionary_type",
+          "dictionary_type": "mountain"
+        },
+        {
+          "type": "ematter:not",
+          "condition": {
+            "type": "ematter:biome",
+            "registry_name": "minecraft:mutated_jungle"
+          }
+        },
+        {
+          "type": "ematter:not",
+          "condition": {
+            "type": "ematter:biome",
+            "registry_name": "minecraft:mutated_savanna"
+          }
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 3
+        }
+      ],
+      "temperature": 688
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:biome_dictionary_type",
+          "dictionary_type": "mountain"
+        },
+        {
+          "type": "ematter:not",
+          "condition": {
+            "type": "ematter:biome",
+            "registry_name": "minecraft:mutated_jungle"
+          }
+        },
+        {
+          "type": "ematter:not",
+          "condition": {
+            "type": "ematter:biome",
+            "registry_name": "minecraft:mutated_savanna"
+          }
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 4
+        }
+      ],
+      "temperature": 609
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:biome_dictionary_type",
+          "dictionary_type": "mountain"
+        },
+        {
+          "type": "ematter:not",
+          "condition": {
+            "type": "ematter:biome",
+            "registry_name": "minecraft:mutated_jungle"
+          }
+        },
+        {
+          "type": "ematter:not",
+          "condition": {
+            "type": "ematter:biome",
+            "registry_name": "minecraft:mutated_savanna"
+          }
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 5
+        }
+      ],
+      "temperature": 531
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:biome_dictionary_type",
+          "dictionary_type": "mountain"
+        },
+        {
+          "type": "ematter:not",
+          "condition": {
+            "type": "ematter:biome",
+            "registry_name": "minecraft:mutated_jungle"
+          }
+        },
+        {
+          "type": "ematter:not",
+          "condition": {
+            "type": "ematter:biome",
+            "registry_name": "minecraft:mutated_savanna"
+          }
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 6
+        }
+      ],
+      "temperature": 452
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:biome_dictionary_type",
+          "dictionary_type": "mountain"
+        },
+        {
+          "type": "ematter:not",
+          "condition": {
+            "type": "ematter:biome",
+            "registry_name": "minecraft:mutated_jungle"
+          }
+        },
+        {
+          "type": "ematter:not",
+          "condition": {
+            "type": "ematter:biome",
+            "registry_name": "minecraft:mutated_savanna"
+          }
+        },
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 7
+        }
+      ],
+      "temperature": 374
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:biome_dictionary_type",
+          "dictionary_type": "mountain"
+        },
+        {
+          "type": "ematter:not",
+          "condition": {
+            "type": "ematter:biome",
+            "registry_name": "minecraft:mutated_jungle"
+          }
+        },
+        {
+          "type": "ematter:not",
+          "condition": {
+            "type": "ematter:biome",
+            "registry_name": "minecraft:mutated_savanna"
+          }
+        }
+      ],
+      "temperature": 295
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 0
+        }
+      ],
+      "temperature": 1107
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 1
+        }
+      ],
+      "temperature": 1006
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 2
+        }
+      ],
+      "temperature": 904
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 3
+        }
+      ],
+      "temperature": 803
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 4
+        }
+      ],
+      "temperature": 701
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 5
+        }
+      ],
+      "temperature": 600
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 6
+        }
+      ],
+      "temperature": 498
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:blockstate_property",
+          "name": "level",
+          "value": 7
+        }
+      ],
+      "temperature": 397
+    },
+    {
+      "temperature": 295
     }
   ]
 }

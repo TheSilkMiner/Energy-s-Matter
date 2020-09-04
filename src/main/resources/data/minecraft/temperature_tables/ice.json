@@ -1,7 +1,8 @@
 {
+  "__comment0": "This is being considered as a somewhat lower temperature than 32 F, since usually ice isn't usually stable when water is at the freezing point",
   "entries": [
     {
-      "temperature": 263
+      "temperature": 269
     }
   ]
 }
