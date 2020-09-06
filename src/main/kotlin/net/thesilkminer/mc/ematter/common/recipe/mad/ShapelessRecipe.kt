@@ -46,7 +46,7 @@ internal class ShapelessMadRecipe @ExperimentalUnsignedTypes constructor(private
         return list
     }
 
-    override fun matches(inv: InventoryCrafting, worldIn: World): Boolean {
+    override fun matches(inv: InventoryCrafting, worldIn: World?): Boolean {
         if (inv !is CraftingInventoryWrapper) return false
         if (inv.containerClass != MadContainer::class) return false
 
