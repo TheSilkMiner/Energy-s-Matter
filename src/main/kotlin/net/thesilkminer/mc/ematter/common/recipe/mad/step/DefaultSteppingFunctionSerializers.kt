@@ -33,7 +33,7 @@ internal class ExponentialSteppingFunctionSerializer : IForgeRegistryEntry.Impl<
     }
 
     override fun read(json: JsonObject): SteppingFunction {
-        val coefficient = json.long("coefficient", 0L)
+        val coefficient = json.long("coefficient", 1L)
         val base = json.double("base", E)
         val mirror = JsonUtils.getBoolean(json, "mirror", false)
         val translation = json.long("translation", 0L)
