@@ -2,8 +2,10 @@
 
 package net.thesilkminer.mc.ematter.common.mole
 
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParseException
+import com.google.gson.JsonSyntaxException
 import net.minecraft.util.JsonUtils
 import net.minecraftforge.fml.common.registry.ForgeRegistries
 import net.thesilkminer.mc.boson.api.id.NameSpacedString
@@ -22,8 +24,11 @@ import net.thesilkminer.mc.boson.prefab.loader.preprocessor.CatchingPreprocessor
 import net.thesilkminer.mc.boson.prefab.loader.preprocessor.JsonConverterPreprocessor
 import net.thesilkminer.mc.boson.prefab.loader.processor.CatchingProcessor
 import net.thesilkminer.mc.boson.prefab.loader.progress.ProgressBarVisitor
+import net.thesilkminer.mc.boson.prefab.naming.toNameSpacedString
 import net.thesilkminer.mc.boson.prefab.naming.toResourceLocation
 import net.thesilkminer.mc.ematter.MOD_NAME
+import net.thesilkminer.mc.ematter.common.mole.condition.get
+import net.thesilkminer.mc.ematter.common.mole.condition.moleTableConditionSerializerRegistry
 
 private val l = L(MOD_NAME, "Mole Tables")
 
@@ -65,14 +70,62 @@ private class MoleTableProcessor : Processor<JsonObject> {
     }
 
     override fun process(content: JsonObject, identifier: NameSpacedString, globalContext: Context?, phaseContext: Context?) {
-        val target = ForgeRegistries.ITEMS.getValue(identifier.toResourceLocation()) ?: return l.warn("Found mole table for unrecognized target '$identifier': ignoring")
+        val target = ForgeRegistries.ITEMS.getValue(identifier.toResourceLocation()) ?: return l.warn("Found temperature table for unrecognized target '$identifier': ignoring")
 
-        val moleCount = JsonUtils.getInt(content, "count")
-        if (moleCount < 0) throw JsonParseException("[$identifier] Found a mole count which is non-positive: this is not possible")
+        val isNormal = content.has("entries")
+        val isRedirect = content.has("from")
+        if (isNormal && isRedirect) throw JsonSyntaxException("Expected either 'entries' or 'from' but got both")
+        if (!isNormal && !isRedirect) throw JsonSyntaxException("Expected either 'entries' or 'from' but got none")
 
-        MoleTables[target] = moleCount
+        val moleTable = if (isNormal) this.processNormalLootTable(content) else this.processRedirectLootTable(content)
+        try {
+            MoleTables[target] = moleTable
+        } catch (e: IllegalStateException) {
+            throw JsonParseException("Unable to set the parsed mole table as the mole table for '$identifier': ${e.message}", e)
+        }
     }
 
+    private fun processNormalLootTable(data: JsonObject): (MoleContext) -> Moles {
+        val entries = JsonUtils.getJsonArray(data, "entries")
+        val entryFunctions = entries.asSequence()
+                .mapIndexed { index, entry -> JsonUtils.getJsonObject(entry, "entries[$index]") }
+                .map(this::processEntry)
+                .toList()
+        return this.merge(entryFunctions)
+    }
+
+    private fun processRedirectLootTable(data: JsonObject): (MoleContext) -> Moles {
+        val from = JsonUtils.getString(data, "from").toNameSpacedString()
+        val targetItem = ForgeRegistries.ITEMS.getValue(from.toResourceLocation()) ?: throw JsonParseException("Unable to find block '$from'")
+
+        return { MoleTables[targetItem](it) }
+    }
+
+    private fun processEntry(data: JsonObject): Pair<() -> Moles, List<(MoleContext) -> Boolean>> {
+        val conditions = JsonUtils.getJsonArray(data, "conditions", JsonArray())
+        val listOfConditions = conditions.asSequence()
+                .mapIndexed { index, condition -> JsonUtils.getJsonObject(condition, "conditions[$index]") }
+                .map(this::processCondition)
+                .toList()
+        val moleCount = JsonUtils.getInt(data, "moles")
+        if (moleCount < 0) throw JsonParseException("Found a mole count which is non-positive: this is not possible")
+        return { moleCount } to listOfConditions
+    }
+
+    private fun processCondition(data: JsonObject) = moleTableConditionSerializerRegistry[data].read(data)
+
+    private fun merge(functions: List<Pair<() -> Moles, List<(MoleContext) -> Boolean>>>): (MoleContext) -> Int {
+        val catchAllPair = this.validate(functions)
+        val conditionBased = functions.minus(catchAllPair)
+        return { context -> (conditionBased.firstOrNull { pair -> pair.second.all { condition -> condition(context) } }?.first ?: catchAllPair.first)() }
+    }
+
+    private fun validate(functions: List<Pair<() -> Int, List<(MoleContext) -> Boolean>>>) =
+            try {
+                functions.asSequence().single { it.second.isEmpty() }
+            } catch (e: IllegalArgumentException) {
+                throw JsonParseException("A set of entries in a mole table must have ONE catch-all condition: no more no less", e)
+            }
 }
 
 internal fun loadMoleTables() {

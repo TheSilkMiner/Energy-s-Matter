@@ -42,6 +42,7 @@ import net.thesilkminer.mc.ematter.client.SidedEventHandler
 import net.thesilkminer.mc.ematter.common.TileEntityRegistration
 import net.thesilkminer.mc.ematter.common.attachBlocksListener
 import net.thesilkminer.mc.ematter.common.attachItemsListener
+import net.thesilkminer.mc.ematter.common.mole.freezeMoleTables
 import net.thesilkminer.mc.ematter.common.mole.loadMoleTables
 import net.thesilkminer.mc.ematter.common.network.GuiHandler
 import net.thesilkminer.mc.ematter.common.network.setUpNetworkChannel
@@ -100,6 +101,7 @@ object EnergyIsMatter {
     fun onLoadFinished(e: BosonPreAvailableEvent) {
         l.info("Pre available")
         freezeTemperatureTables()
+        freezeMoleTables()
     }
 
     @Mod.EventHandler

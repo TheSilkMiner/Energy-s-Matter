@@ -36,9 +36,9 @@ import net.thesilkminer.mc.boson.api.id.NameSpacedString
 import net.thesilkminer.mc.boson.prefab.naming.toNameSpacedString
 import net.thesilkminer.mc.boson.prefab.naming.toResourceLocation
 
-private typealias Reg = IForgeRegistry<TemperatureTableConditionSerializer>
+private typealias TemperatureReg = IForgeRegistry<TemperatureTableConditionSerializer>
 
-internal operator fun Reg.get(serialized: JsonObject) = this[JsonUtils.getString(serialized, "type")]
-internal operator fun Reg.get(name: String) = this[name.toNameSpacedString()]
-internal operator fun Reg.get(name: NameSpacedString) = this.getValue(name.toResourceLocation())
+internal operator fun TemperatureReg.get(serialized: JsonObject) = this[JsonUtils.getString(serialized, "type")]
+internal operator fun TemperatureReg.get(name: String) = this[name.toNameSpacedString()]
+internal operator fun TemperatureReg.get(name: NameSpacedString) = this.getValue(name.toResourceLocation())
         ?: throw IllegalStateException("No serializer with name '$name' exist")
