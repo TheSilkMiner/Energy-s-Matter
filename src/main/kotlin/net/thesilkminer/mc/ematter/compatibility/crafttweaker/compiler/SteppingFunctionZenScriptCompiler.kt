@@ -62,7 +62,7 @@ private fun ParsedFunction.compile(globalEnvironment: IEnvironmentGlobal): (Long
 
     classVisitor.makeConstructor()
 
-    val methodOutput = MethodOutput(classVisitor, Opcodes.ACC_PUBLIC or Opcodes.ACC_STATIC or Opcodes.ACC_SYNTHETIC, "function", this.signature, null, null)
+    val methodOutput = MethodOutput(classVisitor, Opcodes.ACC_PUBLIC or Opcodes.ACC_SYNTHETIC, "function", this.signature, null, null)
     val methodEnvironment = EnvironmentMethod(methodOutput, classEnvironment)
     methodEnvironment.putValue("x", SymbolArgument(0, ZenType.DOUBLE), this.position)
 
