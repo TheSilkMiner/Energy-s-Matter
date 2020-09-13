@@ -10,7 +10,8 @@
       "url": "Https://thesilkminer.net/mc-mods/ematter",
       "updateUrl": "Curse",
       "authorList": [
-        "TheSilkMiner"
+        "TheSilkMiner",
+        "N1Kx"
       ],
       "credits": "Redfire for the idea for this mod, Ace Muffins for textures",
       "logoFile": "ematter_logo.png",
