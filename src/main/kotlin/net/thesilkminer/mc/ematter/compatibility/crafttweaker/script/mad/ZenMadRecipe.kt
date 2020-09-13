@@ -10,7 +10,7 @@ import stanhebben.zenscript.annotations.ZenGetter
 import stanhebben.zenscript.annotations.ZenMethod
 
 @ExperimentalUnsignedTypes
-@ZenClass("net.thesilkminer.mc.ematter.zen.mad.MadRecipe")
+@ZenClass("mods.ematter.mad.MadRecipe")
 @ZenRegister
 interface ZenMadRecipe : ICraftingRecipe {
     @ZenMethod("getPowerRequiredFor") fun zenGetPowerRequiredFor(player: IPlayer): Long

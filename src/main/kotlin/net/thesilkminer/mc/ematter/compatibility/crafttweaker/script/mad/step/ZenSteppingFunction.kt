@@ -6,7 +6,7 @@ import stanhebben.zenscript.annotations.ZenClass
 import stanhebben.zenscript.annotations.ZenMethod
 
 @ExperimentalUnsignedTypes
-@ZenClass("net.thesilkminer.mc.ematter.zen.mad.step.SteppingFunction")
+@ZenClass("mods.ematter.mad.step.SteppingFunction")
 @ZenRegister
 internal interface ZenSteppingFunction : SteppingFunction {
     override fun getPowerCostAt(x: Long): ULong = this.zenGetPowerCostAt(x).toULong()

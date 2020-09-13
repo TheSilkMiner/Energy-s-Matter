@@ -22,7 +22,7 @@ import kotlin.math.E
 
 @ExperimentalUnsignedTypes
 @Suppress("unused")
-@ZenClass("net.thesilkminer.mc.ematter.zen.mad.step.SteppingFunctions")
+@ZenClass("mods.ematter.mad.step.SteppingFunctions")
 @ZenRegister
 internal object ZenSteppingFunctions {
     @ZenMethod("constant")

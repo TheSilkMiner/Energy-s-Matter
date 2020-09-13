@@ -18,7 +18,7 @@ import stanhebben.zenscript.annotations.ZenMethod
 
 @ExperimentalUnsignedTypes
 @Suppress("unused")
-@ZenClass("net.thesilkminer.mc.ematter.zen.mad.MolecularAssemblerDevice")
+@ZenClass("mods.ematter.mad.MolecularAssemblerDevice")
 @ZenRegister
 internal object ZenMolecularAssemblerDevice {
     private val noopRecipeFunction = IRecipeFunction { output, _, _ -> output }
