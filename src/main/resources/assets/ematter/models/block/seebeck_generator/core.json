@@ -1,7 +1,7 @@
 {
   "loader": "ematter:raw_triangles",
   "comment": [
-    "We assume it's a tetrahedron with ABCD as a square base resting on the plane, E the vertex of the top pyramid, F the vertex of the bottom one",
+    "We assume it's an octahedron with ABCD as a square base resting on the plane, E the vertex of the top pyramid, F the vertex of the bottom one",
     "A rests on the positive X axis, B on the positive Z axis, C on the negative X axis, D on the negative Z axis",
     "(In this context, we're assuming Y as the vertical axis, because Minecraft is weird and uses this convention, normally that would be the Z axis)"
   ],
@@ -44,22 +44,22 @@
         {
           "point": "B",
           "uv": [
-            16,
-            16
+            15,
+            4
           ]
         },
         {
           "point": "A",
           "uv": [
-            0,
-            16
+            13.5,
+            4
           ]
         },
         {
           "point": "E",
           "uv": [
-            8,
-            0
+            14.5,
+            2
           ]
         }
       ]
@@ -70,22 +70,22 @@
         {
           "point": "C",
           "uv": [
-            16,
-            16
+            15,
+            4
           ]
         },
         {
           "point": "B",
           "uv": [
-            0,
-            16
+            13.5,
+            4
           ]
         },
         {
           "point": "E",
           "uv": [
-            8,
-            0
+            14.5,
+            2
           ]
         }
       ]
@@ -96,22 +96,22 @@
         {
           "point": "D",
           "uv": [
-            16,
-            16
+            15,
+            4
           ]
         },
         {
           "point": "C",
           "uv": [
-            0,
-            16
+            13.5,
+            4
           ]
         },
         {
           "point": "E",
           "uv": [
-            8,
-            0
+            14.5,
+            2
           ]
         }
       ]
@@ -122,22 +122,22 @@
         {
           "point": "A",
           "uv": [
-            16,
-            16
+            15,
+            4
           ]
         },
         {
           "point": "D",
           "uv": [
-            0,
-            16
+            13.5,
+            4
           ]
         },
         {
           "point": "E",
           "uv": [
-            8,
-            0
+            14.5,
+            2
           ]
         }
       ]
@@ -148,22 +148,22 @@
         {
           "point": "A",
           "uv": [
-            0,
-            16
+            13.5,
+            4.5
           ]
         },
         {
           "point": "B",
           "uv": [
-            16,
-            16
+            15,
+            4.5
           ]
         },
         {
           "point": "F",
           "uv": [
-            8,
-            0
+            14.5,
+            6
           ]
         }
       ]
@@ -174,22 +174,22 @@
         {
           "point": "B",
           "uv": [
-            0,
-            16
+            13.5,
+            4.5
           ]
         },
         {
           "point": "C",
           "uv": [
-            16,
-            16
+            15,
+            4.5
           ]
         },
         {
           "point": "F",
           "uv": [
-            8,
-            0
+            14.5,
+            6
           ]
         }
       ]
@@ -200,22 +200,22 @@
         {
           "point": "C",
           "uv": [
-            0,
-            16
+            13.5,
+            4.5
           ]
         },
         {
           "point": "D",
           "uv": [
-            16,
-            16
+            15,
+            4.5
           ]
         },
         {
           "point": "F",
           "uv": [
-            8,
-            0
+            14.5,
+            6
           ]
         }
       ]
@@ -226,28 +226,28 @@
         {
           "point": "D",
           "uv": [
-            0,
-            16
+            13.5,
+            4.5
           ]
         },
         {
           "point": "A",
           "uv": [
-            16,
-            16
+            15,
+            4.5
           ]
         },
         {
           "point": "F",
           "uv": [
-            8,
-            0
+            14.5,
+            6
           ]
         }
       ]
     }
   ],
   "textures": {
-    "all": "ematter:blocks/seebeck_generator/core"
+    "all": "ematter:blocks/seebeck_generator"
   }
 }
