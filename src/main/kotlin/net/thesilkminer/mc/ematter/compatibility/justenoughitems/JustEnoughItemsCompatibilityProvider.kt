@@ -1,0 +1,7 @@
+package net.thesilkminer.mc.ematter.compatibility.justenoughitems
+
+import net.thesilkminer.mc.boson.api.modid.JUST_ENOUGH_ITEMS
+import net.thesilkminer.mc.boson.prefab.compatibility.ModCompatibilityProvider
+import net.thesilkminer.mc.ematter.compatibility.EnergyIsMatterCompatibilityProvider
+
+internal class JustEnoughItemsCompatibilityProvider : ModCompatibilityProvider(JUST_ENOUGH_ITEMS), EnergyIsMatterCompatibilityProvider
