@@ -126,7 +126,7 @@ internal class MadRecipeCategory(private val guiHelper: IGuiHelper) : IRecipeCat
 
     private fun Int.shouldSkipFor(value: Int, exceptionMessage: String) = when (value) {
         0 -> true
-        1 -> this != 3
+        1 -> this != 2
         2 -> this != 1 && this != 2
         3 -> this == 0 || this == 4
         4 -> this == 4
