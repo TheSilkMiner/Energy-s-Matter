@@ -102,8 +102,8 @@ internal class MadRecipeCategory(private val guiHelper: IGuiHelper) : IRecipeCat
             val outputNamespace = ingredient.item.registryName?.namespace ?: return@addTooltipCallback
 
             if (recipeNamespace != outputNamespace) {
-                val modName = Loader.instance().modList.firstOrNull { it.modId == outputNamespace } ?: unknownModMarker
-                tooltip += "gui.ematter.jei.shared.recipe_by".toLocale("${TextFormatting.DARK_BLUE}$modName", color = Color.GRAY)
+                val modName = Loader.instance().modList.firstOrNull { it.modId == recipeNamespace }?.name ?: unknownModMarker
+                tooltip += "gui.ematter.jei.shared.recipe_by".toLocale("${TextFormatting.BLUE}$modName", color = Color.GRAY)
             }
 
             if (Minecraft.getMinecraft().gameSettings.advancedItemTooltips || GuiScreen.isShiftKeyDown()) {
