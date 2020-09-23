@@ -7,6 +7,7 @@ import crafttweaker.api.item.IItemStack
 import crafttweaker.api.recipes.IRecipeFunction
 import net.minecraftforge.fml.common.registry.ForgeRegistries
 import net.thesilkminer.mc.boson.api.id.NameSpacedString
+import net.thesilkminer.mc.boson.api.modid.CRAFT_TWEAKER_2
 import net.thesilkminer.mc.boson.compatibility.crafttweaker.naming.ZenNameSpacedString
 import net.thesilkminer.mc.boson.compatibility.crafttweaker.zenscriptx.sequence.ZenSequence
 import net.thesilkminer.mc.boson.prefab.naming.toNameSpacedString
@@ -36,6 +37,7 @@ internal object ZenMolecularAssemblerDevice {
         if (ingredients.any { it.isEmpty() }) return CraftTweakerAPI.logError("Unable to register recipe '$name': ingredients array contains an empty row")
         if (ingredients.map { it.count() }.distinct().count() != 1) return CraftTweakerAPI.logError("Unable to register recipe '$name': ingredients array lengths are uneven")
 
+        if (name.nameSpace != CRAFT_TWEAKER_2) CraftTweakerAPI.logWarning("Recipe '$name' does not specify '$CRAFT_TWEAKER_2' as its namespace: this is discouraged")
         if (group != null && !group.contains(':')) CraftTweakerAPI.logWarning("Recipe '$name' has a group without a namespace: this won't work in 1.13+")
         ingredients.count().let { if (it > 5) CraftTweakerAPI.logWarning("Recipe '$name' specifies more than 5 rows ($it): this recipe cannot be crafted") }
         ingredients.first().count().let { if (it > 5) CraftTweakerAPI.logWarning("Recipe '$name' specifies more than 5 columns ($it): this recipe cannot be crafted") }
@@ -65,6 +67,7 @@ internal object ZenMolecularAssemblerDevice {
         if (ingredients.isEmpty()) return CraftTweakerAPI.logError("Unable to register recipe '$name': ingredients array is empty")
         if (ingredients.any { it == null }) return CraftTweakerAPI.logError("Unable to register recipe '$name': shapeless recipes don't support 'null' ingredients")
 
+        if (name.nameSpace != CRAFT_TWEAKER_2) CraftTweakerAPI.logWarning("Recipe '$name' does not specify '$CRAFT_TWEAKER_2' as its namespace: this is discouraged")
         if (group != null && !group.contains(':')) CraftTweakerAPI.logWarning("Recipe '$name' has a group without a namespace: this won't work in 1.13+")
         ingredients.filterNotNull().count().let { if (it > 5 * 5) CraftTweakerAPI.logWarning("Recipe '$name' specified more than ${5 * 5} ingredients ($it): this recipe cannot be crafted") }
         if (ingredients.filterNotNull().any { it.hasTransformers() }) CraftTweakerAPI.logWarning("Recipe '$name' is using the old transformer pipeline: transformers won't run")
