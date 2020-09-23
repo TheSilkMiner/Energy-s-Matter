@@ -10,7 +10,11 @@ import mezz.jei.api.recipe.IRecipeCategoryRegistration
 import mezz.jei.api.recipe.IRecipeWrapper
 import mezz.jei.api.recipe.VanillaRecipeCategoryUid
 import net.minecraft.item.ItemStack
+import net.minecraft.item.crafting.ShapedRecipes
+import net.minecraft.item.crafting.ShapelessRecipes
 import net.minecraftforge.fml.common.registry.ForgeRegistries
+import net.minecraftforge.oredict.ShapedOreRecipe
+import net.minecraftforge.oredict.ShapelessOreRecipe
 import net.thesilkminer.mc.boson.api.log.L
 import net.thesilkminer.mc.ematter.MOD_NAME
 import net.thesilkminer.mc.ematter.common.Blocks
@@ -67,12 +71,20 @@ internal class JustEnoughItemsPlugin : IModPlugin {
         l.info("Registering recipes")
         ForgeRegistries.RECIPES.let {
             registry.addRecipes(it.filterIsInstance<MadRecipe>(), MadRecipeCategory.ID)
+            registry.addRecipes(it.filterIsInstance<ShapedOreRecipe>(), MadRecipeCategory.ID)
+            registry.addRecipes(it.filterIsInstance<ShapedRecipes>(), MadRecipeCategory.ID)
+            registry.addRecipes(it.filterIsInstance<ShapelessOreRecipe>(), MadRecipeCategory.ID)
+            registry.addRecipes(it.filterIsInstance<ShapelessRecipes>(), MadRecipeCategory.ID)
         }
     }
 
     private fun registerRecipeHandlers(registry: IModRegistry) {
         l.info("Registering recipe handlers")
         registry.handleRecipes(MadRecipeCategory.ID, MadRecipe::class) { JeiMadRecipeWrapper(registry.jeiHelpers, it) }
+        registry.handleRecipes(MadRecipeCategory.ID, ShapedOreRecipe::class) { JeiMadRecipeWrapper(registry.jeiHelpers, it) }
+        registry.handleRecipes(MadRecipeCategory.ID, ShapedRecipes::class) { JeiMadRecipeWrapper(registry.jeiHelpers, it) }
+        registry.handleRecipes(MadRecipeCategory.ID, ShapelessOreRecipe::class) { JeiMadRecipeWrapper(registry.jeiHelpers, it) }
+        registry.handleRecipes(MadRecipeCategory.ID, ShapelessRecipes::class) { JeiMadRecipeWrapper(registry.jeiHelpers, it) }
     }
 
     private fun registerClickAreas(registry: IModRegistry) {
