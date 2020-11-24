@@ -29,12 +29,12 @@ internal class MadRecipeCategory(private val guiHelper: IGuiHelper) : IRecipeCat
         private const val FIRST_INPUT_SLOT = 1
         private const val OUTPUT_SLOT = 0
 
-        private val guiBackgroundLocation = NameSpacedString(MOD_ID, "textures/gui/jei_plugin/molecular_assembler_device_background.png")
+        internal val guiBackgroundLocation = NameSpacedString(MOD_ID, "textures/gui/jei_plugin/molecular_assembler_device_background.png")
         private val unknownModMarker by lazy { "gui.ematter.jei.shared.unknown_mod".toLocale() }
     }
 
     private val localizedTitle by lazy { LANGUAGE_KEY.toLocale() }
-    private val guiBackground by lazy { this.guiHelper.createDrawable(guiBackgroundLocation.toResourceLocation(), 0, 0, 104, 143) as IDrawable }
+    private val guiBackground by lazy { this.guiHelper.createDrawable(guiBackgroundLocation.toResourceLocation(), 0, 0, 183, 143) as IDrawable }
     private val categoryIcon by lazy { this.guiHelper.createDrawableIngredient(ItemStack(Blocks.molecularAssemblerDevice(), 1, MadTier.ELITE.targetMeta)) as IDrawable }
 
     override fun getUid() = ID
@@ -42,14 +42,6 @@ internal class MadRecipeCategory(private val guiHelper: IGuiHelper) : IRecipeCat
     override fun getTitle() = this.localizedTitle
     override fun getBackground() = this.guiBackground
     override fun getIcon() = this.categoryIcon
-
-    override fun drawExtras(minecraft: Minecraft) {
-        super.drawExtras(minecraft)
-    }
-
-    override fun getTooltipStrings(mouseX: Int, mouseY: Int): MutableList<String> {
-        return super.getTooltipStrings(mouseX, mouseY)
-    }
 
     override fun setRecipe(recipeLayout: IRecipeLayout, recipeWrapper: JeiMadRecipeWrapper, ingredients: IIngredients) {
         val slots = recipeLayout.itemStacks
