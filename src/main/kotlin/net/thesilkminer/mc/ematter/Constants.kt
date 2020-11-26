@@ -1,20 +1,25 @@
 /*
  * Copyright (C) 2020  TheSilkMiner
  *
- * This file is part of Boson.
+ * This file is part of Energy's Matter.
  *
- * Boson is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published
- * by the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Energy's Matter is provided AS IS, WITHOUT ANY WARRANTY, even without the
+ * implied warranty of FITNESS FOR A CERTAIN PURPOSE. Energy's Matter is
+ * therefore being distributed in the hope it will be useful, but no
+ * other assumptions are made.
  *
- * Boson is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * Energy's Matter is considered "all rights reserved", meaning you are not
+ * allowed to copy or redistribute any part of this program, including
+ * but not limited to the compiled binaries, the source code, or any
+ * other form of the program without prior written permission of the
+ * owner.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Boson.  If not, see <https://www.gnu.org/licenses/>.
+ * On the other hand, you are allowed as per terms of GitHub to fork
+ * this repository and produce derivative works, as long as they remain
+ * for PERSONAL USAGE only: redistribution of changed binaries is also
+ * not allowed.
+ *
+ * Refer to the 'COPYING' file in this repository for more information
  *
  * Contact information:
  * E-mail: thesilkminer <at> outlook <dot> com
