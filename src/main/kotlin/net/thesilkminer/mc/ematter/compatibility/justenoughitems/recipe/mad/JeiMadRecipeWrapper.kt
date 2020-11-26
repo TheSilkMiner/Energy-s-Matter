@@ -236,7 +236,7 @@ internal class JeiMadRecipeWrapper(private val helpers: IJeiHelpers, val recipe:
     private fun ULong.toYCoordinate(min: ULong, max: ULong): Double {
         // (this - min) / (max - min) = (this on yAxis) / (max on yAxis)
         val maxYAxis = abs(graphCurrentValueBegin.second - graphCurrentValueEnd.second)
-        val thisYAxis = if (max.toDouble() <= 0.0) 0.0 else ((this - min).toDouble() / (max - min).toDouble()) * maxYAxis
+        val thisYAxis = if ((max - min).toDouble() <= 0.0) 0.0 else ((this - min).toDouble() / (max - min).toDouble()) * maxYAxis
         return graphCurrentValueBegin.second - thisYAxis
     }
 
