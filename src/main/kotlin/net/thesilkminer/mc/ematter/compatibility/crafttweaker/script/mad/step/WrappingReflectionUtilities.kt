@@ -23,7 +23,8 @@ private fun SteppingFunction.tryNativeCommandString() = when (this::class.simple
 
 @ExperimentalUnsignedTypes
 private fun SteppingFunction.toConstantCommandString(): String {
-    val cost = this.field<ULong>("cost")
+    // ULongs, being inline classes, don't exist at runtime, so they get compiled down to longs. Nevertheless, better safe than sorry
+    val cost = try { this.field<Long>("cost").toULong() } catch(e: ClassCastException) { this.field<ULong>("cost") }
     return "SteppingFunctions.constant($cost)"
 }
 

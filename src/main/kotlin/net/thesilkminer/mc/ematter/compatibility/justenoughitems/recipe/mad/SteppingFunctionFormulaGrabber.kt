@@ -4,6 +4,7 @@ package net.thesilkminer.mc.ematter.compatibility.justenoughitems.recipe.mad
 
 import net.thesilkminer.kotlin.commons.lang.uncheckedCast
 import net.thesilkminer.mc.ematter.common.recipe.mad.step.SteppingFunction
+import java.lang.ClassCastException
 import java.lang.reflect.Field
 import kotlin.reflect.KClass
 
@@ -26,7 +27,8 @@ private fun SteppingFunction.obtainFormulaReflectively(): List<String>? = when(t
 
 @ExperimentalUnsignedTypes
 private fun SteppingFunction.toConstantFormula(): List<String> {
-    val cost = this.field<ULong>("cost")
+    // ULongs don't exist at runtime because they are inlined, but better safe than sorry I guess
+    val cost = try { this.field<Long>("cost").toULong() } catch (e: ClassCastException) { this.field<ULong>("cost") }
     return listOf("y = $cost")
 }
 
