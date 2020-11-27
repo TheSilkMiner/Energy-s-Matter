@@ -105,5 +105,5 @@ private inline fun withColorAndWidth(minecraft: Minecraft, color: Int, scale: Do
 }
 
 @Suppress("NOTHING_TO_INLINE") private inline fun Double.toDegrees() = this * 180.0 / PI
-@Suppress("NOTHING_TO_INLINE") private inline fun Int.toArgb() = (this shr 8) or ((this and 255) shl 24)
-@Suppress("NOTHING_TO_INLINE") private inline fun Int.swapAlpha() = ((0xFF - (this shr 24)) shl 24) or (this and 0x00FFFFFF)
+@Suppress("NOTHING_TO_INLINE") private inline fun Int.toArgb() = (this ushr 8) or ((this and 255) shl 24)
+@Suppress("NOTHING_TO_INLINE") private inline fun Int.swapAlpha() = ((0xFF - (this ushr 24)) shl 24) or (this and 0x00FFFFFF)
