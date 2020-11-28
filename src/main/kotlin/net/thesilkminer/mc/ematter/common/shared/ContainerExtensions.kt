@@ -37,7 +37,7 @@ internal fun bindPlayerInventory(playerInventory: IInventory, initialX: Int, ini
         (0..8).forEach { column ->
             val x = initialX + column * 18
             val y = initialY + row * 18
-            addSlotToContainer(Slot(playerInventory, column + row * 9 + 10, x, y))
+            addSlotToContainer(Slot(playerInventory, column + row * 9 + 9, x, y))
         }
     }
     (0..8).forEach { column ->
