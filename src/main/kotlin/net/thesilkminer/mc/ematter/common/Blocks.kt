@@ -35,6 +35,7 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries
 import net.thesilkminer.mc.boson.api.registry.DeferredRegister
 import net.thesilkminer.mc.boson.api.registry.RegistryObject
 import net.thesilkminer.mc.ematter.MOD_ID
+import net.thesilkminer.mc.ematter.common.feature.cable.CableBlock
 import net.thesilkminer.mc.ematter.common.feature.mad.MadBlock
 import net.thesilkminer.mc.ematter.common.feature.seebeck.SeebeckBlock
 
@@ -48,6 +49,9 @@ internal object Blocks {
     }
     val seebeckGenerator = register("seebeck_generator") {
         SeebeckBlock().setCreativeTab(mainItemGroup).setTranslationKey("ematter.seebeck_generator").setHardness(8.0F).apply { this.setHarvestLevel("pickaxe", 2) }
+    }
+    val cable = register("cable") {
+        CableBlock().setCreativeTab(mainItemGroup).setTranslationKey("ematter.cable").setHardness(5.0F).apply { this.setHarvestLevel("pickaxe", 1)}
     }
 }
 
