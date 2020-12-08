@@ -1,0 +1,29 @@
+{
+  "entries": [
+    {
+      "conditions": [
+        {
+          "type": "ematter:durability",
+          "condition": "between",
+          "lowerTarget": 20,
+          "higherTarget": 80
+        }
+      ],
+      "moles": 100
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:durability",
+          "condition": "outside",
+          "lowerTarget": 20,
+          "higherTarget": 80
+        }
+      ],
+      "moles": 10
+    },
+    {
+      "moles": 1
+    }
+  ]
+}

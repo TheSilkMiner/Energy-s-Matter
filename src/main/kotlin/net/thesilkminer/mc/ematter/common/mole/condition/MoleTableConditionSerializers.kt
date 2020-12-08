@@ -9,9 +9,9 @@ import net.thesilkminer.mc.ematter.MOD_ID
 private const val REGISTRY_NAME = "mole_table_condition_serializers"
 
 private val moleTableConditionSerializerDeferredRegister =
-        DeferredRegister(MOD_ID, MoleTableConditionSerializer::class, REGISTRY_NAME) {
-            this.setMaxID(67_108_863).disableSaving().allowModification()
-        }
+    DeferredRegister(MOD_ID, MoleTableConditionSerializer::class, REGISTRY_NAME) {
+        this.setMaxID(67_108_863).disableSaving().allowModification()
+    }
 
 @Suppress("unused")
 internal object MoleTableConditionSerializers {
@@ -19,7 +19,8 @@ internal object MoleTableConditionSerializers {
     val not = moleTableConditionSerializerDeferredRegister.register("not", ::MoleNotConditionSerializer)
     val or = moleTableConditionSerializerDeferredRegister.register("or", ::MoleOrConditionSerializer)
     val meta = moleTableConditionSerializerDeferredRegister.register("meta", ::MoleMetadataConditionSerializer)
+    val durability = moleTableConditionSerializerDeferredRegister.register("durability", ::MoleDurabilityConditionSerializer)
 }
 
 internal fun attachMoleTableConditionSerializersListener(bus: EventBus) =
-        moleTableConditionSerializerDeferredRegister.subscribeOnto(bus).also { MoleTableConditionSerializers.toString() } // Static init
+    moleTableConditionSerializerDeferredRegister.subscribeOnto(bus).also { MoleTableConditionSerializers.toString() } // Static init

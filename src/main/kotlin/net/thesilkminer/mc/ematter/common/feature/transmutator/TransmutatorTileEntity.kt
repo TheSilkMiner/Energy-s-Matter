@@ -2,13 +2,11 @@ package net.thesilkminer.mc.ematter.common.feature.transmutator
 
 import net.minecraft.block.Block
 import net.minecraft.entity.item.EntityItem
-import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
-import net.minecraft.util.EnumHand
 import net.minecraft.util.ITickable
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.util.Constants
@@ -68,7 +66,7 @@ class TransmutatorTileEntity : TileEntity(), ITickable, Holder, Consumer {
         override fun onContentsChanged(slot: Int) = this@TransmutatorTileEntity.markDirty()
 
         override fun insertItem(slot: Int, stack: ItemStack, simulate: Boolean): ItemStack {
-            MoleTables[stack.item](MoleContext(stack.metadata)).let { moles ->
+            MoleTables[stack.item](stack.createMoleContext()).let { moles ->
                 if (moles == 0) return stack
 
                 if (!simulate) {
@@ -235,7 +233,7 @@ class TransmutatorTileEntity : TileEntity(), ITickable, Holder, Consumer {
         }
     }
 
-    internal fun changeOutput(playerIn: EntityPlayer, hand: EnumHand) = Unit.also { this.selectedOutput = playerIn.getHeldItem(hand).copy().apply { this.count = 1 } }
+    internal fun changeOutput(stack: ItemStack) = Unit.also { this.selectedOutput = stack.copy().apply { this.count = 1 } }
     internal fun requestRecalculation() = Unit.also { this.recalculationNeeded = true }
 
     // TODO("n1kx", "rethink this")

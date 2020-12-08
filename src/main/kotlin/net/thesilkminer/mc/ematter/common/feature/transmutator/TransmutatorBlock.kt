@@ -29,9 +29,9 @@ class TransmutatorBlock : Block(Material.IRON) {
         hitX: Float, hitY: Float, hitZ: Float
     ): Boolean {
         if (worldIn.isRemote) return true
-        worldIn.getTileEntity(pos).let {
-            if (it !is TransmutatorTileEntity) return false
-            it.changeOutput(playerIn, hand)
+        worldIn.getTileEntity(pos).let { te ->
+            if (te !is TransmutatorTileEntity) return false
+            te.changeOutput(playerIn.getHeldItem(hand))
             return true
         }
     }
