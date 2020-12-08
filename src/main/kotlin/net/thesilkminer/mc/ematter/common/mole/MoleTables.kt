@@ -6,6 +6,28 @@ import net.thesilkminer.mc.ematter.MOD_NAME
 
 internal typealias Moles = Int
 
+/*
+ * Format writeup:
+ *
+ * {
+ *   "entries": [
+ *     {
+ *       "conditions": [
+ *         {
+ *           "type": "see net/thesilkminer/mc/ematter/common/mole/condition/MoleTableConditionSerializers.kt",
+ *           "data": "condition_based"
+ *         }
+ *       ],
+ *       "moles": 10
+ *     },
+ *     {
+ *       "moles": 5
+ *     }
+ *   ]
+ * }
+ *
+ * No condition limit, the first which matches will be taken. Exactly one catch all condition must be present.
+ */
 
 internal object MoleTables {
     private val l = L(MOD_NAME, "Mole Tables")
