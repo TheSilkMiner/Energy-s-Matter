@@ -21,6 +21,7 @@ class MoleHolder(moleCount: Int) {
         this.state = MoleState.values()[nbt.getInteger(NBT_STATE_KEY)]
     }
 
+    // TODO("n1kx", "lol, what have I done here")
     internal fun nextState() {
         if (this.state.ordinal == MoleState.values().size) throw Exception()
         if (this.state != MoleState.HEATING) this.moleCount /= 2

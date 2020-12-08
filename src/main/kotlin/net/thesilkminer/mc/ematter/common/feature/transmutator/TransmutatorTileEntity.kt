@@ -1,5 +1,6 @@
 package net.thesilkminer.mc.ematter.common.feature.transmutator
 
+import net.minecraft.block.Block
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.init.Blocks
@@ -25,19 +26,21 @@ import net.thesilkminer.mc.boson.prefab.tag.blockTagType
 import net.thesilkminer.mc.boson.prefab.tag.isInTag
 import net.thesilkminer.mc.ematter.MOD_ID
 import net.thesilkminer.mc.ematter.common.Items
-import net.thesilkminer.mc.ematter.common.mole.MoleHolder
-import net.thesilkminer.mc.ematter.common.mole.MoleState
+import net.thesilkminer.mc.ematter.common.mole.*
 import net.thesilkminer.mc.ematter.common.temperature.TemperatureContext
 import net.thesilkminer.mc.ematter.common.temperature.TemperatureTables
 import kotlin.random.Random
 
 @Suppress("EXPERIMENTAL_API_USAGE", "EXPERIMENTAL_OVERRIDE", "EXPERIMENTAL_UNSIGNED_LITERALS")
 class TransmutatorTileEntity : TileEntity(), ITickable, Holder, Consumer {
+
     internal companion object {
+
         private val MAX_CAPACITY = 248_139UL
 
-        private const val MOLE_TEST: Int = 10
-        private const val ENERGY_TEST: ULong = 1_000UL
+        // TODO("this thingy needs some recipes")
+        private const val MOLES_NEEDED: Moles = 10
+        private const val ENERGY_NEEDED: ULong = 1_000UL
 
         private const val WASTE_TIME: Int = 20
         private const val PRODUCE_TIME: Int = 100
@@ -49,22 +52,36 @@ class TransmutatorTileEntity : TileEntity(), ITickable, Holder, Consumer {
 
     private val heaters by lazy { bosonApi.tagRegistry[blockTagType, NameSpacedString(MOD_ID, "heaters/molecular_transmutator")] }
 
-    private var heatSource = Blocks.AIR
-    private var currentDayMoment: TemperatureContext.DayMoment = TemperatureContext.DayMoment.DAY
-    private val notWastePercentage = reloadableLazy { (TemperatureTables[heatSource](TemperatureContext(this.world, this.pos, this.currentDayMoment)) / 2000).coerceAtMost(1) }
-    private var recalculationNeeded: Boolean = false
+    private lateinit var heatSource: Block
+    private lateinit var currentDayMoment: TemperatureContext.DayMoment
 
-    private var inputList: List<MoleHolder> = listOf()
-    private var overallMoles: Int = 0
+    private val notWastePercentage = reloadableLazy { (TemperatureTables[heatSource](TemperatureContext(this.world, this.pos, this.currentDayMoment)) / 2000).coerceAtMost(1) } // TODO("n1kx", "find out why I took 2000")
+    private var recalculationNeeded: Boolean = true
+
+    // TODO("n1kx", "think about better solutions than a MoleHolder")
+    private var inputList: MutableList<MoleHolder> = mutableListOf()
     private var selectedOutput: ItemStack = ItemStack.EMPTY
+
+    private var overallMoles: Int = 0
+
     private val stackHandler: ItemStackHandler = object : ItemStackHandler(1) {
         override fun onContentsChanged(slot: Int) = this@TransmutatorTileEntity.markDirty()
-        override fun insertItem(slot: Int, stack: ItemStack, simulate: Boolean): ItemStack = ItemStack.EMPTY.also {
-            for (i in 0 until stack.count) {
-                this@TransmutatorTileEntity.inputList.plus(MoleHolder(MOLE_TEST))
-                this@TransmutatorTileEntity.overallMoles += MOLE_TEST
+
+        override fun insertItem(slot: Int, stack: ItemStack, simulate: Boolean): ItemStack {
+            MoleTables[stack.item](MoleContext(stack.metadata)).let { moles ->
+                if (moles == 0) return stack
+
+                if (!simulate) {
+                    for (i in 0 until stack.count) {
+                        this@TransmutatorTileEntity.inputList.add(MoleHolder(moles))
+                        this@TransmutatorTileEntity.overallMoles += moles
+                    }
+                }
             }
+            return ItemStack.EMPTY
         }
+
+        // TODO("n1kx", "this should maybe just throw an exception?")
         override fun setStackInSlot(slot: Int, stack: ItemStack) = Unit.also { this.insertItem(slot, stack, false) }
     }
 
@@ -86,37 +103,43 @@ class TransmutatorTileEntity : TileEntity(), ITickable, Holder, Consumer {
     private fun waste() {
         if (--this.wasteTimer > 0) return
         this.wasteTimer = WASTE_TIME
-        this.inputList
-                .onEach {
-                    if (it.state == MoleState.HEATING) return@onEach
-                    if (Random.Default.nextFloat() <= this.notWastePercentage.value) return@onEach
-                    var moleCount: Int = it.moleCount
-                    it.nextState()
-                    this.overallMoles -= (moleCount + it.moleCount)
-                }
-                .filterNot { it.state == MoleState.WASTE_L3 }
+        this.inputList = this.inputList.asSequence()
+            .onEach {
+                if (it.state == MoleState.HEATING) return@onEach
+                if (Random.Default.nextFloat() <= this.notWastePercentage.value) return@onEach
+                val moleCount: Int = it.moleCount
+                it.nextState()
+                this.overallMoles -= (moleCount - it.moleCount)
+            }
+            .filterNot { it.state == MoleState.WASTE_L3 }
+            .toMutableList()
     }
 
     private fun produce() {
         if (--this.produceTimer > 0) return
         this.produceTimer = PRODUCE_TIME
         when {
-            this.powerStored < ENERGY_TEST -> {
+            this.powerStored < ENERGY_NEEDED && this.overallMoles < MOLES_NEEDED -> {
+            }
+
+            this.powerStored < ENERGY_NEEDED -> {
                 this.powerStored = 0UL
                 this.overallMoles = 0
-                this.inputList = listOf()
+                this.inputList = mutableListOf()
                 this.output(ItemStack(Items.waste.get(), 1))
             }
-            this.overallMoles < MOLE_TEST -> {
-                this.powerStored -= ENERGY_TEST
+
+            this.overallMoles < MOLES_NEEDED -> {
+                this.powerStored -= ENERGY_NEEDED
                 this.overallMoles = 0
-                this.inputList = listOf()
+                this.inputList = mutableListOf()
                 this.output(ItemStack(Items.waste.get(), 1))
             }
+
             else -> {
-                this.powerStored -= ENERGY_TEST
-                this.overallMoles -= MOLE_TEST
-                for (i in 0 until MOLE_TEST) {
+                this.powerStored -= ENERGY_NEEDED
+                this.overallMoles -= MOLES_NEEDED
+                for (i in 0 until MOLES_NEEDED) {
                     this.inputList.first().let {
                         it.reduceMoleCount()
                         if (it.moleCount == 0) this.inputList.minus(it)
@@ -129,8 +152,8 @@ class TransmutatorTileEntity : TileEntity(), ITickable, Holder, Consumer {
 
     private fun output(stack: ItemStack) {
         var toOutput = stack
-        this.world.getTileEntity(this.pos.down())?.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.UP).let {
-            if (it != null) toOutput = ItemHandlerHelper.insertItem(it, toOutput, false)
+        this.world.getTileEntity(this.pos.down())?.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.UP)?.let {
+            toOutput = ItemHandlerHelper.insertItem(it, toOutput, false)
             if (toOutput == ItemStack.EMPTY) return
         }
         this.world.spawnEntity(EntityItem(this.world, this.pos.x.toDouble(), this.pos.y.toDouble() + 1, this.pos.z.toDouble(), toOutput))
@@ -178,7 +201,7 @@ class TransmutatorTileEntity : TileEntity(), ITickable, Holder, Consumer {
     private fun getFacing(): EnumFacing? = this.world.getBlockState(this.pos).let { state ->
         state.block.let { block ->
             if (block !is TransmutatorBlock) return null
-            block.getFacing(state)
+            state.getValue(TransmutatorBlock.FACING)
         }
     }
 
@@ -215,6 +238,7 @@ class TransmutatorTileEntity : TileEntity(), ITickable, Holder, Consumer {
     internal fun changeOutput(playerIn: EntityPlayer, hand: EnumHand) = Unit.also { this.selectedOutput = playerIn.getHeldItem(hand).copy().apply { this.count = 1 } }
     internal fun requestRecalculation() = Unit.also { this.recalculationNeeded = true }
 
+    // TODO("n1kx", "rethink this")
     private inline fun <T> andNotify(block: () -> T) = block().also { this.markDirty() }.also { this.notifyUpdate() }
     private fun notifyUpdate() = this.world.getBlockState(this.pos).let { this.world.notifyBlockUpdate(this.pos, it, it, Constants.BlockFlags.DEFAULT) }
 }

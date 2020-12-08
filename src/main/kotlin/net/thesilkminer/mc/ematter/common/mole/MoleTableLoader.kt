@@ -70,14 +70,14 @@ private class MoleTableProcessor : Processor<JsonObject> {
     }
 
     override fun process(content: JsonObject, identifier: NameSpacedString, globalContext: Context?, phaseContext: Context?) {
-        val target = ForgeRegistries.ITEMS.getValue(identifier.toResourceLocation()) ?: return l.warn("Found temperature table for unrecognized target '$identifier': ignoring")
+        val target = ForgeRegistries.ITEMS.getValue(identifier.toResourceLocation()) ?: return l.warn("Found mole table for unrecognized target '$identifier': ignoring")
 
         val isNormal = content.has("entries")
         val isRedirect = content.has("from")
         if (isNormal && isRedirect) throw JsonSyntaxException("Expected either 'entries' or 'from' but got both")
         if (!isNormal && !isRedirect) throw JsonSyntaxException("Expected either 'entries' or 'from' but got none")
 
-        val moleTable = if (isNormal) this.processNormalLootTable(content) else this.processRedirectLootTable(content)
+        val moleTable = if (isNormal) this.processNormalTable(content) else this.processRedirectTable(content)
         try {
             MoleTables[target] = moleTable
         } catch (e: IllegalStateException) {
@@ -85,7 +85,7 @@ private class MoleTableProcessor : Processor<JsonObject> {
         }
     }
 
-    private fun processNormalLootTable(data: JsonObject): (MoleContext) -> Moles {
+    private fun processNormalTable(data: JsonObject): (MoleContext) -> Moles {
         val entries = JsonUtils.getJsonArray(data, "entries")
         val entryFunctions = entries.asSequence()
                 .mapIndexed { index, entry -> JsonUtils.getJsonObject(entry, "entries[$index]") }
@@ -94,7 +94,7 @@ private class MoleTableProcessor : Processor<JsonObject> {
         return this.merge(entryFunctions)
     }
 
-    private fun processRedirectLootTable(data: JsonObject): (MoleContext) -> Moles {
+    private fun processRedirectTable(data: JsonObject): (MoleContext) -> Moles {
         val from = JsonUtils.getString(data, "from").toNameSpacedString()
         val targetItem = ForgeRegistries.ITEMS.getValue(from.toResourceLocation()) ?: throw JsonParseException("Unable to find block '$from'")
 
@@ -114,7 +114,7 @@ private class MoleTableProcessor : Processor<JsonObject> {
 
     private fun processCondition(data: JsonObject) = moleTableConditionSerializerRegistry[data].read(data)
 
-    private fun merge(functions: List<Pair<() -> Moles, List<(MoleContext) -> Boolean>>>): (MoleContext) -> Int {
+    private fun merge(functions: List<Pair<() -> Moles, List<(MoleContext) -> Boolean>>>): (MoleContext) -> Moles {
         val catchAllPair = this.validate(functions)
         val conditionBased = functions.minus(catchAllPair)
         return { context -> (conditionBased.firstOrNull { pair -> pair.second.all { condition -> condition(context) } }?.first ?: catchAllPair.first)() }
@@ -122,7 +122,7 @@ private class MoleTableProcessor : Processor<JsonObject> {
 
     private fun validate(functions: List<Pair<() -> Int, List<(MoleContext) -> Boolean>>>) =
             try {
-                functions.asSequence().single { it.second.isEmpty() }
+                functions.single { it.second.isEmpty() }
             } catch (e: IllegalArgumentException) {
                 throw JsonParseException("A set of entries in a mole table must have ONE catch-all condition: no more no less", e)
             }

@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "ematter:molecular_transmutator" },
+    "facing=south": { "model": "ematter:molecular_transmutator", "y": 180 },
+    "facing=west":  { "model": "ematter:molecular_transmutator", "y": 270 },
+    "facing=east":  { "model": "ematter:molecular_transmutator", "y": 90 }
+  }
+}

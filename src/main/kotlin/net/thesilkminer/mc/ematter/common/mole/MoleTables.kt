@@ -6,6 +6,7 @@ import net.thesilkminer.mc.ematter.MOD_NAME
 
 internal typealias Moles = Int
 
+
 internal object MoleTables {
     private val l = L(MOD_NAME, "Mole Tables")
     private val tables = mutableMapOf<Item, (MoleContext) -> Moles>()

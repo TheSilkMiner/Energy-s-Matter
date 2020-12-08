@@ -1,0 +1,37 @@
+{
+  "entries": [
+    {
+      "conditions": [
+        {
+          "type": "ematter:or",
+          "conditions": [
+            {
+              "type": "ematter:meta",
+              "meta": 0
+            },
+            {
+              "type": "ematter:meta",
+              "meta": 1
+            }
+          ]
+        }
+      ],
+      "moles": 10
+    },
+    {
+      "conditions": [
+        {
+          "type": "ematter:not",
+          "condition": {
+            "type": "ematter:meta",
+            "meta": 3
+          }
+        }
+      ],
+      "moles": 6
+    },
+    {
+      "moles":5
+    }
+  ]
+}

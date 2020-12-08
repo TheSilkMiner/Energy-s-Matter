@@ -42,6 +42,7 @@ import net.thesilkminer.mc.ematter.client.SidedEventHandler
 import net.thesilkminer.mc.ematter.common.TileEntityRegistration
 import net.thesilkminer.mc.ematter.common.attachBlocksListener
 import net.thesilkminer.mc.ematter.common.attachItemsListener
+import net.thesilkminer.mc.ematter.common.mole.condition.attachMoleTableConditionSerializersListener
 import net.thesilkminer.mc.ematter.common.mole.freezeMoleTables
 import net.thesilkminer.mc.ematter.common.mole.loadMoleTables
 import net.thesilkminer.mc.ematter.common.network.GuiHandler
@@ -68,6 +69,7 @@ object EnergyIsMatter {
             attachItemsListener(it)
             attachSteppingFunctionListener(it)
             attachTemperatureTableConditionSerializersListener(it)
+            attachMoleTableConditionSerializersListener(it)
             it.register(TileEntityRegistration)
             it.register(CompatibilityProviderHandler)
         }

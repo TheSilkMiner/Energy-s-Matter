@@ -18,7 +18,7 @@ internal object MoleTableConditionSerializers {
     val and = moleTableConditionSerializerDeferredRegister.register("and", ::MoleAndConditionSerializer)
     val not = moleTableConditionSerializerDeferredRegister.register("not", ::MoleNotConditionSerializer)
     val or = moleTableConditionSerializerDeferredRegister.register("or", ::MoleOrConditionSerializer)
-    val metadata = moleTableConditionSerializerDeferredRegister.register("metadata", ::MoleMetadataConditionSerializer)
+    val meta = moleTableConditionSerializerDeferredRegister.register("meta", ::MoleMetadataConditionSerializer)
 }
 
 internal fun attachMoleTableConditionSerializersListener(bus: EventBus) =
