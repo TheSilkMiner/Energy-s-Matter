@@ -33,7 +33,6 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.ITickable
-import net.minecraft.util.math.BlockPos
 import net.minecraftforge.common.capabilities.Capability
 import net.thesilkminer.kotlin.commons.lang.reloadableLazy
 import net.thesilkminer.kotlin.commons.lang.uncheckedCast
@@ -51,12 +50,15 @@ import net.thesilkminer.mc.boson.prefab.tag.isInTag
 import net.thesilkminer.mc.ematter.MOD_ID
 import net.thesilkminer.mc.ematter.common.temperature.TemperatureContext
 import net.thesilkminer.mc.ematter.common.temperature.TemperatureTables
+import net.thesilkminer.mc.ematter.common.temperature.createTemperatureContext
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
 @Suppress("EXPERIMENTAL_API_USAGE", "EXPERIMENTAL_OVERRIDE", "EXPERIMENTAL_UNSIGNED_LITERALS")
 internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
+
     private companion object {
+
         private const val MAX_CAPACITY = 3_141UL //same storage the basic mad has
         // TODO("See if the actual capacity should be amped up by a small margin")
 
@@ -74,7 +76,7 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
         private const val NBT_PUSHING_BURST_KEY = "pushing_time"
     }
 
-    private val airTemperature = reloadableLazy { TemperatureTables[Blocks.AIR](this.pos.createTemperatureContext()) }
+    private val airTemperature = reloadableLazy { TemperatureTables[Blocks.AIR](this.world.createTemperatureContext(this.pos)) }
     private val sources by lazy { bosonApi.tagRegistry[blockTagType, NameSpacedString(MOD_ID, "seebeck_generator_sources")] }
 
     private var tempDifference = 0U
@@ -103,7 +105,7 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
         this.pushPower()
     }
 
-    private fun queryWorldTime() = if (currentDayMoment != TemperatureContext.DayMoment[this.world.worldTime]) this.requestRecalculation() else Unit
+    private fun queryWorldTime() = if (this.currentDayMoment != TemperatureContext.DayMoment[this.world.worldTime]) this.requestRecalculation() else Unit
 
     private fun generatePower() {
         // Power is generated every burst time, in an amount that matches the tick rate
@@ -182,7 +184,7 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
         return super.hasCapability(capability, facing)
     }
 
-    override fun <T: Any?> getCapability(capability: Capability<T>, facing: EnumFacing?): T? {
+    override fun <T : Any?> getCapability(capability: Capability<T>, facing: EnumFacing?): T? {
         if (capability == producerCapability && (facing == EnumFacing.UP || facing == null)) return this.uncheckedCast()
         if (capability == holderCapability && facing == null) return this.uncheckedCast()
         return super.getCapability(capability, facing)
@@ -210,18 +212,18 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
         this.airTemperature.reload()
 
         this.tempDifference = Direction.values()
-                .asSequence()
-                .minus(Direction.UP)
-                .map { this.pos.offset(it.toFacing()) }
-                .map { this.world.getBlockState(it) to it.createTemperatureContext() }
-                .map { it.first.let { state -> if (state.isRecognized()) state.block else Blocks.AIR } to it.second }
-                .map { TemperatureTables[it.first](it.second) }
-                .map { it - this.airTemperature.value }
-                .filterNot { it == 0 }
-                .onEach { if (it > 0) ++heatSources else ++coolants }
-                .map { abs(it).toUInt() }
-                .plus(0U)
-                .reduce { acc, it -> acc + it }
+            .asSequence()
+            .minus(Direction.UP)
+            .map { this.pos.offset(it.toFacing()) }
+            .map { this.world.getBlockState(it) to this.world.createTemperatureContext(it) }
+            .map { it.first.let { state -> if (state.isRecognized()) state.block else Blocks.AIR } to it.second }
+            .map { TemperatureTables[it.first](it.second) }
+            .map { it - this.airTemperature.value }
+            .filterNot { it == 0 }
+            .onEach { if (it > 0) ++heatSources else ++coolants }
+            .map { abs(it).toUInt() }
+            .plus(0U)
+            .reduce { acc, it -> acc + it }
 
         // For every non cooled heat source the effectiveness reduces; if there are 5 heat sources or coolants the effectiveness is 0
         this.effectiveness = 1.0 - 0.2 * (heatSources - coolants * 2).let { if (it >= 0) it else if (coolants == 5) 5 else 0 }
@@ -244,5 +246,4 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
     }
 
     private fun IBlockState.isRecognized() = this isInTag this@SeebeckTileEntity.sources
-    private fun BlockPos.createTemperatureContext() = TemperatureContext(this@SeebeckTileEntity.world, this, this@SeebeckTileEntity.currentDayMoment)
 }

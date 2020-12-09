@@ -33,15 +33,19 @@ import net.minecraft.world.World
 data class TemperatureContext(val world: World, val pos: BlockPos, val dayMoment: DayMoment) {
     // TODO("Check whether placing this here makes sense")
     enum class DayMoment(private val begin: Int, private val end: Int) {
+
         DAWN(23_000, 24_000),
         DAY(0, 12_000),
         DUSK(12_000, 13_000),
         NIGHT(13_000, 23_000);
 
         companion object {
+
             private val values = values()
             internal operator fun get(time: Int) = (time % DAWN.end).let { modTime -> this.values.first { it.begin <= modTime && modTime < it.end } }
             internal operator fun get(time: Long) = this[time.toInt()]
         }
     }
 }
+
+fun World.createTemperatureContext(pos: BlockPos) = TemperatureContext(this, pos, TemperatureContext.DayMoment[this.worldTime])

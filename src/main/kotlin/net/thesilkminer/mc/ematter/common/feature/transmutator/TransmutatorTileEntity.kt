@@ -27,6 +27,7 @@ import net.thesilkminer.mc.ematter.common.Items
 import net.thesilkminer.mc.ematter.common.mole.*
 import net.thesilkminer.mc.ematter.common.temperature.TemperatureContext
 import net.thesilkminer.mc.ematter.common.temperature.TemperatureTables
+import net.thesilkminer.mc.ematter.common.temperature.createTemperatureContext
 import kotlin.random.Random
 
 @Suppress("EXPERIMENTAL_API_USAGE", "EXPERIMENTAL_OVERRIDE", "EXPERIMENTAL_UNSIGNED_LITERALS")
@@ -51,9 +52,8 @@ class TransmutatorTileEntity : TileEntity(), ITickable, Holder, Consumer {
     private val heaters by lazy { bosonApi.tagRegistry[blockTagType, NameSpacedString(MOD_ID, "heaters/molecular_transmutator")] }
 
     private lateinit var heatSource: Block
-    private lateinit var currentDayMoment: TemperatureContext.DayMoment
 
-    private val notWastePercentage = reloadableLazy { (TemperatureTables[heatSource](TemperatureContext(this.world, this.pos, this.currentDayMoment)) / 2000).coerceAtMost(1) } // TODO("n1kx", "find out why I took 2000")
+    private val notWastePercentage = reloadableLazy { (TemperatureTables[heatSource](this.world.createTemperatureContext(this.pos)) / 2000).coerceAtMost(1) } // TODO("n1kx", "find out why I took 2000")
     private var recalculationNeeded: Boolean = true
 
     // TODO("n1kx", "think about better solutions than a MoleHolder")
@@ -171,7 +171,6 @@ class TransmutatorTileEntity : TileEntity(), ITickable, Holder, Consumer {
 
     private fun recalculateData() {
         this.recalculationNeeded = false
-        this.currentDayMoment = TemperatureContext.DayMoment[this.world.worldTime]
         this.getFacing().let { facing ->
             if (facing == null) return
             this.world.getBlockState(this.pos.offset(facing)).let { heatSource ->
