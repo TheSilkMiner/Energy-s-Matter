@@ -18,11 +18,21 @@ internal class CableNetwork : INBTSerializable<NBTTagCompound> {
 
     override fun serializeNBT(): NBTTagCompound {
         val tag = NBTTagCompound()
-        this.cables.forEachIndexed { index, pos -> tag.setLong("cable$index", pos.toLong() ) }
+        this.cables.forEachIndexed { index, pos ->
+            tag.setIntArray("cable$index", IntArray(3).apply {
+                this[0] = pos.x
+                this[1] = pos.y
+                this[2] = pos.z
+            })
+        }
         return tag
     }
 
     override fun deserializeNBT(nbt: NBTTagCompound?) {
-        nbt?.keySet?.forEach { this.cables.add(BlockPos.fromLong(nbt.getLong(it))) }
+        nbt?.keySet?.forEach { key ->
+            nbt.getIntArray(key).let { xyz ->
+                this.cables.add(BlockPos(xyz[0], xyz[1], xyz[2]))
+            }
+        }
     }
 }

@@ -5,7 +5,6 @@ import net.minecraft.util.math.BlockPos
 import net.thesilkminer.mc.boson.api.direction.Direction
 import net.thesilkminer.mc.boson.prefab.direction.toFacing
 import net.thesilkminer.mc.ematter.common.feature.cable.CableNetwork
-import java.lang.IllegalArgumentException
 
 @ExperimentalUnsignedTypes
 internal class CableNetworkManagerCapability : NetworkManager {
