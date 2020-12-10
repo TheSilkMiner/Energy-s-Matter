@@ -43,6 +43,7 @@ import net.thesilkminer.mc.ematter.common.BlockEntityRegistration
 import net.thesilkminer.mc.ematter.common.ConfigurationRegistrationHandler
 import net.thesilkminer.mc.ematter.common.attachBlocksListener
 import net.thesilkminer.mc.ematter.common.attachItemsListener
+import net.thesilkminer.mc.ematter.common.feature.cable.capability.CableNetworkCapabilityHandler
 import net.thesilkminer.mc.ematter.common.network.GuiHandler
 import net.thesilkminer.mc.ematter.common.network.setUpNetworkChannel
 import net.thesilkminer.mc.ematter.common.recipe.mad.capability.MadRecipeCapabilityHandler
@@ -87,10 +88,12 @@ object EnergyIsMatter {
         onlyOn(Distribution.CLIENT) { SidedEventHandler::registerCustomModelLoaders }
     }
 
+    @ExperimentalUnsignedTypes
     @Mod.EventHandler
     fun onInitialization(e: FMLInitializationEvent) {
         l.info("Initialization")
         MadRecipeCapabilityHandler.registerCapability()
+        CableNetworkCapabilityHandler.registerCapability()
         setUpNetworkChannel()
         GuiHandler().register()
         onlyOn(Distribution.CLIENT) { SidedEventHandler::registerBlockEntityRenders }

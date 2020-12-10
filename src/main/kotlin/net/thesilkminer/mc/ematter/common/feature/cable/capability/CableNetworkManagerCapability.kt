@@ -1,17 +1,20 @@
-package net.thesilkminer.mc.ematter.common.feature.cable
+package net.thesilkminer.mc.ematter.common.feature.cable.capability
 
+import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.math.BlockPos
 import net.thesilkminer.mc.boson.api.direction.Direction
 import net.thesilkminer.mc.boson.prefab.direction.toFacing
+import net.thesilkminer.mc.ematter.common.feature.cable.CableNetwork
+import java.lang.IllegalArgumentException
 
 @ExperimentalUnsignedTypes
-internal object NetworkManager {
+internal class CableNetworkManagerCapability : NetworkManager {
 
     private val networks: MutableSet<CableNetwork> = mutableSetOf()
 
-    operator fun get(pos: BlockPos): CableNetwork? = this.networks.find { pos in it }
+    override fun get(pos: BlockPos): CableNetwork? = this.networks.find { pos in it }
 
-    fun add(pos: BlockPos) {
+    override fun add(pos: BlockPos) {
         if (this[pos] != null) return
 
         val adjacentNetworks: Set<CableNetwork> = pos.getAdjacentNetworks()
@@ -26,7 +29,7 @@ internal object NetworkManager {
         }
     }
 
-    fun remove(pos: BlockPos) {
+    override fun remove(pos: BlockPos) {
         this[pos]?.let {
             val adjacentCables: Set<BlockPos> = pos.getAdjacentCables()
 
@@ -58,13 +61,28 @@ internal object NetworkManager {
     }
 
     private fun BlockPos.getAdjacentNetworks(): Set<CableNetwork> = Direction.values().asSequence()
-        .map { this@NetworkManager[this.offset(it.toFacing())] }
+        .map { this@CableNetworkManagerCapability[this.offset(it.toFacing())] }
         .filter { it != null }
         .map { it as CableNetwork }
         .toSet()
 
     private fun BlockPos.getAdjacentCables(): Set<BlockPos> = Direction.values().asSequence()
         .map { this.offset(it.toFacing()) }
-        .filter { this@NetworkManager[it] != null }
+        .filter { this@CableNetworkManagerCapability[it] != null }
         .toSet()
+
+    override fun serializeNBT(): NBTTagCompound {
+        val tag = NBTTagCompound()
+        this.networks.forEachIndexed { index, cableNetwork -> tag.setTag("$index", cableNetwork.serializeNBT()) }
+        return tag
+    }
+
+    override fun deserializeNBT(nbt: NBTTagCompound?) {
+        this.networks.clear()
+        nbt?.keySet?.forEach { index ->
+            (nbt.getTag(index) as? NBTTagCompound)?.let { tag ->
+                this.networks.add(CableNetwork().apply { this.deserializeNBT(tag) })
+            }
+        }
+    }
 }
