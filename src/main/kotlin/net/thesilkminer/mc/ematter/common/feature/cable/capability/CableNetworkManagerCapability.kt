@@ -14,8 +14,6 @@ internal class CableNetworkManagerCapability : NetworkManager {
     override fun get(pos: BlockPos): CableNetwork? = this.networks.find { pos in it }
 
     override fun add(pos: BlockPos) {
-        if (this[pos] != null) return
-
         val adjacentNetworks: Set<CableNetwork> = pos.getAdjacentNetworks()
 
         // 0 -> no networks adjacent -> create new network

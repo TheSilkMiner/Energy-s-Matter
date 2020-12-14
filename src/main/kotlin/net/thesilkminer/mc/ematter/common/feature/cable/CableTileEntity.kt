@@ -8,8 +8,11 @@ import net.thesilkminer.mc.ematter.common.feature.cable.capability.getNetworkMan
 @ExperimentalUnsignedTypes
 internal class CableTileEntity : TileEntity() {
 
-    override fun onLoad() = if (!this.world.isRemote) this.world.getNetworkManager()?.add(this.pos) ?: Unit else Unit
-    fun onRemove() = if (!this.world.isRemote) this.world.getNetworkManager()?.remove(this.pos) ?: Unit else Unit
+    fun onAdd() =
+        if (!this.world.isRemote) this.world.getNetworkManager()?.add(this.pos) ?: Unit else Unit
+
+    fun onRemove() =
+        if (!this.world.isRemote) this.world.getNetworkManager()?.remove(this.pos) ?: Unit else Unit
 
     // TODO("n1kx", "best feature eu-west: blocking connections")
 }

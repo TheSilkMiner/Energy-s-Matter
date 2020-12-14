@@ -20,14 +20,17 @@ object CableNetworkCapabilityHandler {
 
         private val capabilityInstance by lazy { CableNetworkManagerCapability() }
 
-        override fun hasCapability(capability: Capability<*>, facing: EnumFacing?): Boolean = capability == cableNetworkCapability && facing == null
+        override fun hasCapability(capability: Capability<*>, facing: EnumFacing?): Boolean =
+            capability == cableNetworkCapability && facing == null
 
         override fun <T : Any?> getCapability(capability: Capability<T>, facing: EnumFacing?): T? =
             if (capability == cableNetworkCapability && facing == null) this.capabilityInstance.uncheckedCast() else null
 
-        override fun serializeNBT(): NBTTagCompound = this.capabilityInstance.serializeNBT()
+        override fun serializeNBT(): NBTTagCompound =
+            this.capabilityInstance.serializeNBT()
 
-        override fun deserializeNBT(nbt: NBTTagCompound?) = this.capabilityInstance.deserializeNBT(nbt)
+        override fun deserializeNBT(nbt: NBTTagCompound?) =
+            this.capabilityInstance.deserializeNBT(nbt)
     }
 
     private class NetworkManagerCapabilityStorage : Capability.IStorage<NetworkManager> {
@@ -47,7 +50,8 @@ object CableNetworkCapabilityHandler {
     }
 
     @ExperimentalUnsignedTypes
-    internal fun registerCapability() = CapabilityManager.INSTANCE.register(NetworkManager::class.java, NetworkManagerCapabilityStorage(), ::CableNetworkManagerCapability)
+    internal fun registerCapability() =
+        CapabilityManager.INSTANCE.register(NetworkManager::class.java, NetworkManagerCapabilityStorage(), ::CableNetworkManagerCapability)
 
     @ExperimentalUnsignedTypes
     @SubscribeEvent

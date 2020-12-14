@@ -29,5 +29,9 @@ internal class CableBlock : Block(MATERIAL_CABLE) {
         super.breakBlock(worldIn, pos, state)
     }
 
+    override fun onBlockAdded(worldIn: World, pos: BlockPos, state: IBlockState) {
+        (worldIn.getTileEntity(pos) as? CableTileEntity)?.onAdd() // this call actually creates the tile entity but that's fine since the chunk would create it in the same tick anyways
+    }
+
     // TODO("n1kx", "make rendering go brrrrr again")
 }
