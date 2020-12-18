@@ -48,7 +48,7 @@ internal interface CraftedMadRecipesAmount : INBTSerializable<NBTTagCompound> {
     fun findAmountFor(name: NameSpacedString): Long
     fun findAmountFor(recipe: IRecipe) = this.findAmountFor(recipe.registryName!!.toNameSpacedString())
     fun increaseAmountFor(name: NameSpacedString)
-    fun increaseAmountFor(recipe: IRecipe) = this.findAmountFor(recipe.registryName!!.toNameSpacedString())
+    fun increaseAmountFor(recipe: IRecipe) = this.increaseAmountFor(recipe.registryName!!.toNameSpacedString())
 }
 
 internal class CraftedMadRecipesAmountCapability : CraftedMadRecipesAmount {
