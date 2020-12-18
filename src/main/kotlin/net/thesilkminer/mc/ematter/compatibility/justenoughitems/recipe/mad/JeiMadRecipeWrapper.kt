@@ -117,8 +117,17 @@ internal class JeiMadRecipeWrapper(private val helpers: IJeiHelpers, val recipe:
         private const val FORMULA_WARNING_TEXT_COLOR = 0xFFD700FF.toInt()
 
         private val fieldReferences = mutableMapOf<KClass<*>, Field?>()
-        private val fieldReferenceComputingFunction = { key: KClass<*> ->
-            try { key.java.getDeclaredField("steppingFunction").apply { this.isAccessible = true } } catch (e: ReflectiveOperationException) { null }
+        private val fieldReferenceComputingFunction = this::computeSteppingFunctionField
+
+        private fun computeSteppingFunctionField(targetClass: KClass<*>?): Field? {
+            if (targetClass == null) return null
+            return try {
+                targetClass.java.getDeclaredField("steppingFunction").apply { this.isAccessible = true }
+            } catch (e: NoSuchFieldException) {
+                computeSteppingFunctionField(targetClass.java.superclass?.uncheckedCast<Class<*>>()?.kotlin)
+            } catch (e: ReflectiveOperationException) {
+                null
+            }
         }
 
         private fun IRecipe.wrap() = when (this) {
