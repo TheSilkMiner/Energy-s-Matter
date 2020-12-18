@@ -533,6 +533,7 @@ internal class ZenMadRecipeWrapper(private val wrapped: MadRecipe) : ZenMadRecip
             stringBuilder += this.group.toString().removePrefix("minecraft:")
             stringBuilder += '"'
         }
+        stringBuilder += ", "
 
         // ingredients as IIngredient?[]{[]}
         stringBuilder += '['

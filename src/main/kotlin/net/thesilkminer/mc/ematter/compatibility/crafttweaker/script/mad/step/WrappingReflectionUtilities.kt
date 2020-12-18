@@ -36,7 +36,7 @@ import net.thesilkminer.mc.ematter.common.recipe.mad.step.SteppingFunction
 internal fun SteppingFunction.toCommandString() = if (this is ZenSteppingFunction) this.toCommandString() else this.nativeToCommandString()
 
 @ExperimentalUnsignedTypes
-private fun SteppingFunction.nativeToCommandString() = this.tryNativeCommandString() ?: "SteppingFunctions.custom(function (x as double) as double { ... })"
+private fun SteppingFunction.nativeToCommandString() = this.tryNativeCommandString() ?: "SteppingFunctions.custom(function (x as long) as long { ... })"
 
 @ExperimentalUnsignedTypes
 private fun SteppingFunction.tryNativeCommandString() = when (this::class.simpleName) {

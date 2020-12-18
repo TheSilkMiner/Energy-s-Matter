@@ -144,6 +144,6 @@ private class ZenCustomSteppingFunction private constructor(private val function
         return returnValue
     }
 
-    override fun toCommandString() = "SteppingFunctions.custom${if (this.isSafe) "" else "___unsafe"}(function (x as double) as double { ... })"
+    override fun toCommandString() = "SteppingFunctions.custom${if (this.isSafe) "" else "___unsafe"}(function (x as long) as long { ... })"
     override val isUnsafe get() = !this.isSafe
 }
