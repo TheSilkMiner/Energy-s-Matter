@@ -59,7 +59,7 @@ internal sealed class AddRecipeAction(private val name: NameSpacedString, privat
     override fun describe() = "Registering a ${this.type} Molecular Assembler Device recipe with name '${this.name}' for item output '${this.output}'"
 
     override fun apply() {
-        if (ForgeRegistries.RECIPES.getValue(this.name.toResourceLocation()) != null) {
+        if (ForgeRegistries.RECIPES.getValue(this.name.toResourceLocation()) == null) {
             return ForgeRegistries.RECIPES.register(this.recipe.setRegistryName(this.name.toResourceLocation()))
         }
         CraftTweakerAPI.logError("Unable to register recipe with name '${this.name}' since it is conflicting with another recipe with the same name")
