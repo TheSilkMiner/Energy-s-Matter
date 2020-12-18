@@ -59,7 +59,9 @@ internal class MadContainer(private val te: MadTileEntity, private val playerInv
         override fun canTakeStack(playerIn: EntityPlayer) = this.recipe().let { it != null && (it !is MadRecipe || it.getPowerRequiredFor(this.player) <= this.te.storedPower) }
 
         override fun onCrafting(stack: ItemStack) {
-            (this.inventory as? InventoryCraftResult)?.recipeUsed?.let { this.player.getCapability(craftedMadRecipesAmountCapability, null)!!.increaseAmountFor(it) }
+            if (!this.player.world.isRemote) {
+                (this.inventory as? InventoryCraftResult)?.recipeUsed?.let { this.player.getCapability(craftedMadRecipesAmountCapability, null)!!.increaseAmountFor(it) }
+            }
             super.onCrafting(stack)
         }
     }
@@ -75,7 +77,7 @@ internal class MadContainer(private val te: MadTileEntity, private val playerInv
     internal val currentRecipe get() = this.foundRecipes.getOrNull(0)
 
     init {
-        this.addSlotToContainer(PoweredCraftingSlot(this.te, { this.foundRecipes.getOrElse(0) { null } }, playerInventory.player, this.craftingMatrix,
+        this.addSlotToContainer(PoweredCraftingSlot(this.te, { this.currentRecipe }, playerInventory.player, this.craftingMatrix,
                 this.craftResult, 0, 83, 11))
         this.addSlotToContainer(FakeSlot(this.alternativeCraftResultLeft, 0, 55, 23))
         this.addSlotToContainer(FakeSlot(this.alternativeCraftResultRight, 0, 111, 23))

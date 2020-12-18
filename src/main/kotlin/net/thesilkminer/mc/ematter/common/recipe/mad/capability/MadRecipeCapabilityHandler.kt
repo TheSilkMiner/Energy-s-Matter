@@ -116,7 +116,9 @@ internal object MadRecipeCapabilityHandler {
     @Suppress("unused")
     fun onItemCrafted(event: net.minecraftforge.fml.common.gameevent.PlayerEvent.ItemCraftedEvent) {
         // The below explicit equality is needed due to nullable checks being in place
-        if (event.craftMatrix?.let { it !is CraftingInventoryWrapper || it.containerClass != MadContainer::class } == true) return
+        if (event.player != null && event.player.world != null && event.player.world.isRemote) return
+        val matrix = event.craftMatrix ?: return
+        if (matrix !is CraftingInventoryWrapper || matrix.containerClass != MadContainer::class) return
         this.syncCapabilities(event.player)
     }
 
