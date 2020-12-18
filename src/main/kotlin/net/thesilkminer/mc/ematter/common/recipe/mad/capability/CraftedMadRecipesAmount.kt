@@ -30,6 +30,7 @@
 package net.thesilkminer.mc.ematter.common.recipe.mad.capability
 
 import it.unimi.dsi.fastutil.objects.Object2LongAVLTreeMap
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.crafting.IRecipe
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.common.capabilities.Capability
@@ -40,6 +41,8 @@ import net.thesilkminer.mc.boson.prefab.naming.toNameSpacedString
 
 @CapabilityInject(CraftedMadRecipesAmount::class)
 internal lateinit var craftedMadRecipesAmountCapability: Capability<CraftedMadRecipesAmount>
+
+internal val EntityPlayer.craftedMadRecipesAmount get() = this.getCapability(craftedMadRecipesAmountCapability, null)
 
 internal interface CraftedMadRecipesAmount : INBTSerializable<NBTTagCompound> {
     fun findAmountFor(name: NameSpacedString): Long
