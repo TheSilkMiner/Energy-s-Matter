@@ -144,6 +144,7 @@ internal class MadContainer(private val te: MadTileEntity, private val playerInv
 
     private fun transferMatrixStack(stack: ItemStack, stackInSlot: ItemStack): ItemStack? {
         if (!this.mergeItemStack(stackInSlot, 28, 64, false)) return null
+        this.onCraftMatrixChanged(this.craftingMatrix)
         return stack
     }
 
