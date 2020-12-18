@@ -264,7 +264,7 @@ internal class JeiMadRecipeWrapper(private val helpers: IJeiHelpers, val recipe:
 
     @ExperimentalUnsignedTypes
     private fun MadRecipe.findSteppingFunction() = when (this) {
-        is FakeShapelessMadRecipe -> FakeDoNothingSteppingFunction
+        is FakeShapelessMadRecipe -> FakeDoNothingSteppingFunction.let { null } // TODO("Configuration option")
         else -> fieldReferences.computeIfAbsent(this::class, fieldReferenceComputingFunction)?.let { it[this].uncheckedCast<SteppingFunction>() }
     }
 
