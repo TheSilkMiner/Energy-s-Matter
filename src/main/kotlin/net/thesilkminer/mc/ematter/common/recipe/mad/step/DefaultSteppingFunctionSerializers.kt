@@ -55,7 +55,7 @@ internal class ConstantSteppingFunctionSerializer : IForgeRegistryEntry.Impl<Ste
 internal class ExponentialSteppingFunctionSerializer : IForgeRegistryEntry.Impl<SteppingFunctionSerializer>(), SteppingFunctionSerializer {
     private class ExponentialSteppingFunction(private val coefficient: Long, private val base: Double, private val mirror: Boolean, private val translation: Long) : SteppingFunction {
         // y = a * b^((-1)^m * (x - t))
-        override fun getPowerCostAt(x: Long) = (this.coefficient * this.base.pow((x - this.translation).toDouble() * (-1).pow(this.mirror))).toULong()
+        override fun getPowerCostAt(x: Long) = (this.coefficient * this.base.pow((x - this.translation).toDouble() * (-1).pow(!this.mirror))).toULong()
         @Suppress("NOTHING_TO_INLINE") private inline fun Int.pow(boolean: Boolean) = this.toDouble().pow(if (boolean) 0 else 1)
     }
 
