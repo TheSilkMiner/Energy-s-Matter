@@ -205,7 +205,7 @@ internal class JeiMadRecipeWrapper(private val helpers: IJeiHelpers, val recipe:
 
     @ExperimentalUnsignedTypes
     private fun renderSteppingFunctionBoundsMarkers(minecraft: Minecraft, min: ULong, current: ULong?, max: ULong) {
-        if (min == max) return this.renderSteppingFunctionBoundsMarkers(minecraft, min, current, max + 1.toULong())
+        if (min == max) return this.renderSteppingFunctionBoundsMarkers(minecraft, if (min == 0UL) 0UL else min - 1.toULong(), current, max + 1.toULong())
         val minText = min.toUserFriendlyAmount(decimalDigits = 0).replace(" ", "")
         val maxText = max.toUserFriendlyAmount(decimalDigits = 0).replace(" ", "")
         val currentText = "gui.ematter.jei.mad.step.power.current".toLocale(current?.toUserFriendlyAmount(decimalDigits = 4) ?: "gui.ematter.jei.mad.step.power.unknown".toLocale())
@@ -270,6 +270,10 @@ internal class JeiMadRecipeWrapper(private val helpers: IJeiHelpers, val recipe:
 
     @ExperimentalUnsignedTypes
     private fun ULong.toYCoordinate(min: ULong, max: ULong): Double {
+        // if min == max, place in the middle
+        if (min == max && min != 0UL) return (graphCurrentValueBegin.second + graphCurrentValueEnd.second) / 2
+
+        // otherwise, draw the actual graph with formula
         // (this - min) / (max - min) = (this on yAxis) / (max on yAxis)
         val maxYAxis = abs(graphCurrentValueBegin.second - graphCurrentValueEnd.second)
         val thisYAxis = if ((max - min).toDouble() <= 0.0) 0.0 else ((this - min).toDouble() / (max - min).toDouble()) * maxYAxis
