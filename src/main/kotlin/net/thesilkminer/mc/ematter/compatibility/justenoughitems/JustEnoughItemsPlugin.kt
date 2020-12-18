@@ -36,6 +36,9 @@ import mezz.jei.api.ingredients.IModIngredientRegistration
 import mezz.jei.api.recipe.IRecipeCategoryRegistration
 import mezz.jei.api.recipe.IRecipeWrapper
 import mezz.jei.api.recipe.VanillaRecipeCategoryUid
+import mezz.jei.api.recipe.transfer.IRecipeTransferRegistry
+import net.minecraft.client.gui.inventory.GuiContainer
+import net.minecraft.inventory.Container
 import net.minecraft.item.ItemStack
 import net.minecraft.item.crafting.ShapedRecipes
 import net.minecraft.item.crafting.ShapelessRecipes
@@ -44,7 +47,9 @@ import net.minecraftforge.oredict.ShapedOreRecipe
 import net.minecraftforge.oredict.ShapelessOreRecipe
 import net.thesilkminer.mc.boson.api.log.L
 import net.thesilkminer.mc.ematter.MOD_NAME
+import net.thesilkminer.mc.ematter.client.feature.mad.MadGui
 import net.thesilkminer.mc.ematter.common.Blocks
+import net.thesilkminer.mc.ematter.common.feature.mad.MadContainer
 import net.thesilkminer.mc.ematter.common.feature.mad.MadTier
 import net.thesilkminer.mc.ematter.common.recipe.mad.MadRecipe
 import net.thesilkminer.mc.ematter.compatibility.justenoughitems.recipe.mad.JeiMadRecipeWrapper
@@ -82,7 +87,7 @@ internal class JustEnoughItemsPlugin : IModPlugin {
         this.registerRecipes(registry)
         this.registerRecipeHandlers(registry)
         this.registerClickAreas(registry)
-        this.registerTransferHandlers(registry)
+        this.registerTransferHandlers(registry.recipeTransferRegistry)
     }
 
     private fun registerCatalysts(registry: IModRegistry) {
@@ -116,12 +121,23 @@ internal class JustEnoughItemsPlugin : IModPlugin {
 
     private fun registerClickAreas(registry: IModRegistry) {
         l.info("Registering click areas")
+        registry.addRecipeClickArea(MadGui::class, 86 to 38, 10 to 5, MadRecipeCategory.ID, VanillaRecipeCategoryUid.CRAFTING)
     }
 
-    private fun registerTransferHandlers(registry: IModRegistry) {
+    private fun registerTransferHandlers(registry: IRecipeTransferRegistry) {
         l.info("Registering transfer handlers")
+        registry.addRecipeTransferHandler(MadContainer::class, MadRecipeCategory.ID, 3 to 27, 28 to 54)
+        registry.addRecipeTransferHandler(MadContainer::class, VanillaRecipeCategoryUid.CRAFTING, 3 to 27, 28 to 54)
     }
 
     private fun <T : Any> IModRegistry.handleRecipes(categoryId: String, recipeClass: KClass<T>, factory: (T) -> IRecipeWrapper) =
             this.handleRecipes(recipeClass.java, { factory(it) }, categoryId)
+
+    private fun <T : GuiContainer> IModRegistry.addRecipeClickArea(screenClass: KClass<T>, position: Pair<Int, Int>, size: Pair<Int, Int>, vararg categoryIds: String) =
+            this.addRecipeClickArea(screenClass.java, position.first, position.second, size.first, size.second, *categoryIds)
+
+    private fun <T : Container> IRecipeTransferRegistry.addRecipeTransferHandler(containerClass: KClass<T>, categoryId: String,
+                                                                                 recipeSlots: Pair<Int, Int>, inventorySlots: Pair<Int, Int>) =
+            this.addRecipeTransferHandler(containerClass.java, categoryId, recipeSlots.first,
+                    recipeSlots.second - recipeSlots.first, inventorySlots.first, inventorySlots.second - inventorySlots.first)
 }
