@@ -70,7 +70,7 @@ internal sealed class ZenMadRecipeBase(val group: NameSpacedString?, private val
     : IForgeRegistryEntry.Impl<IRecipe>(), MadRecipe, ZenMadRecipe {
 
     abstract val nativeIngredients: NonNullList<Ingredient>
-    override val recipeName = this.registryName!!.toNameSpacedString().let { ZenNameSpacedString(it.nameSpace, it.path) }
+    override val recipeName get() = this.registryName!!.toNameSpacedString().let { ZenNameSpacedString(it.nameSpace, it.path) }
     override val internal get() = this
 
     @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS") // Apparently, World can be null because mods have decided so... I hate it so much.
@@ -226,7 +226,7 @@ internal class ZenShapedMadRecipe(group: NameSpacedString?, private val width: I
                 val x = xBasis - xZero
                 val y = yBasis - yZero
 
-                val ingredient = ingredients[x][y]?.toNative() ?: Ingredient.EMPTY
+                val ingredient = (if (x in 0 until this.width && y in 0 until this.height) ingredients[y][x]?.toNative() else null) ?: Ingredient.EMPTY
 
                 if (!ingredient.apply(inv.getStackInRowAndColumn(xBasis, yBasis))) return false
             }
@@ -476,7 +476,7 @@ internal class ZenMadRecipeWrapper(private val wrapped: MadRecipe) : ZenMadRecip
     private class ZenSteppingFunctionWrapper(wrapped: MadRecipe) : ZenSteppingFunction {
         private val steppingFunction by lazy {
             try {
-                wrapped::class.java.getDeclaredField("steppingFunction").apply { this.isAccessible = true }[this].uncheckedCast<SteppingFunction>()
+                wrapped::class.java.getDeclaredField("steppingFunction").apply { this.isAccessible = true }[wrapped].uncheckedCast<SteppingFunction>()
             } catch (e: ReflectiveOperationException) {
                 object : SteppingFunction {
                     init {

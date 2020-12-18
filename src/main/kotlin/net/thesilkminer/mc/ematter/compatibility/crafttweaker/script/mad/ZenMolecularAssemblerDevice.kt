@@ -174,7 +174,6 @@ internal object ZenMolecularAssemblerDevice {
         CraftTweakerAPI.logInfo("Applying Molecular Assembler Device actions - Step 2: Additions")
         this.recipesToAdd.forEach(CraftTweakerAPI::apply)
         if (this.dumpAction != null) {
-            CraftTweakerAPI.logInfo("Dumping current status of Molecular Assembler Device recipes")
             CraftTweakerAPI.apply(this.dumpAction)
         }
         CraftTweakerAPI.logInfo("Applying Molecular Assembler Device actions - Completed")
