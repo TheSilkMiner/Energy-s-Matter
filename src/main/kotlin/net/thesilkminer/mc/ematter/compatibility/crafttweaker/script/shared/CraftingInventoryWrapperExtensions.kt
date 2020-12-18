@@ -38,9 +38,9 @@ import net.minecraft.inventory.Container
 import net.minecraft.inventory.SlotCrafting
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper
 import net.thesilkminer.kotlin.commons.lang.uncheckedCast
+import net.thesilkminer.mc.boson.compatibility.crafttweaker.toNativeStack
+import net.thesilkminer.mc.boson.compatibility.crafttweaker.toZen
 import net.thesilkminer.mc.ematter.common.shared.CraftingInventoryWrapper
-import net.thesilkminer.mc.ematter.compatibility.crafttweaker.toNativeStack
-import net.thesilkminer.mc.ematter.compatibility.crafttweaker.toZen
 
 private val eventHandlerField by lazy { ObfuscationReflectionHelper.findField(Class.forName("net.minecraft.inventory.InventoryCrafting"), "field_70465_c") }
 private val playerField by lazy { ObfuscationReflectionHelper.findField(Class.forName("net.minecraft.inventory.SlotCrafting"), "field_75238_b") }

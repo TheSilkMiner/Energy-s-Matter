@@ -51,6 +51,9 @@ import net.thesilkminer.kotlin.commons.lang.plusAssign
 import net.thesilkminer.kotlin.commons.lang.uncheckedCast
 import net.thesilkminer.mc.boson.api.id.NameSpacedString
 import net.thesilkminer.mc.boson.compatibility.crafttweaker.naming.ZenNameSpacedString
+import net.thesilkminer.mc.boson.compatibility.crafttweaker.toNative
+import net.thesilkminer.mc.boson.compatibility.crafttweaker.toNativeStack
+import net.thesilkminer.mc.boson.compatibility.crafttweaker.toZen
 import net.thesilkminer.mc.boson.prefab.naming.toNameSpacedString
 import net.thesilkminer.mc.ematter.common.feature.mad.MadContainer
 import net.thesilkminer.mc.ematter.common.recipe.mad.MadRecipe
@@ -61,9 +64,6 @@ import net.thesilkminer.mc.ematter.compatibility.crafttweaker.script.mad.step.to
 import net.thesilkminer.mc.ematter.compatibility.crafttweaker.script.shared.ZenCraftingInfo
 import net.thesilkminer.mc.ematter.compatibility.crafttweaker.script.shared.buildMarks
 import net.thesilkminer.mc.ematter.compatibility.crafttweaker.script.shared.toZen
-import net.thesilkminer.mc.ematter.compatibility.crafttweaker.toNative
-import net.thesilkminer.mc.ematter.compatibility.crafttweaker.toNativeStack
-import net.thesilkminer.mc.ematter.compatibility.crafttweaker.toZen
 
 @ExperimentalUnsignedTypes
 internal sealed class ZenMadRecipeBase(val group: NameSpacedString?, private val output: IItemStack, val steppingFunction: ZenSteppingFunction)
