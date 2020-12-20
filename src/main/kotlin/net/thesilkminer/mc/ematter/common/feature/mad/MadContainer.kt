@@ -1,3 +1,30 @@
+/*
+ * Copyright (C) 2020  TheSilkMiner
+ *
+ * This file is part of Energy's Matter.
+ *
+ * Energy's Matter is provided AS IS, WITHOUT ANY WARRANTY, even without the
+ * implied warranty of FITNESS FOR A CERTAIN PURPOSE. Energy's Matter is
+ * therefore being distributed in the hope it will be useful, but no
+ * other assumptions are made.
+ *
+ * Energy's Matter is considered "all rights reserved", meaning you are not
+ * allowed to copy or redistribute any part of this program, including
+ * but not limited to the compiled binaries, the source code, or any
+ * other form of the program without prior written permission of the
+ * owner.
+ *
+ * On the other hand, you are allowed as per terms of GitHub to fork
+ * this repository and produce derivative works, as long as they remain
+ * for PERSONAL USAGE only: redistribution of changed binaries is also
+ * not allowed.
+ *
+ * Refer to the 'COPYING' file in this repository for more information
+ *
+ * Contact information:
+ * E-mail: thesilkminer <at> outlook <dot> com
+ */
+
 package net.thesilkminer.mc.ematter.common.feature.mad
 
 import net.minecraft.client.entity.EntityPlayerSP
@@ -32,7 +59,9 @@ internal class MadContainer(private val te: MadTileEntity, private val playerInv
         override fun canTakeStack(playerIn: EntityPlayer) = this.recipe().let { it != null && (it !is MadRecipe || it.getPowerRequiredFor(this.player) <= this.te.storedPower) }
 
         override fun onCrafting(stack: ItemStack) {
-            (this.inventory as? InventoryCraftResult)?.recipeUsed?.let { this.player.getCapability(craftedMadRecipesAmountCapability, null)!!.increaseAmountFor(it) }
+            if (!this.player.world.isRemote) {
+                (this.inventory as? InventoryCraftResult)?.recipeUsed?.let { this.player.getCapability(craftedMadRecipesAmountCapability, null)!!.increaseAmountFor(it) }
+            }
             super.onCrafting(stack)
         }
     }
@@ -48,7 +77,7 @@ internal class MadContainer(private val te: MadTileEntity, private val playerInv
     internal val currentRecipe get() = this.foundRecipes.getOrNull(0)
 
     init {
-        this.addSlotToContainer(PoweredCraftingSlot(this.te, { this.foundRecipes.getOrElse(0) { null } }, playerInventory.player, this.craftingMatrix,
+        this.addSlotToContainer(PoweredCraftingSlot(this.te, { this.currentRecipe }, playerInventory.player, this.craftingMatrix,
                 this.craftResult, 0, 83, 11))
         this.addSlotToContainer(FakeSlot(this.alternativeCraftResultLeft, 0, 55, 23))
         this.addSlotToContainer(FakeSlot(this.alternativeCraftResultRight, 0, 111, 23))
@@ -115,6 +144,7 @@ internal class MadContainer(private val te: MadTileEntity, private val playerInv
 
     private fun transferMatrixStack(stack: ItemStack, stackInSlot: ItemStack): ItemStack? {
         if (!this.mergeItemStack(stackInSlot, 28, 64, false)) return null
+        this.onCraftMatrixChanged(this.craftingMatrix)
         return stack
     }
 

@@ -1,3 +1,30 @@
+/*
+ * Copyright (C) 2020  TheSilkMiner
+ *
+ * This file is part of Energy's Matter.
+ *
+ * Energy's Matter is provided AS IS, WITHOUT ANY WARRANTY, even without the
+ * implied warranty of FITNESS FOR A CERTAIN PURPOSE. Energy's Matter is
+ * therefore being distributed in the hope it will be useful, but no
+ * other assumptions are made.
+ *
+ * Energy's Matter is considered "all rights reserved", meaning you are not
+ * allowed to copy or redistribute any part of this program, including
+ * but not limited to the compiled binaries, the source code, or any
+ * other form of the program without prior written permission of the
+ * owner.
+ *
+ * On the other hand, you are allowed as per terms of GitHub to fork
+ * this repository and produce derivative works, as long as they remain
+ * for PERSONAL USAGE only: redistribution of changed binaries is also
+ * not allowed.
+ *
+ * Refer to the 'COPYING' file in this repository for more information
+ *
+ * Contact information:
+ * E-mail: thesilkminer <at> outlook <dot> com
+ */
+
 @file:JvmName("ZR")
 
 package net.thesilkminer.mc.ematter.compatibility.crafttweaker.script.mad
@@ -24,6 +51,9 @@ import net.thesilkminer.kotlin.commons.lang.plusAssign
 import net.thesilkminer.kotlin.commons.lang.uncheckedCast
 import net.thesilkminer.mc.boson.api.id.NameSpacedString
 import net.thesilkminer.mc.boson.compatibility.crafttweaker.naming.ZenNameSpacedString
+import net.thesilkminer.mc.boson.compatibility.crafttweaker.toNative
+import net.thesilkminer.mc.boson.compatibility.crafttweaker.toNativeStack
+import net.thesilkminer.mc.boson.compatibility.crafttweaker.toZen
 import net.thesilkminer.mc.boson.prefab.naming.toNameSpacedString
 import net.thesilkminer.mc.ematter.common.feature.mad.MadContainer
 import net.thesilkminer.mc.ematter.common.recipe.mad.MadRecipe
@@ -34,16 +64,13 @@ import net.thesilkminer.mc.ematter.compatibility.crafttweaker.script.mad.step.to
 import net.thesilkminer.mc.ematter.compatibility.crafttweaker.script.shared.ZenCraftingInfo
 import net.thesilkminer.mc.ematter.compatibility.crafttweaker.script.shared.buildMarks
 import net.thesilkminer.mc.ematter.compatibility.crafttweaker.script.shared.toZen
-import net.thesilkminer.mc.ematter.compatibility.crafttweaker.toNative
-import net.thesilkminer.mc.ematter.compatibility.crafttweaker.toNativeStack
-import net.thesilkminer.mc.ematter.compatibility.crafttweaker.toZen
 
 @ExperimentalUnsignedTypes
 internal sealed class ZenMadRecipeBase(val group: NameSpacedString?, private val output: IItemStack, val steppingFunction: ZenSteppingFunction)
     : IForgeRegistryEntry.Impl<IRecipe>(), MadRecipe, ZenMadRecipe {
 
     abstract val nativeIngredients: NonNullList<Ingredient>
-    override val recipeName = this.registryName!!.toNameSpacedString().let { ZenNameSpacedString(it.nameSpace, it.path) }
+    override val recipeName get() = this.registryName!!.toNameSpacedString().let { ZenNameSpacedString(it.nameSpace, it.path) }
     override val internal get() = this
 
     @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS") // Apparently, World can be null because mods have decided so... I hate it so much.
@@ -199,7 +226,7 @@ internal class ZenShapedMadRecipe(group: NameSpacedString?, private val width: I
                 val x = xBasis - xZero
                 val y = yBasis - yZero
 
-                val ingredient = ingredients[x][y]?.toNative() ?: Ingredient.EMPTY
+                val ingredient = (if (x in 0 until this.width && y in 0 until this.height) ingredients[y][x]?.toNative() else null) ?: Ingredient.EMPTY
 
                 if (!ingredient.apply(inv.getStackInRowAndColumn(xBasis, yBasis))) return false
             }
@@ -449,7 +476,7 @@ internal class ZenMadRecipeWrapper(private val wrapped: MadRecipe) : ZenMadRecip
     private class ZenSteppingFunctionWrapper(wrapped: MadRecipe) : ZenSteppingFunction {
         private val steppingFunction by lazy {
             try {
-                wrapped::class.java.getDeclaredField("steppingFunction").apply { this.isAccessible = true }[this].uncheckedCast<SteppingFunction>()
+                wrapped::class.java.getDeclaredField("steppingFunction").apply { this.isAccessible = true }[wrapped].uncheckedCast<SteppingFunction>()
             } catch (e: ReflectiveOperationException) {
                 object : SteppingFunction {
                     init {
@@ -506,6 +533,7 @@ internal class ZenMadRecipeWrapper(private val wrapped: MadRecipe) : ZenMadRecip
             stringBuilder += this.group.toString().removePrefix("minecraft:")
             stringBuilder += '"'
         }
+        stringBuilder += ", "
 
         // ingredients as IIngredient?[]{[]}
         stringBuilder += '['

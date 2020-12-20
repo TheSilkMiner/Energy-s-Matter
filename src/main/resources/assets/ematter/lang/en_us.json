@@ -1,5 +1,9 @@
 {
   "gui.ematter.mad.power_level": "%1$s / %2$s",
+  "gui.ematter.jei.mad.category": "MAD Crafting",
+  "gui.ematter.jei.shared.recipe_by": "Recipe added by %1$s",
+  "gui.ematter.jei.shared.recipe_name": "Recipe Name: %1$s",
+  "gui.ematter.jei.shared.unknown_mod": "<unknown>",
   "itemGroup.ematter.main": "Energy's Matter",
   "tile.ematter.molecular_assembler_device.advanced.name": "Advanced Molecular Assembler Device (MAD)",
   "tile.ematter.molecular_assembler_device.basic.name": "Basic Molecular Assembler Device (MAD)",

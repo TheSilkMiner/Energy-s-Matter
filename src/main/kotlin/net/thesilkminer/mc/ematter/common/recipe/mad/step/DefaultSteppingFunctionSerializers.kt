@@ -1,3 +1,30 @@
+/*
+ * Copyright (C) 2020  TheSilkMiner
+ *
+ * This file is part of Energy's Matter.
+ *
+ * Energy's Matter is provided AS IS, WITHOUT ANY WARRANTY, even without the
+ * implied warranty of FITNESS FOR A CERTAIN PURPOSE. Energy's Matter is
+ * therefore being distributed in the hope it will be useful, but no
+ * other assumptions are made.
+ *
+ * Energy's Matter is considered "all rights reserved", meaning you are not
+ * allowed to copy or redistribute any part of this program, including
+ * but not limited to the compiled binaries, the source code, or any
+ * other form of the program without prior written permission of the
+ * owner.
+ *
+ * On the other hand, you are allowed as per terms of GitHub to fork
+ * this repository and produce derivative works, as long as they remain
+ * for PERSONAL USAGE only: redistribution of changed binaries is also
+ * not allowed.
+ *
+ * Refer to the 'COPYING' file in this repository for more information
+ *
+ * Contact information:
+ * E-mail: thesilkminer <at> outlook <dot> com
+ */
+
 @file:JvmName("DSFS")
 
 package net.thesilkminer.mc.ematter.common.recipe.mad.step
@@ -28,7 +55,7 @@ internal class ConstantSteppingFunctionSerializer : IForgeRegistryEntry.Impl<Ste
 internal class ExponentialSteppingFunctionSerializer : IForgeRegistryEntry.Impl<SteppingFunctionSerializer>(), SteppingFunctionSerializer {
     private class ExponentialSteppingFunction(private val coefficient: Long, private val base: Double, private val mirror: Boolean, private val translation: Long) : SteppingFunction {
         // y = a * b^((-1)^m * (x - t))
-        override fun getPowerCostAt(x: Long) = (this.coefficient * this.base.pow((x - this.translation).toDouble() * (-1).pow(this.mirror))).toULong()
+        override fun getPowerCostAt(x: Long) = (this.coefficient * this.base.pow((x - this.translation).toDouble() * (-1).pow(!this.mirror))).toULong()
         @Suppress("NOTHING_TO_INLINE") private inline fun Int.pow(boolean: Boolean) = this.toDouble().pow(if (boolean) 0 else 1)
     }
 
