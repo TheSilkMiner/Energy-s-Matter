@@ -19,4 +19,4 @@ internal interface NetworkManager : INBTSerializable<NBTTagCompound> {
     fun remove(pos: BlockPos)
 }
 
-internal fun World.getNetworkManager() = this.getCapability(cableNetworkCapability, null)
+internal val World.networkManager get() = this.getCapability(cableNetworkCapability, null)
