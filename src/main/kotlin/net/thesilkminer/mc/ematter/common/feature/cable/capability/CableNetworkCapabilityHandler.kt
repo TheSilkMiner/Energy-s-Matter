@@ -18,7 +18,9 @@ object CableNetworkCapabilityHandler {
     @ExperimentalUnsignedTypes
     private class NetworkManagerCapabilityProvider : ICapabilityProvider, ICapabilitySerializable<NBTTagCompound> {
 
-        private val capabilityInstance by lazy { CableNetworkManagerCapability() }
+        lateinit var world: World
+
+        private val capabilityInstance by lazy { CableNetworkManagerCapability().apply { this.world = this@NetworkManagerCapabilityProvider.world } }
 
         override fun hasCapability(capability: Capability<*>, facing: EnumFacing?): Boolean =
             capability == cableNetworkCapability && facing == null
@@ -57,6 +59,8 @@ object CableNetworkCapabilityHandler {
     @SubscribeEvent
     @Suppress("unused")
     fun onWorldCapabilityAttach(e: AttachCapabilitiesEvent<World>) {
-        e.addCapability(ResourceLocation(MOD_ID, "network_manager"), NetworkManagerCapabilityProvider())
+        e.addCapability(ResourceLocation(MOD_ID, "network_manager"), NetworkManagerCapabilityProvider().apply {
+            this.world = e.`object`
+        })
     }
 }

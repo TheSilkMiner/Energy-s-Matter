@@ -2,37 +2,65 @@ package net.thesilkminer.mc.ematter.common.feature.cable
 
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.math.BlockPos
+import net.minecraft.world.World
 import net.minecraftforge.common.util.INBTSerializable
+import net.thesilkminer.mc.boson.api.direction.Direction
+import net.thesilkminer.mc.boson.api.energy.Consumer
 
-// TODO("n1kx", "save networks")
 @ExperimentalUnsignedTypes
-internal class CableNetwork : INBTSerializable<NBTTagCompound> {
+internal class CableNetwork(val world: World) : INBTSerializable<NBTTagCompound>, Consumer {
 
-    // block positions do not load chunks when I use them; TE do, so using them brings additional problems i do not wanna deal with
-    // TODO("n1kx", "call some mark dirty methods in here")
+    // block position are far easier to work with
     val cables: MutableSet<BlockPos> = mutableSetOf()
+    val consumers: MutableSet<BlockPos> = mutableSetOf()
 
-    // TODO("n1kx", "think about funny ways to store, add and remove consumers")
+    // contains only consumers located next to a loaded cable
+    val posToLoadedConsumers: MutableMap<BlockPos, MutableSet<Pair<Consumer, Direction>>> = mutableMapOf()
+    lateinit var loadedConsumers: Map<Consumer, Direction>
 
     operator fun contains(pos: BlockPos): Boolean = pos in this.cables
 
+    fun updateLoadedConsumers() {
+        this.loadedConsumers = this.posToLoadedConsumers.values.flatten().toMap()
+    }
+    
     override fun serializeNBT(): NBTTagCompound {
         val tag = NBTTagCompound()
-        this.cables.forEachIndexed { index, pos ->
-            tag.setIntArray("cable$index", IntArray(3).apply {
-                this[0] = pos.x
-                this[1] = pos.y
-                this[2] = pos.z
-            })
-        }
+        tag.setTag("cables", NBTTagCompound().apply {
+            this@CableNetwork.cables.forEachIndexed { index, pos ->
+                this.setIntArray("$index", pos.toIntArray())
+            }
+        })
+        tag.setTag("consumers", NBTTagCompound().apply {
+            this@CableNetwork.consumers.forEachIndexed { index, pos ->
+                this.setIntArray("$index", pos.toIntArray())
+            }
+        })
         return tag
     }
 
     override fun deserializeNBT(nbt: NBTTagCompound?) {
-        nbt?.keySet?.forEach { key ->
-            nbt.getIntArray(key).let { xyz ->
-                this.cables.add(BlockPos(xyz[0], xyz[1], xyz[2]))
+        (nbt?.getTag("cables") as? NBTTagCompound)?.let { tag ->
+            tag.keySet.forEach { index ->
+                this.cables.add(tag.getBlockPos(index))
+            }
+        }
+        (nbt?.getTag("consumers") as? NBTTagCompound)?.let { tag ->
+            tag.keySet.forEach { index ->
+                this.consumers.add(tag.getBlockPos(index))
             }
         }
     }
+
+    override fun tryAccept(power: ULong, from: Direction): ULong {
+        TODO("Not yet implemented")
+    }
+
+    private fun BlockPos.toIntArray() = IntArray(3).apply {
+        this[0] = this@toIntArray.x
+        this[1] = this@toIntArray.y
+        this[2] = this@toIntArray.z
+    }
+
+    private fun NBTTagCompound.getBlockPos(key: String) = this.getIntArray(key).let { xyz -> BlockPos(xyz[0], xyz[1], xyz[2]) }
 }
