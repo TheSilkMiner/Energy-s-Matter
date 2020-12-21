@@ -12,7 +12,7 @@ import net.thesilkminer.mc.boson.prefab.energy.getEnergyConsumer
 import net.thesilkminer.mc.ematter.common.feature.cable.CableNetwork
 
 @ExperimentalUnsignedTypes
-internal class CableNetworkManagerCapability : NetworkManager {
+internal class NetworkManagerCapability : INetworkManager {
 
     override lateinit var world: World
 
@@ -110,14 +110,14 @@ internal class CableNetworkManagerCapability : NetworkManager {
     }
 
     private fun BlockPos.getAdjacentNetworks(): Set<CableNetwork> = Direction.values().asSequence()
-        .map { this@CableNetworkManagerCapability[this.offset(it.toFacing())] }
+        .map { this@NetworkManagerCapability[this.offset(it.toFacing())] }
         .filter { it != null }
         .map { it as CableNetwork }
         .toSet()
 
     private fun BlockPos.getAdjacentCables(): Set<BlockPos> = Direction.values().asSequence()
         .map { this.offset(it.toFacing()) }
-        .filter { this@CableNetworkManagerCapability[it] != null }
+        .filter { this@NetworkManagerCapability[it] != null }
         .toSet()
 
     private fun World.getTileEntitySafely(pos: BlockPos) =

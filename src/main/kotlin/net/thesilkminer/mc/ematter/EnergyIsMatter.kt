@@ -43,7 +43,7 @@ import net.thesilkminer.mc.ematter.common.BlockEntityRegistration
 import net.thesilkminer.mc.ematter.common.ConfigurationRegistrationHandler
 import net.thesilkminer.mc.ematter.common.attachBlocksListener
 import net.thesilkminer.mc.ematter.common.attachItemsListener
-import net.thesilkminer.mc.ematter.common.feature.cable.capability.CableNetworkCapabilityHandler
+import net.thesilkminer.mc.ematter.common.feature.cable.capability.NetworkManagerCapabilityHandler
 import net.thesilkminer.mc.ematter.common.network.GuiHandler
 import net.thesilkminer.mc.ematter.common.network.setUpNetworkChannel
 import net.thesilkminer.mc.ematter.common.recipe.mad.capability.MadRecipeCapabilityHandler
@@ -81,7 +81,7 @@ object EnergyIsMatter {
         MinecraftForge.EVENT_BUS.let {
             l.info("Setting up additional event handlers")
             it.register(MadRecipeCapabilityHandler)
-            it.register(CableNetworkCapabilityHandler)
+            it.register(NetworkManagerCapabilityHandler)
         }
         CompatibilityProviderHandler.firePreInitializationEvent()
         // Since model loading happens between pre-init and init, I'm assuming this is where model loaders
@@ -94,7 +94,7 @@ object EnergyIsMatter {
     fun onInitialization(e: FMLInitializationEvent) {
         l.info("Initialization")
         MadRecipeCapabilityHandler.registerCapability()
-        CableNetworkCapabilityHandler.registerCapability()
+        NetworkManagerCapabilityHandler.registerCapability()
         setUpNetworkChannel()
         GuiHandler().register()
         onlyOn(Distribution.CLIENT) { SidedEventHandler::registerBlockEntityRenders }
