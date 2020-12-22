@@ -14,10 +14,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.thesilkminer.kotlin.commons.lang.uncheckedCast
 import net.thesilkminer.mc.ematter.MOD_ID
 
+@Suppress("EXPERIMENTAL_API_USAGE")
 object NetworkManagerCapabilityHandler {
-    @ExperimentalUnsignedTypes
+
     private class NetworkManagerCapabilityProvider : ICapabilityProvider, ICapabilitySerializable<NBTTagCompound> {
 
+        // gets set in #onWorldCapabilityAttach
         lateinit var world: World
 
         private val capabilityInstance by lazy { NetworkManagerCapability().apply { this.world = this@NetworkManagerCapabilityProvider.world } }
@@ -39,23 +41,21 @@ object NetworkManagerCapabilityHandler {
 
         override fun writeNBT(capability: Capability<INetworkManager>?, instance: INetworkManager?, side: EnumFacing?): NBTBase? {
             if (capability != cableNetworkCapability) return null
-            if (instance == null) throw IllegalArgumentException("Unable to read data into a null capability instance")
+            if (instance == null) throw IllegalArgumentException("Unable to write data into a null capability instance")
             return instance.serializeNBT()
         }
 
         override fun readNBT(capability: Capability<INetworkManager>?, instance: INetworkManager?, side: EnumFacing?, nbt: NBTBase?) {
             if (capability != cableNetworkCapability) return
-            if (instance == null) throw IllegalArgumentException("Unable to read data into a null capability instance")
+            if (instance == null) throw IllegalArgumentException("Unable to read data into from a null capability instance")
             if (nbt !is NBTTagCompound) throw IllegalArgumentException("The NBT type ${if (nbt == null) "null" else nbt::class.java.simpleName} isn't valid for this capability")
             instance.deserializeNBT(nbt)
         }
     }
 
-    @ExperimentalUnsignedTypes
     internal fun registerCapability() =
         CapabilityManager.INSTANCE.register(INetworkManager::class.java, NetworkManagerCapabilityStorage(), ::NetworkManagerCapability)
 
-    @ExperimentalUnsignedTypes
     @SubscribeEvent
     @Suppress("unused")
     fun onWorldCapabilityAttach(e: AttachCapabilitiesEvent<World>) {

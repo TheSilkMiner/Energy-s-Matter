@@ -11,28 +11,43 @@ import net.thesilkminer.mc.boson.prefab.energy.consumerCapability
 import net.thesilkminer.mc.boson.prefab.energy.getEnergyConsumer
 import net.thesilkminer.mc.ematter.common.feature.cable.capability.networkManager
 
-@ExperimentalUnsignedTypes
+@Suppress("EXPERIMENTAL_API_USAGE")
 internal class CableTileEntity : TileEntity() {
 
+    // needed in #onNeighborChanged to determine if a consumer got removed or added
     private val neighboringConsumers: MutableSet<Direction> = mutableSetOf()
 
+    // lifecycle
     fun onAdd() {
         if (this.world.isRemote) return
 
-        this.world.networkManager?.add(this.pos)
+        this.world.networkManager?.addCable(this.pos)
 
         this.neighboringConsumers.addAll(
             Direction.values().asSequence()
                 .filterNot { side ->
                     this.world.getTileEntity(this.pos.offset(side))?.getEnergyConsumer(side.opposite)?.let { it is CableNetwork } ?: true
                 }
-                .onEach { this.world.networkManager?.addConsumer(this.pos.offset(it)) }
+                .onEach { this.world.networkManager?.addConsumer(this.pos.offset(it), it.opposite) }
         )
     }
 
-    fun onRemove() =
-        if (!this.world.isRemote) this.world.networkManager?.remove(this.pos) ?: Unit else Unit
+    fun onRemove() {
+        if (this.world.isRemote) return
 
+        this.neighboringConsumers.forEach { this.world.networkManager?.removeConsumer(this.pos.offset(it), it.opposite) }
+
+        this.world.networkManager?.removeCable(this.pos)
+    }
+
+    // load/unload
+    override fun onLoad() =
+        if (!this.world.isRemote) this.world.networkManager?.loadConsumers(this.pos) ?: Unit else Unit
+
+    override fun onChunkUnload() =
+        if (!this.world.isRemote) this.world.networkManager?.unloadConsumers(this.pos) ?: Unit else Unit
+
+    // reacting to other things
     fun onNeighborChanged(side: Direction) {
         if (this.world.isRemote) return
 
@@ -40,7 +55,7 @@ internal class CableTileEntity : TileEntity() {
 
         if (side in this.neighboringConsumers) {
             this.neighboringConsumers.remove(side)
-            this.world.networkManager?.removeConsumer(this.pos)
+            this.world.networkManager?.removeConsumer(this.pos.offset(side), side.opposite)
 
             flag = true
         }
@@ -49,19 +64,13 @@ internal class CableTileEntity : TileEntity() {
             if (consumer is CableNetwork) return@let
 
             this.neighboringConsumers.add(side)
-            this.world.networkManager?.addConsumer(this.pos.offset(side))
+            this.world.networkManager?.addConsumer(this.pos.offset(side), side.opposite)
 
             flag = true
         }
 
         if (flag) this.markDirty()
     }
-
-    override fun onLoad() =
-        if (!this.world.isRemote) this.world.networkManager?.loadConsumers(this.pos) ?: Unit else Unit
-
-    override fun onChunkUnload() =
-        if (!this.world.isRemote) this.world.networkManager?.unloadConsumers(this.pos) ?: Unit else Unit
 
     // capability handling
     override fun hasCapability(capability: Capability<*>, facing: EnumFacing?): Boolean {

@@ -10,7 +10,6 @@ import net.minecraft.world.World
 import net.thesilkminer.mc.boson.api.direction.Direction
 import net.thesilkminer.mc.boson.prefab.direction.offset
 
-@ExperimentalUnsignedTypes
 internal class CableBlock : Block(MATERIAL_CABLE) {
 
     internal companion object {
@@ -32,7 +31,7 @@ internal class CableBlock : Block(MATERIAL_CABLE) {
     }
 
     override fun onBlockAdded(worldIn: World, pos: BlockPos, state: IBlockState) {
-        (worldIn.getTileEntity(pos) as? CableTileEntity)?.onAdd() // this call actually creates the tile entity but that's fine since the chunk would create it in the same tick anyways
+        (worldIn.getTileEntity(pos) as? CableTileEntity)?.onAdd() // this actually creates the te but that's fine since it would be created in the same tick anyways (at least I hope it's fine)
     }
 
     override fun neighborChanged(state: IBlockState, worldIn: World, pos: BlockPos, blockIn: Block, fromPos: BlockPos) {

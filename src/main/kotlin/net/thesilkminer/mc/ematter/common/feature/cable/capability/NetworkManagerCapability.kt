@@ -3,29 +3,28 @@ package net.thesilkminer.mc.ematter.common.feature.cable.capability
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
-import net.minecraft.world.chunk.Chunk
 import net.thesilkminer.mc.boson.api.direction.Direction
-import net.thesilkminer.mc.boson.api.energy.Consumer
 import net.thesilkminer.mc.boson.prefab.direction.offset
 import net.thesilkminer.mc.boson.prefab.direction.toFacing
-import net.thesilkminer.mc.boson.prefab.energy.getEnergyConsumer
 import net.thesilkminer.mc.ematter.common.feature.cable.CableNetwork
 
-@ExperimentalUnsignedTypes
+@Suppress("EXPERIMENTAL_API_USAGE")
 internal class NetworkManagerCapability : INetworkManager {
 
+    // gets set by NetworkManagerCapabilityProvider
     override lateinit var world: World
 
     private val networks: MutableSet<CableNetwork> = mutableSetOf()
 
+    // INetworkManager
     override fun get(pos: BlockPos): CableNetwork? = this.networks.find { pos in it }
 
-    override fun add(pos: BlockPos) {
+    override fun addCable(pos: BlockPos) {
         val adjacentNetworks: Set<CableNetwork> = pos.getAdjacentNetworks()
 
-        // 0 -> no networks adjacent -> create new network
-        // 1 -> gets added to just one network -> just add it
-        // more -> cable will be a node -> merging goes brrr
+        // 0 -> no networks adjacent -> create new
+        // 1 -> add to only one network -> just add it
+        // more -> pos will be a node -> merge adjacent networks
         when (adjacentNetworks.count()) {
             0 -> this.networks.add(CableNetwork(this.world).apply { this.cables.add(pos) })
             1 -> adjacentNetworks.first().cables.add(pos)
@@ -33,52 +32,76 @@ internal class NetworkManagerCapability : INetworkManager {
         }
     }
 
-    override fun remove(pos: BlockPos) {
-        this[pos]?.let {
+    override fun removeCable(pos: BlockPos) {
+        this[pos]?.let { network ->
             val adjacentCables: Set<BlockPos> = pos.getAdjacentCables()
 
-            // 0 -> network with only one cable -> network gets yeeted
-            // 1 -> endpoint of a network -> just need to remove it
-            // more -> cable is a node -> we need to split the network
+            // 0 -> last remaining pos in network -> remove network
+            // 1 -> endpoint of network -> just remove it
+            // more -> cable is a node -> split network
             when (adjacentCables.count()) {
-                0 -> this.networks.remove(it)
-                1 -> it.cables.remove(pos)
-                else -> this.split(it, splitPos = pos)
+                0 -> this.networks.remove(network)
+                1 -> network.cables.remove(pos)
+                else -> this.split(network, splitPos = pos)
             }
         }
     }
 
-    override fun addConsumer(pos: BlockPos) {
-        this[pos]?.consumers?.add(pos)
+    override fun addConsumer(pos: BlockPos, side: Direction) {
+        this[pos]?.let { network ->
+            network.consumers.add(pos)
+
+            network.loadedConsumers.putIfAbsent(pos, mutableSetOf(side))?.let { sides ->
+                if (sides.add(side)) network.reloadConsumerCache()
+            }
+            network.reloadConsumerCache()
+        }
     }
 
-    override fun removeConsumer(pos: BlockPos) {
-        this[pos]?.consumers?.remove(pos)
+    override fun removeConsumer(pos: BlockPos, side: Direction) {
+        this[pos]?.let { network ->
+            network.consumers.remove(pos)
+
+            network.loadedConsumers[pos]?.let { sides ->
+                if (sides.remove(side)) {
+                    if (sides.isEmpty()) network.loadedConsumers.remove(pos)
+                    network.reloadConsumerCache()
+                }
+            }
+        }
     }
 
     override fun loadConsumers(pos: BlockPos) {
         this[pos]?.let { network ->
-            Direction.values().asSequence()
-                .map { it.opposite to pos.offset(it) }
-                .filter { it.second in network.consumers }
-                .map { it.first to this.world.getTileEntitySafely(it.second)?.getEnergyConsumer(it.first) }
-                .filterNot { it.second == null || it.second is CableNetwork }
-                .map { it.second as Consumer to it.first }
-                .forEach {
-                    network.posToLoadedConsumers.putIfAbsent(pos, mutableSetOf(it.first to it.second))?.add(it.first to it.second)
-                }
-            network.updateLoadedConsumers()
+            val flag = Direction.values().asSequence()
+                .map { pos.offset(it) to it.opposite }
+                .filter { it.first in network.consumers }
+                .onEach { network.loadedConsumers.putIfAbsent(it.first, mutableSetOf(it.second))?.add(it.second) }
+                .count() != 0
+
+            if (flag) network.reloadConsumerCache()
         }
     }
 
     override fun unloadConsumers(pos: BlockPos) {
         this[pos]?.let { network ->
-            network.posToLoadedConsumers.remove(pos)
-            network.updateLoadedConsumers()
+            val flag = Direction.values().asSequence()
+                .map { pos.offset(it) to it.opposite }
+                .filter { it.first in network.consumers }
+                .onEach {
+                    network.loadedConsumers[it.first]?.let { sides ->
+                        if (sides.remove(it.second)) {
+                            if (sides.isEmpty()) network.loadedConsumers.remove(pos)
+                        }
+                    }
+                }
+                .count() != 0
+
+            if (flag) network.reloadConsumerCache() // flag can be true even if loadedConsumers did not change; let me know if you have a better idea
         }
     }
 
-    // TODO("n1kx", "maybe size check could be more efficient")
+    /** merges all networks into the first; merge pos gets added to this network too */
     private fun merge(vararg networks: CableNetwork, mergePos: BlockPos) {
         for (i in 1 until networks.size) {
             networks.first().cables.addAll(networks[i].cables)
@@ -88,12 +111,14 @@ internal class NetworkManagerCapability : INetworkManager {
         networks.first().cables.add(mergePos)
     }
 
+    /** removes split pos and then re adds each position to this manager; this "splits" the network */
     private fun split(network: CableNetwork, splitPos: BlockPos) {
         this.networks.remove(network)
         network.cables.remove(splitPos)
-        network.cables.forEach { this.add(it) } // re adding everything just recalculates the networks and since the split position got removed other cables will think that there is a gap
+        network.cables.forEach { this.addCable(it) }
     }
 
+    // INBTSerializable
     override fun serializeNBT(): NBTTagCompound {
         val tag = NBTTagCompound()
         this.networks.forEachIndexed { index, cableNetwork -> tag.setTag("$index", cableNetwork.serializeNBT()) }
@@ -109,6 +134,7 @@ internal class NetworkManagerCapability : INetworkManager {
         }
     }
 
+    // helper functions
     private fun BlockPos.getAdjacentNetworks(): Set<CableNetwork> = Direction.values().asSequence()
         .map { this@NetworkManagerCapability[this.offset(it.toFacing())] }
         .filter { it != null }
@@ -119,7 +145,4 @@ internal class NetworkManagerCapability : INetworkManager {
         .map { this.offset(it.toFacing()) }
         .filter { this@NetworkManagerCapability[it] != null }
         .toSet()
-
-    private fun World.getTileEntitySafely(pos: BlockPos) =
-        this.chunkProvider.getLoadedChunk(pos.x, pos.z)?.getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK)
 }
