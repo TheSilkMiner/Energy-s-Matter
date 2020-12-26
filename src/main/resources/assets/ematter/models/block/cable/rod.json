@@ -1,0 +1,20 @@
+{
+	"credit": "Made with Blockbench",
+	"elements": [
+		{
+			"name": "rod_north",
+			"from": [7, 7, 0],
+			"to": [9, 9, 7],
+			"rotation": {"angle": 0, "axis": "y", "origin": [15, 8, 8]},
+			"color": 7,
+			"faces": {
+				"north": {"uv": [0, 0, 1, 1], "texture": "#missing"},
+				"east": {"uv": [0, 0, 7, 1], "texture": "#missing"},
+				"south": {"uv": [0, 0, 1, 1], "texture": "#missing"},
+				"west": {"uv": [0, 0, 7, 1], "texture": "#missing"},
+				"up": {"uv": [0, 0, 1, 7], "texture": "#missing"},
+				"down": {"uv": [0, 0, 1, 7], "texture": "#missing"}
+			}
+		}
+	]
+}
