@@ -40,4 +40,5 @@ internal interface INetworkManager : INBTSerializable<NBTTagCompound> {
     fun unloadConsumers(pos: BlockPos)
 }
 
-internal val World.networkManager get() = this.getCapability(cableNetworkCapability, null)
+internal val World.networkManager
+    get() = this.getCapability(cableNetworkCapability, null) ?: throw IllegalStateException("Could not get the network manager for $this. Somehow our capability got removed or the adding got bypassed. This is a serious issue and should be reported to the mod authors!")

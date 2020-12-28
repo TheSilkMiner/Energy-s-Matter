@@ -33,14 +33,14 @@ internal class CableTileEntity : TileEntity() {
     fun onAdd() {
         if (this.world.isRemote) return
 
-        this.world.networkManager?.addCable(this.pos)
+        this.world.networkManager.addCable(this.pos)
 
         Direction.values().forEach { side ->
             this.world.getTileEntitySafely(this.pos.offset(side))?.let { te ->
                 if (te.hasEnergySupport(side.opposite)) this.connections = this.connections + side
                 if (te.isEnergyConsumer(side.opposite) && te !is CableTileEntity) {
                     this.consumers = this.consumers + side
-                    this.world.networkManager?.addConsumer(this.pos.offset(side), side.opposite)
+                    this.world.networkManager.addConsumer(this.pos.offset(side), side.opposite)
                 }
             }
         }
@@ -51,20 +51,20 @@ internal class CableTileEntity : TileEntity() {
     fun onRemove() {
         if (this.world.isRemote) return
 
-        this.neighboringConsumers.forEach { this.world.networkManager?.removeConsumer(this.pos.offset(it), it.opposite) }
+        this.neighboringConsumers.forEach { this.world.networkManager.removeConsumer(this.pos.offset(it), it.opposite) }
 
-        this.world.networkManager?.removeCable(this.pos)
+        this.world.networkManager.removeCable(this.pos)
     }
     // << Lifecycle
 
     // Load/Unload >>
     override fun onLoad() {
         if (this.world.isRemote) return
-        this.world.networkManager?.loadConsumers(this.pos)
+        this.world.networkManager.loadConsumers(this.pos)
     }
 
     override fun onChunkUnload() =
-        if (!this.world.isRemote) this.world.networkManager?.unloadConsumers(this.pos) ?: Unit else Unit
+        if (!this.world.isRemote) this.world.networkManager.unloadConsumers(this.pos) else Unit
     // << Load/Unload
 
     // Reactions >>
@@ -77,13 +77,13 @@ internal class CableTileEntity : TileEntity() {
         this.connections = this.connections - side
         this.consumers = this.consumers - side
 
-        if (this.consumers != oldConsumers) this.world.networkManager?.removeConsumer(this.pos.offset(side), side.opposite)
+        if (this.consumers != oldConsumers) this.world.networkManager.removeConsumer(this.pos.offset(side), side.opposite)
 
         this.world.getTileEntitySafely(this.pos.offset(side))?.let { te ->
             if (te.hasEnergySupport(side.opposite)) this.connections = this.connections + side
             if (te.isEnergyConsumer(side.opposite) && te !is CableTileEntity) {
                 this.consumers = this.consumers + side
-                this.world.networkManager?.addConsumer(this.pos.offset(side), side.opposite)
+                this.world.networkManager.addConsumer(this.pos.offset(side), side.opposite)
             }
         }
 
@@ -99,15 +99,15 @@ internal class CableTileEntity : TileEntity() {
 
     // Capability >>
     override fun hasCapability(capability: Capability<*>, facing: EnumFacing?): Boolean {
-        this.world.networkManager?.get(this.pos)?.let { _ ->
-            if (capability == consumerCapability) return true
+        if (capability == consumerCapability) {
+            this.world.networkManager[this.pos]?.let { _ -> return true }
         }
         return super.hasCapability(capability, facing)
     }
 
     override fun <T : Any?> getCapability(capability: Capability<T>, facing: EnumFacing?): T? {
-        this.world.networkManager?.get(this.pos)?.let { network ->
-            if (capability == consumerCapability) return network.uncheckedCast()
+        if (capability == consumerCapability) {
+            this.world.networkManager[this.pos]?.let { return it.uncheckedCast() }
         }
         return super.getCapability(capability, facing)
     }
@@ -125,9 +125,6 @@ internal class CableTileEntity : TileEntity() {
         this.consumers = DirectionsByte(compound.getByte("consumers"))
         this.connections = DirectionsByte(compound.getByte("connections"))
     }
-
-    private fun Collection<Direction>.toIntArray() = this.map { it.ordinal }.toIntArray()
-    private fun NBTTagCompound.getDirectionList(key: String) = this.getIntArray(key).map { Direction.values()[it] }
     // << NBT
 
     // Networking >>
