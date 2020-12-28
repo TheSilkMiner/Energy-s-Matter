@@ -48,6 +48,7 @@ internal class NetworkManagerCapability : INetworkManager {
     }
 
     override fun addConsumer(pos: BlockPos, side: Direction) {
+        // TODO("n1kx", "lol what have I done, pos is pos of consumer not of cable, FIX!")
         this[pos]?.let { network ->
             network.consumers.add(pos)
 
@@ -59,6 +60,7 @@ internal class NetworkManagerCapability : INetworkManager {
     }
 
     override fun removeConsumer(pos: BlockPos, side: Direction) {
+        // TODO("n1kx", "lol what have I done, pos is pos of consumer not of cable, FIX!")
         this[pos]?.let { network ->
             network.consumers.remove(pos)
 

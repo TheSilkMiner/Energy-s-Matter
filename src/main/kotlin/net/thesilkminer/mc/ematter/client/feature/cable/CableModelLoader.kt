@@ -64,17 +64,17 @@ internal class CableBakedModel(coreModel: IModel, rodModel: IModel, state: IMode
             //if state is null this got called to render an item
             val quads: MutableList<BakedQuad> = mutableListOf()
             quads.addAll(this.coreQuads)
-            quads.addAll(this.rodQuads[Direction.EAST] ?: listOf())
-            quads.addAll(this.rodQuads[Direction.WEST] ?: listOf())
+            quads.addAll(this.rodQuads.getValue(Direction.EAST))
+            quads.addAll(this.rodQuads.getValue(Direction.WEST))
             return quads
         }
         //we don't want to render specific sides individually
         if (face != null) return mutableListOf()
-        if (state !is IExtendedBlockState) throw IllegalArgumentException("Tried to get the quads for $this but $state is no ${IExtendedBlockState::class.java.simpleName}!")
+        if (state !is IExtendedBlockState) throw IllegalArgumentException("Tried to get the quads for $this but $state is no ${IExtendedBlockState::class.simpleName}!")
 
         val quads: MutableList<BakedQuad> = mutableListOf()
         quads.addAll(this.coreQuads)
-        state.getValue(CableBlock.CONNECTIONS).forEach { quads.addAll(this.rodQuads.getValue(it)) }
+        state.getConnectionSet().forEach { quads.addAll(this.rodQuads.getValue(it)) }
         return quads
     }
 
@@ -84,3 +84,12 @@ internal class CableBakedModel(coreModel: IModel, rodModel: IModel, state: IMode
     override fun isGui3d(): Boolean = false
     override fun getOverrides(): ItemOverrideList = ItemOverrideList.NONE
 }
+
+fun IExtendedBlockState.getConnectionSet() = mutableSetOf<Direction>().apply {
+    if (this@getConnectionSet.getValue(CableBlock.connectionNorth)) this.add(Direction.NORTH)
+    if (this@getConnectionSet.getValue(CableBlock.connectionEast)) this.add(Direction.EAST)
+    if (this@getConnectionSet.getValue(CableBlock.connectionSouth)) this.add(Direction.SOUTH)
+    if (this@getConnectionSet.getValue(CableBlock.connectionWest)) this.add(Direction.WEST)
+    if (this@getConnectionSet.getValue(CableBlock.connectionUp)) this.add(Direction.UP)
+    if (this@getConnectionSet.getValue(CableBlock.connectionDown)) this.add(Direction.DOWN)
+}.toSet()

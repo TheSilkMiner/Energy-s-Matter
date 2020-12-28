@@ -6,29 +6,25 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.ChunkPos
 import net.minecraft.world.World
-import net.minecraft.world.chunk.Chunk
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.util.Constants
 import net.thesilkminer.kotlin.commons.lang.uncheckedCast
 import net.thesilkminer.mc.boson.api.direction.Direction
 import net.thesilkminer.mc.boson.prefab.direction.offset
 import net.thesilkminer.mc.boson.prefab.energy.consumerCapability
-import net.thesilkminer.mc.boson.prefab.energy.getEnergyConsumer
 import net.thesilkminer.mc.boson.prefab.energy.hasEnergySupport
+import net.thesilkminer.mc.boson.prefab.energy.isEnergyConsumer
 import net.thesilkminer.mc.ematter.common.feature.cable.capability.networkManager
-import kotlin.experimental.or
-import kotlin.math.pow
+import net.thesilkminer.mc.ematter.common.shared.DirectionsByte
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 internal class CableTileEntity : TileEntity() {
 
-    private var connections: Byte = 0
+    var connections: DirectionsByte = DirectionsByte(0)
+        private set
 
-    fun getConnectionSet(): Set<Direction> = Direction.values().asSequence()
-            .filterIndexed { i, _ -> this.connections.toInt() and (1 shl i) != 0 }
-            .toSet()
+    private var consumers: DirectionsByte = DirectionsByte(0)
 
     // needed in #onNeighborChanged to determine if a consumer got removed or added
     private val neighboringConsumers: MutableSet<Direction> = mutableSetOf()
@@ -39,16 +35,17 @@ internal class CableTileEntity : TileEntity() {
 
         this.world.networkManager?.addCable(this.pos)
 
-        this.neighboringConsumers.addAll(
-            Direction.values().asSequence()
-                .filterNot { side ->
-                    this.world.getTileEntitySafely(this.pos.offset(side))?.getEnergyConsumer(side.opposite)?.let { it is CableNetwork } ?: true
+        Direction.values().forEach { side ->
+            this.world.getTileEntitySafely(this.pos.offset(side))?.let { te ->
+                if (te.hasEnergySupport(side.opposite)) this.connections = this.connections + side
+                if (te.isEnergyConsumer(side.opposite) && te !is CableTileEntity) {
+                    this.consumers = this.consumers + side
+                    this.world.networkManager?.addConsumer(this.pos.offset(side), side.opposite)
                 }
-                .onEach { this.world.networkManager?.addConsumer(this.pos.offset(it), it.opposite) }
-        )
+            }
+        }
 
-        this.updateConnections()
-        this.markDirty()
+        this.markAndNotify()
     }
 
     fun onRemove() {
@@ -74,39 +71,29 @@ internal class CableTileEntity : TileEntity() {
     fun onNeighborChanged(side: Direction) {
         if (this.world.isRemote) return
 
-        if (side in this.neighboringConsumers) {
-            this.neighboringConsumers.remove(side)
-            this.world.networkManager?.removeConsumer(this.pos.offset(side), side.opposite)
-        }
+        val oldConnections = this.connections
+        val oldConsumers = this.consumers
 
-        this.world.getTileEntity(this.pos.offset(side))?.getEnergyConsumer(side.opposite)?.let { consumer ->
-            if (consumer is CableNetwork) return@let
+        this.connections = this.connections - side
+        this.consumers = this.consumers - side
 
-            this.neighboringConsumers.add(side)
-            this.world.networkManager?.addConsumer(this.pos.offset(side), side.opposite)
-        }
+        if (this.consumers != oldConsumers) this.world.networkManager?.removeConsumer(this.pos.offset(side), side.opposite)
 
-        this.updateConnections()
-        this.markDirty()
-    }
-
-    private fun updateConnections() {
-        var newConnections: Byte = 0
-
-        Direction.values().forEach { side ->
-            if (this.world.getTileEntity(this.pos.offset(side))?.hasEnergySupport(side.opposite) == true) {
-                newConnections = newConnections or 2.0.pow(side.ordinal.toDouble()).toInt().toByte()
+        this.world.getTileEntitySafely(this.pos.offset(side))?.let { te ->
+            if (te.hasEnergySupport(side.opposite)) this.connections = this.connections + side
+            if (te.isEnergyConsumer(side.opposite) && te !is CableTileEntity) {
+                this.consumers = this.consumers + side
+                this.world.networkManager?.addConsumer(this.pos.offset(side), side.opposite)
             }
         }
 
-        if (this.connections != newConnections) {
-            this.connections = newConnections
-        }
+        if (this.connections != oldConnections) this.markAndNotify()
+        else if (this.consumers != oldConsumers) this.markDirty()
     }
 
-    override fun markDirty() {
-        super.markDirty()
-        this.world.getBlockState(this.pos).let { this.world.notifyBlockUpdate(this.pos, it, it, 0) }
+    private fun markAndNotify() {
+        this.markDirty()
+        this.world.getBlockState(this.pos).let { this.world.notifyBlockUpdate(this.pos, it, it, 0) } // zero just because I can; actually notifies the client
     }
     // << Reactions
 
@@ -128,18 +115,15 @@ internal class CableTileEntity : TileEntity() {
 
     // NBT >>
     override fun writeToNBT(compound: NBTTagCompound): NBTTagCompound {
-        compound.setIntArray("sides", this.neighboringConsumers.toIntArray())
-        compound.setByte("connections", this.connections)
+        compound.setByte("connections", this.connections.byte)
+        compound.setByte("consumers", this.consumers.byte)
         return super.writeToNBT(compound)
     }
 
     override fun readFromNBT(compound: NBTTagCompound) {
         super.readFromNBT(compound)
-        this.neighboringConsumers.apply {
-            this.clear()
-            this.addAll(compound.getDirectionList("sides"))
-        }
-        this.connections = compound.getByte("connections")
+        this.consumers = DirectionsByte(compound.getByte("consumers"))
+        this.connections = DirectionsByte(compound.getByte("connections"))
     }
 
     private fun Collection<Direction>.toIntArray() = this.map { it.ordinal }.toIntArray()
@@ -152,11 +136,11 @@ internal class CableTileEntity : TileEntity() {
         this.setInteger("x", this@CableTileEntity.pos.x)
         this.setInteger("y", this@CableTileEntity.pos.y)
         this.setInteger("z", this@CableTileEntity.pos.z)
-        this.setByte("connections", this@CableTileEntity.connections)
+        this.setByte("connections", this@CableTileEntity.connections.byte)
     }
 
     override fun handleUpdateTag(tag: NBTTagCompound) {
-        this.connections = tag.getByte("connections")
+        this.connections = DirectionsByte(tag.getByte("connections"))
         this.world.getBlockState(this.pos).let { this.world.notifyBlockUpdate(this.pos, it, it, Constants.BlockFlags.RERENDER_MAIN_THREAD) }
     }
 
