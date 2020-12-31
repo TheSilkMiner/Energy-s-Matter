@@ -4,14 +4,12 @@ import net.minecraft.block.Block
 import net.minecraft.block.material.MapColor
 import net.minecraft.block.material.Material
 import net.minecraft.block.properties.PropertyBool
+import net.minecraft.block.state.BlockStateContainer
 import net.minecraft.block.state.IBlockState
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.IBlockAccess
 import net.minecraft.world.World
-import net.minecraftforge.common.property.ExtendedBlockState
-import net.minecraftforge.common.property.IExtendedBlockState
-import net.minecraftforge.common.property.Properties
 import net.thesilkminer.mc.boson.api.direction.Direction
 import net.thesilkminer.mc.boson.prefab.direction.offset
 
@@ -26,12 +24,12 @@ internal class CableBlock : Block(MATERIAL_CABLE) {
             }
         }
 
-        val connectionNorth: Properties.PropertyAdapter<Boolean> = Properties.PropertyAdapter(PropertyBool.create("connection_north"))
-        val connectionEast: Properties.PropertyAdapter<Boolean> = Properties.PropertyAdapter(PropertyBool.create("connection_east"))
-        val connectionSouth: Properties.PropertyAdapter<Boolean> = Properties.PropertyAdapter(PropertyBool.create("connection_south"))
-        val connectionWest: Properties.PropertyAdapter<Boolean> = Properties.PropertyAdapter(PropertyBool.create("connection_west"))
-        val connectionUp: Properties.PropertyAdapter<Boolean> = Properties.PropertyAdapter(PropertyBool.create("connection_up"))
-        val connectionDown: Properties.PropertyAdapter<Boolean> = Properties.PropertyAdapter(PropertyBool.create("connection_down"))
+        val connectionNorth: PropertyBool = PropertyBool.create("north")
+        val connectionEast: PropertyBool = PropertyBool.create("east")
+        val connectionSouth: PropertyBool = PropertyBool.create("south")
+        val connectionWest: PropertyBool = PropertyBool.create("west")
+        val connectionUp: PropertyBool = PropertyBool.create("up")
+        val connectionDown: PropertyBool = PropertyBool.create("down")
     }
 
     // TE >>
@@ -57,10 +55,12 @@ internal class CableBlock : Block(MATERIAL_CABLE) {
     // << Reactions
 
     // BlockState >>
-    override fun createBlockState() = ExtendedBlockState(this, arrayOf(), arrayOf(connectionNorth, connectionEast, connectionSouth, connectionWest, connectionUp, connectionDown))
+    override fun createBlockState() = BlockStateContainer(this, connectionNorth, connectionEast, connectionSouth, connectionWest, connectionUp, connectionDown)
 
-    override fun getExtendedState(state: IBlockState, world: IBlockAccess, pos: BlockPos) = (world.getTileEntity(pos) as? CableTileEntity)?.connections?.let {
-        (state as IExtendedBlockState).withProperty(connectionNorth, it.hasNorth())
+    override fun getMetaFromState(state: IBlockState) = 0 // mc expects us to override this; otherwise it crashes..
+
+    override fun getActualState(state: IBlockState, world: IBlockAccess, pos: BlockPos) = (world.getTileEntity(pos) as? CableTileEntity)?.connections?.let {
+        state.withProperty(connectionNorth, it.hasNorth())
             .withProperty(connectionEast, it.hasEast())
             .withProperty(connectionSouth, it.hasSouth())
             .withProperty(connectionWest, it.hasWest())

@@ -39,7 +39,7 @@ import net.minecraftforge.fml.common.eventhandler.EventBus
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.thesilkminer.mc.boson.api.event.ConfigurationRegisterEvent
 import net.thesilkminer.mc.boson.api.registry.RegistryObject
-import net.thesilkminer.mc.ematter.client.feature.cable.CableModelLoader
+import net.thesilkminer.mc.ematter.client.shared.CombiningModelLoader
 import net.thesilkminer.mc.ematter.client.feature.mad.MadBlockEntityRender
 import net.thesilkminer.mc.ematter.client.feature.thermometer.ThermometerOverlay
 import net.thesilkminer.mc.ematter.client.shared.CustomHighlightManager
@@ -51,6 +51,7 @@ import net.thesilkminer.mc.ematter.common.items
 import kotlin.reflect.KClass
 
 object SidedEventHandler {
+
     private val customModelItems = listOf<RegistryObject<out Item>>(ItemBlocks.molecularAssemblerDevice)
 
     internal fun setUpSidedHandlers(bus: EventBus) {
@@ -61,7 +62,7 @@ object SidedEventHandler {
 
     internal fun registerCustomModelLoaders() {
         TriangleBasedModelLoader().register()
-        CableModelLoader.register()
+        CombiningModelLoader.register()
     }
 
     internal fun registerBlockEntityRenders() {

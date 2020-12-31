@@ -1,3 +1,52 @@
 {
-  "parent": "ematter:block/cable/cable"
+  "loader": "ematter:combining",
+  "particle": "ematter:cable/core",
+  "combine": [
+    {
+      "model": "ematter:cable/core"
+    },
+    {
+      "model": "ematter:cable/rod",
+      "x": 0,
+      "y": 90
+    },
+    {
+      "model": "ematter:cable/rod",
+      "x": 0,
+      "y": 270
+    }
+  ],
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [75, 45, 40],
+      "scale": [0.375, 0.375, 0.375]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [75, 45, 40],
+      "scale": [0.375, 0.375, 0.375]
+    },
+    "firstperson_righthand": {
+      "rotation": [0, 45, 0],
+      "scale": [0.4, 0.4, 0.4]
+    },
+    "firstperson_lefthand": {
+      "rotation": [0, 225, 0],
+      "scale": [0.4, 0.4, 0.4]
+    },
+    "ground": {
+      "translation": [0, 3, 0],
+      "scale": [0.25, 0.25, 0.25]
+    },
+    "gui": {
+      "rotation": [30, 225, 0],
+      "scale": [0.8, 0.8, 0.8]
+    },
+    "head": {
+      "rotation": [0, 180, 0],
+      "translation": [0, 13, 7]
+    },
+    "fixed": {
+      "scale": [0.7, 0.7, 0.7]
+    }
+  }
 }
