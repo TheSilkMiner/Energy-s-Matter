@@ -5,10 +5,9 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import net.thesilkminer.mc.boson.api.direction.Direction
 import net.thesilkminer.mc.boson.prefab.direction.offset
-import net.thesilkminer.mc.boson.prefab.direction.toFacing
 import net.thesilkminer.mc.ematter.common.feature.cable.CableNetwork
 
-@Suppress("EXPERIMENTAL_API_USAGE")
+@Suppress("experimental_api_usage")
 internal class NetworkManagerCapability : INetworkManager {
 
     // gets set by NetworkManagerCapabilityProvider
@@ -16,8 +15,10 @@ internal class NetworkManagerCapability : INetworkManager {
 
     private val networks: MutableSet<CableNetwork> = mutableSetOf()
 
-    // INetworkManager
+    // INetworkManager >>
     override fun get(pos: BlockPos): CableNetwork? = this.networks.find { pos in it }
+
+    override fun getAllNetworks() = this.networks.toSet()
 
     override fun addCable(pos: BlockPos) {
         val adjacentNetworks: Set<CableNetwork> = pos.getAdjacentNetworks()
@@ -48,25 +49,21 @@ internal class NetworkManagerCapability : INetworkManager {
     }
 
     override fun addConsumer(pos: BlockPos, side: Direction) {
-        // TODO("n1kx", "lol what have I done, pos is pos of consumer not of cable, FIX!")
         this[pos]?.let { network ->
-            network.consumers.add(pos)
+            network.consumers.add(pos.offset(side))
 
-            network.loadedConsumers.putIfAbsent(pos, mutableSetOf(side))?.let { sides ->
-                if (sides.add(side)) network.reloadConsumerCache()
-            }
-            network.reloadConsumerCache()
+            network.loadedConsumers.putIfAbsent(pos.offset(side), mutableSetOf())
+            if (network.loadedConsumers[pos.offset(side)]?.add(side.opposite) == true) network.reloadConsumerCache()
         }
     }
 
     override fun removeConsumer(pos: BlockPos, side: Direction) {
-        // TODO("n1kx", "lol what have I done, pos is pos of consumer not of cable, FIX!")
         this[pos]?.let { network ->
-            network.consumers.remove(pos)
+            network.consumers.remove(pos.offset(side))
 
-            network.loadedConsumers[pos]?.let { sides ->
-                if (sides.remove(side)) {
-                    if (sides.isEmpty()) network.loadedConsumers.remove(pos)
+            network.loadedConsumers[pos.offset(side)]?.let { sides ->
+                if (sides.remove(side.opposite)) {
+                    if (sides.isEmpty()) network.loadedConsumers.remove(pos.offset(side))
                     network.reloadConsumerCache()
                 }
             }
@@ -75,34 +72,30 @@ internal class NetworkManagerCapability : INetworkManager {
 
     override fun loadConsumers(pos: BlockPos) {
         this[pos]?.let { network ->
-            val flag = Direction.values().asSequence()
+            Direction.values().asSequence()
                 .map { pos.offset(it) to it.opposite }
-                .filter { it.first in network.consumers }
-                .onEach { network.loadedConsumers.putIfAbsent(it.first, mutableSetOf(it.second))?.add(it.second) }
-                .count() != 0
-
-            if (flag) network.reloadConsumerCache()
+                .filter { it.first in network.consumers && this.world.isBlockLoaded(it.first) }
+                .forEach { network.loadedConsumers.putIfAbsent(it.first, mutableSetOf(it.second))?.add(it.second) }
         }
     }
 
     override fun unloadConsumers(pos: BlockPos) {
         this[pos]?.let { network ->
-            val flag = Direction.values().asSequence()
+            Direction.values().asSequence()
                 .map { pos.offset(it) to it.opposite }
                 .filter { it.first in network.consumers }
-                .onEach {
+                .forEach {
                     network.loadedConsumers[it.first]?.let { sides ->
                         if (sides.remove(it.second)) {
                             if (sides.isEmpty()) network.loadedConsumers.remove(pos)
                         }
                     }
                 }
-                .count() != 0
-
-            if (flag) network.reloadConsumerCache() // flag can be true even if loadedConsumers did not change; let me know if you have a better idea
         }
     }
+    // << INetworkManager
 
+    // network operations >>
     /** merges all networks into the first; merge pos gets added to this network too */
     private fun merge(vararg networks: CableNetwork, mergePos: BlockPos) {
         for (i in 1 until networks.size) {
@@ -113,14 +106,15 @@ internal class NetworkManagerCapability : INetworkManager {
         networks.first().cables.add(mergePos)
     }
 
-    /** removes split pos and then re adds each position to this manager; this "splits" the network */
+    /** removes split pos and then re adds each position to this manager; that's what we call "splitting" the network */
     private fun split(network: CableNetwork, splitPos: BlockPos) {
         this.networks.remove(network)
         network.cables.remove(splitPos)
         network.cables.forEach { this.addCable(it) }
     }
+    // << network operations
 
-    // INBTSerializable
+    // INBTSerializable >>
     override fun serializeNBT(): NBTTagCompound {
         val tag = NBTTagCompound()
         this.networks.forEachIndexed { index, cableNetwork -> tag.setTag("$index", cableNetwork.serializeNBT()) }
@@ -135,16 +129,17 @@ internal class NetworkManagerCapability : INetworkManager {
             }
         }
     }
+    // << INBTSerializable
 
-    // helper functions
+    // helper functions >>
     private fun BlockPos.getAdjacentNetworks(): Set<CableNetwork> = Direction.values().asSequence()
-        .map { this@NetworkManagerCapability[this.offset(it.toFacing())] }
+        .map { this@NetworkManagerCapability[this.offset(it)] }
         .filter { it != null }
         .map { it as CableNetwork }
         .toSet()
 
     private fun BlockPos.getAdjacentCables(): Set<BlockPos> = Direction.values().asSequence()
-        .map { this.offset(it.toFacing()) }
+        .map { this.offset(it) }
         .filter { this@NetworkManagerCapability[it] != null }
         .toSet()
 }

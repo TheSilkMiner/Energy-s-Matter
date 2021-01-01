@@ -36,7 +36,7 @@ internal class CableNetwork(val world: World) : INBTSerializable<NBTTagCompound>
         )
     }
 
-    // INBTSerializable
+    // INBTSerializable >>
     override fun serializeNBT(): NBTTagCompound {
         val tag = NBTTagCompound()
         tag.setTag("cables", NBTTagCompound().apply {
@@ -63,10 +63,11 @@ internal class CableNetwork(val world: World) : INBTSerializable<NBTTagCompound>
                 this.consumers.add(tag.getBlockPos(index))
             }
         }
-        // TileEntity#onLoad() fires after this so we don't have to build loadedConsumers here, the te will do that for us
+        // TileEntity::onLoad fires after this so we don't have to build loadedConsumers here, the te will do that for us
     }
+    // << INBTSerializable
 
-    // Consumer
+    // Consumer >>
     override fun tryAccept(power: ULong, from: Direction): ULong {
         if (this.consumerCache.isEmpty()) return 0UL // if there are no consumers we can't consume something
 
@@ -85,13 +86,14 @@ internal class CableNetwork(val world: World) : INBTSerializable<NBTTagCompound>
             var powerConsumed: ULong = 0UL // power each consumer accepted
             consumerSequence = consumerSequence
                 .onEach { powerConsumed = it.first.tryAccept(powerSplit, it.second) } // tries to transfer power
-                .filter { powerConsumed == 0UL } //we remove every consumer that hasn't accept any power
+                .filter { powerConsumed != 0UL } //we remove every consumer that hasn't accept any power
                 .onEach { powerLeft -= powerConsumed } // the power which we need to transfer decreases by the power we just transferred
 
             if (consumerSequence.toList().isEmpty()) return power - notTransferable - powerLeft // if all consumers are full we can safely return
         }
         return power - notTransferable // if we end up here this means we transferred all possible power
     }
+    // << Consumer
 
     // helper functions
     private fun BlockPos.toIntArray() = IntArray(3).apply {
@@ -103,5 +105,5 @@ internal class CableNetwork(val world: World) : INBTSerializable<NBTTagCompound>
     private fun NBTTagCompound.getBlockPos(key: String) = this.getIntArray(key).let { xyz -> BlockPos(xyz[0], xyz[1], xyz[2]) }
 
     private fun World.getTileEntitySafely(pos: BlockPos) =
-        this.chunkProvider.getLoadedChunk(pos.x, pos.z)?.getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK)
+        if (this.isBlockLoaded(pos)) this.getTileEntity(pos) else null
 }

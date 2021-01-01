@@ -26,10 +26,7 @@ internal class CableTileEntity : TileEntity() {
 
     private var consumers: DirectionsByte = DirectionsByte(0)
 
-    // needed in #onNeighborChanged to determine if a consumer got removed or added
-    private val neighboringConsumers: MutableSet<Direction> = mutableSetOf()
-
-    // Lifecycle >>
+    // lifecycle >>
     fun onAdd() {
         if (this.world.isRemote) return
 
@@ -40,24 +37,25 @@ internal class CableTileEntity : TileEntity() {
                 if (te.hasEnergySupport(side.opposite)) this.connections = this.connections + side
                 if (te.isEnergyConsumer(side.opposite) && te !is CableTileEntity) {
                     this.consumers = this.consumers + side
-                    this.world.networkManager.addConsumer(this.pos.offset(side), side.opposite)
+                    this.world.networkManager.addConsumer(this.pos, side)
                 }
             }
         }
 
+        this.onLoad() // ::onLoad gets called before this so we call it here again, after we added the cable
         this.markAndNotify()
     }
 
     fun onRemove() {
         if (this.world.isRemote) return
 
-        this.neighboringConsumers.forEach { this.world.networkManager.removeConsumer(this.pos.offset(it), it.opposite) }
+        this.consumers.forEach { this.world.networkManager.removeConsumer(this.pos, it) }
 
         this.world.networkManager.removeCable(this.pos)
     }
-    // << Lifecycle
+    // << lifecycle
 
-    // Load/Unload >>
+    // load/unload >>
     override fun onLoad() {
         if (this.world.isRemote) return
         this.world.networkManager.loadConsumers(this.pos)
@@ -65,9 +63,9 @@ internal class CableTileEntity : TileEntity() {
 
     override fun onChunkUnload() =
         if (!this.world.isRemote) this.world.networkManager.unloadConsumers(this.pos) else Unit
-    // << Load/Unload
+    // << load/unload
 
-    // Reactions >>
+    // reactions >>
     fun onNeighborChanged(side: Direction) {
         if (this.world.isRemote) return
 
@@ -77,13 +75,13 @@ internal class CableTileEntity : TileEntity() {
         this.connections = this.connections - side
         this.consumers = this.consumers - side
 
-        if (this.consumers != oldConsumers) this.world.networkManager.removeConsumer(this.pos.offset(side), side.opposite)
+        if (this.consumers != oldConsumers) this.world.networkManager.removeConsumer(this.pos, side)
 
         this.world.getTileEntitySafely(this.pos.offset(side))?.let { te ->
             if (te.hasEnergySupport(side.opposite)) this.connections = this.connections + side
             if (te.isEnergyConsumer(side.opposite) && te !is CableTileEntity) {
                 this.consumers = this.consumers + side
-                this.world.networkManager.addConsumer(this.pos.offset(side), side.opposite)
+                this.world.networkManager.addConsumer(this.pos, side)
             }
         }
 
@@ -95,9 +93,9 @@ internal class CableTileEntity : TileEntity() {
         this.markDirty()
         this.world.getBlockState(this.pos).let { this.world.notifyBlockUpdate(this.pos, it, it, 0) } // zero just because I can; actually notifies the client
     }
-    // << Reactions
+    // << reactions
 
-    // Capability >>
+    // capability handling >>
     override fun hasCapability(capability: Capability<*>, facing: EnumFacing?): Boolean {
         if (capability == consumerCapability) {
             this.world.networkManager[this.pos]?.let { _ -> return true }
@@ -111,9 +109,9 @@ internal class CableTileEntity : TileEntity() {
         }
         return super.getCapability(capability, facing)
     }
-    // << Capability
+    // << capability handling
 
-    // NBT >>
+    // nbt handling >>
     override fun writeToNBT(compound: NBTTagCompound): NBTTagCompound {
         compound.setByte("connections", this.connections.byte)
         compound.setByte("consumers", this.consumers.byte)
@@ -125,9 +123,9 @@ internal class CableTileEntity : TileEntity() {
         this.consumers = DirectionsByte(compound.getByte("consumers"))
         this.connections = DirectionsByte(compound.getByte("connections"))
     }
-    // << NBT
+    // << nbt handling
 
-    // Networking >>
+    // networking >>
     override fun getUpdateTag(): NBTTagCompound = NBTTagCompound().apply {
         // pos needed for mc to deserialize on chunk load; see NetHandlerPlayClient#handleChunkData
         this.setInteger("x", this@CableTileEntity.pos.x)
@@ -141,13 +139,16 @@ internal class CableTileEntity : TileEntity() {
         this.world.getBlockState(this.pos).let { this.world.notifyBlockUpdate(this.pos, it, it, Constants.BlockFlags.RERENDER_MAIN_THREAD) }
     }
 
-    override fun getUpdatePacket(): SPacketUpdateTileEntity = SPacketUpdateTileEntity(this.pos, -1, this.updateTag)
+    override fun getUpdatePacket(): SPacketUpdateTileEntity =
+        SPacketUpdateTileEntity(this.pos, -1, this.updateTag)
 
-    override fun onDataPacket(net: NetworkManager, pkt: SPacketUpdateTileEntity) = this.handleUpdateTag(pkt.nbtCompound)
-    // << Networking
+    override fun onDataPacket(net: NetworkManager, pkt: SPacketUpdateTileEntity) =
+        this.handleUpdateTag(pkt.nbtCompound)
+    // << networking
 
-    // Helper Functions >>
-    private fun World.getTileEntitySafely(pos: BlockPos) = if (this.isBlockLoaded(pos)) this.getTileEntity(pos) else null
+    // helper functions >>
+    private fun World.getTileEntitySafely(pos: BlockPos) =
+        if (this.isBlockLoaded(pos)) this.getTileEntity(pos) else null
 
     // TODO("n1kx", "best feature eu-west: blocking connections")
 }

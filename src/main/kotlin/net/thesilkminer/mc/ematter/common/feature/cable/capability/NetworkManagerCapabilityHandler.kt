@@ -10,11 +10,14 @@ import net.minecraftforge.common.capabilities.CapabilityManager
 import net.minecraftforge.common.capabilities.ICapabilityProvider
 import net.minecraftforge.common.capabilities.ICapabilitySerializable
 import net.minecraftforge.event.AttachCapabilitiesEvent
+import net.minecraftforge.event.world.ChunkEvent
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.thesilkminer.kotlin.commons.lang.uncheckedCast
 import net.thesilkminer.mc.ematter.MOD_ID
+import net.thesilkminer.mc.ematter.common.feature.cable.CableTileEntity
 
-@Suppress("EXPERIMENTAL_API_USAGE")
+@Suppress("unused", "experimental_api_usage")
 object NetworkManagerCapabilityHandler {
 
     private class NetworkManagerCapabilityProvider : ICapabilityProvider, ICapabilitySerializable<NBTTagCompound> {
@@ -57,10 +60,18 @@ object NetworkManagerCapabilityHandler {
         CapabilityManager.INSTANCE.register(INetworkManager::class.java, NetworkManagerCapabilityStorage(), ::NetworkManagerCapability)
 
     @SubscribeEvent
-    @Suppress("unused")
-    fun onWorldCapabilityAttach(e: AttachCapabilitiesEvent<World>) {
+    fun onWorldCapabilityAttach(e: AttachCapabilitiesEvent<World>) =
         e.addCapability(ResourceLocation(MOD_ID, "network_manager"), NetworkManagerCapabilityProvider().apply {
             this.world = e.`object`
         })
-    }
+
+    // a) it's more efficient doing it like that then each cable that loads triggers a reload
+    // b) it was possible that a block is not yet loaded when the network tries to access it; now we make sure that everything in the chunk is loaded before the network access something
+    @SubscribeEvent
+    fun onChunkLoad(e: ChunkEvent.Load) =
+        if (!e.world.isRemote) e.chunk.networks.forEach { it.reloadConsumerCache() } else Unit
+
+    @SubscribeEvent
+    fun onChunkUnload(e: ChunkEvent.Unload) =
+        if (!e.world.isRemote) e.chunk.networks.forEach { it.reloadConsumerCache() } else Unit
 }
