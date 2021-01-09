@@ -39,7 +39,7 @@ import net.minecraftforge.fml.common.eventhandler.EventBus
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.thesilkminer.mc.boson.api.event.ConfigurationRegisterEvent
 import net.thesilkminer.mc.boson.api.registry.RegistryObject
-import net.thesilkminer.mc.ematter.client.shared.CombiningModelLoader
+import net.thesilkminer.mc.ematter.client.shared.MultipartModelLoader
 import net.thesilkminer.mc.ematter.client.feature.mad.MadBlockEntityRender
 import net.thesilkminer.mc.ematter.client.feature.thermometer.ThermometerOverlay
 import net.thesilkminer.mc.ematter.client.shared.CustomHighlightManager
@@ -62,7 +62,7 @@ object SidedEventHandler {
 
     internal fun registerCustomModelLoaders() {
         TriangleBasedModelLoader().register()
-        CombiningModelLoader.register()
+        MultipartModelLoader.register()
     }
 
     internal fun registerBlockEntityRenders() {
