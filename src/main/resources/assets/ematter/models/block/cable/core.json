@@ -1,18 +1,21 @@
 {
 	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "ematter:blocks/cable/core",
+		"particle": "ematter:blocks/cable/core"
+	},
 	"elements": [
 		{
 			"name": "core",
 			"from": [6.5, 6.5, 6.5],
 			"to": [9.5, 9.5, 9.5],
-			"color": 3,
 			"faces": {
-				"north": {"uv": [0, 0, 2, 2], "texture": "#missing"},
-				"east": {"uv": [0, 0, 2, 2], "texture": "#missing"},
-				"south": {"uv": [0, 0, 2, 2], "texture": "#missing"},
-				"west": {"uv": [0, 0, 2, 2], "texture": "#missing"},
-				"up": {"uv": [0, 0, 2, 2], "texture": "#missing"},
-				"down": {"uv": [0, 0, 2, 2], "texture": "#missing"}
+				"north": {"uv": [0, 0, 3, 3], "texture": "#0"},
+				"east": {"uv": [0, 0, 3, 3], "texture": "#0"},
+				"south": {"uv": [0, 0, 3, 3], "texture": "#0"},
+				"west": {"uv": [0, 0, 3, 3], "texture": "#0"},
+				"up": {"uv": [0, 0, 3, 3], "texture": "#0"},
+				"down": {"uv": [0, 0, 3, 3], "texture": "#0"}
 			}
 		}
 	]
