@@ -3,11 +3,9 @@ package net.thesilkminer.mc.ematter.common.feature.cable
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
-import net.minecraft.world.chunk.Chunk
 import net.minecraftforge.common.util.INBTSerializable
 import net.thesilkminer.mc.boson.api.direction.Direction
 import net.thesilkminer.mc.boson.api.energy.Consumer
-import net.thesilkminer.mc.boson.prefab.direction.offset
 import net.thesilkminer.mc.boson.prefab.energy.getEnergyConsumer
 
 @ExperimentalUnsignedTypes
@@ -69,29 +67,27 @@ internal class CableNetwork(val world: World) : INBTSerializable<NBTTagCompound>
 
     // Consumer >>
     override fun tryAccept(power: ULong, from: Direction): ULong {
-        if (this.consumerCache.isEmpty()) return 0UL // if there are no consumers we can't consume something
+        if (this.consumerCache.isEmpty()) return 0UL // early return if nothing exists which could consume power
 
-        val notTransferable: ULong = if (power.coerceAtMost(1024UL /* TODO("n1kx", "<--" */) == power) 0UL else power - 1024UL // the power over the maximum transfer rate
-        var powerLeft: ULong = power - notTransferable // power left to transfer
+        val notTransferable: ULong = if (power.coerceAtMost(1024UL) == power) 0UL else power - 1024UL // take transfer limits in account
+        var leftToTransfer: ULong = power - notTransferable
 
-        var consumerSequence: Sequence<Pair<Consumer, Direction>> = this.consumerCache.asSequence().map { it.first to it.second } // all loaded consumers which accepts power; updates during distribution
+        val consumers = consumerCache.toMutableSet() // don't change the cache
 
-        while (powerLeft > 0UL) {
-            val consumers: ULong = consumerSequence.toList().size.toULong()
+        while (leftToTransfer > 0UL && consumers.isNotEmpty()) {
+            // split the power between all consumers evenly
+            val splitted: ULong = ((leftToTransfer - leftToTransfer % consumers.size.toULong()) / consumers.size.toULong()).let { if (it != 0UL) it else 1UL }
 
-            // splits the power between all consumers evenly
-            // if we have less power then consumers each consumer gets 1 ampere and we pretend everything worked fine
-            val powerSplit: ULong = ((powerLeft - powerLeft % consumers) / consumers).let { if (it != 0UL) it else 1UL }
+            for (consumer in consumers.toList()) {
+                val consumed = consumer.first.tryAccept(splitted, consumer.second)
 
-            var powerConsumed: ULong = 0UL // power each consumer accepted
-            consumerSequence = consumerSequence
-                .onEach { powerConsumed = it.first.tryAccept(powerSplit, it.second) } // tries to transfer power
-                .filter { powerConsumed != 0UL } //we remove every consumer that hasn't accept any power
-                .onEach { powerLeft -= powerConsumed } // the power which we need to transfer decreases by the power we just transferred
+                leftToTransfer -= consumed
+                if (leftToTransfer == 0UL) break // break to make sure that unsigned long does not fall below zero (0UL - 1UL = ULong.MAX_VALUE)
 
-            if (consumerSequence.toList().isEmpty()) return power - notTransferable - powerLeft // if all consumers are full we can safely return
+                if (consumed == 0UL) consumers.remove(consumer) // if the consumer hasn't accepted any power now it won't do next iteration either
+            }
         }
-        return power - notTransferable // if we end up here this means we transferred all possible power
+        return power - (notTransferable + leftToTransfer)
     }
     // << Consumer
 
