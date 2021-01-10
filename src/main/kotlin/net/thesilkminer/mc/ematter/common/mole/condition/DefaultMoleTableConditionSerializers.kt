@@ -7,6 +7,7 @@ import com.google.gson.JsonSyntaxException
 import net.minecraft.util.JsonUtils
 import net.minecraftforge.registries.IForgeRegistryEntry
 import net.thesilkminer.mc.ematter.common.mole.MoleContext
+import kotlin.math.roundToInt
 
 internal class MoleAndConditionSerializer : IForgeRegistryEntry.Impl<MoleTableConditionSerializer>(), MoleTableConditionSerializer {
 
@@ -90,15 +91,13 @@ internal class MoleDurabilityConditionSerializer : IForgeRegistryEntry.Impl<Mole
         SingleTargetConditions.values().find { condition == it.jsonName }?.let { cond ->
             val target = JsonUtils.getInt(json, "target")
 
-            return { context ->
-                cond.carryOutOperation(if (absolutValues) context.durability else context.durabilityPercentage, target)
-            }
+            return { context -> cond.carryOutOperation(if (absolutValues) context.durability else ((context.durability.toDouble() / context.maxDurability.toDouble()) * 10).roundToInt() * 10, target) }
         }
         RangeConditions.values().find { condition == it.jsonName }?.let { cond ->
             val lowerTarget = JsonUtils.getInt(json, "lowerTarget")
             val higherTarget = JsonUtils.getInt(json, "higherTarget")
 
-            return { context -> cond.carryOutOperation(if (absolutValues) context.durability else context.durabilityPercentage, lowerTarget, higherTarget) }
+            return { context -> cond.carryOutOperation(if (absolutValues) context.durability else ((context.durability.toDouble() / context.maxDurability.toDouble()) * 10).roundToInt() * 10, lowerTarget, higherTarget) }
         }
 
         throw JsonSyntaxException("No such condition '$condition' exists: allowed values are '${this.conditions}")
