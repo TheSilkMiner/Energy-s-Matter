@@ -1,5 +1,8 @@
 package net.thesilkminer.mc.ematter.client.shared
 
+import com.google.common.cache.CacheBuilder
+import com.google.common.cache.CacheLoader
+import com.google.common.cache.LoadingCache
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
 import com.google.gson.*
@@ -48,6 +51,10 @@ internal object MultipartModelLoader : ICustomModelLoader {
     private val name = NameSpacedString(MOD_ID, "multipart")
     private var resourceManager: IResourceManager? = null
 
+    val cache: LoadingCache<CacheKey, BakedItemModel> = CacheBuilder.newBuilder().maximumSize(1).build(object : CacheLoader<CacheKey, BakedItemModel>() {
+        override fun load(key: CacheKey) = key.model.bakeImpl(key.state, key.format, key.bakedTextureGetter)
+    })
+
     internal fun register() = ModelLoaderRegistry.registerLoader(this)
 
     override fun onResourceManagerReload(resourceManager: IResourceManager) {
@@ -75,6 +82,8 @@ internal object MultipartModelLoader : ICustomModelLoader {
                 return json.block()
             }
         }
+
+    data class CacheKey(val model: MultipartModel, val state: IModelState, val format: VertexFormat, val bakedTextureGetter: Function<ResourceLocation, TextureAtlasSprite>)
 }
 
 internal class MultipartModel(
@@ -83,7 +92,10 @@ internal class MultipartModel(
     private val textureMap: Map<String, ResourceLocation> = emptyMap()
 ) : IModel {
 
-    override fun bake(state: IModelState, format: VertexFormat, bakedTextureGetter: Function<ResourceLocation, TextureAtlasSprite>) =
+    override fun bake(state: IModelState, format: VertexFormat, bakedTextureGetter: Function<ResourceLocation, TextureAtlasSprite>): BakedItemModel =
+        MultipartModelLoader.cache[MultipartModelLoader.CacheKey(this, state, format, bakedTextureGetter)]
+
+    fun bakeImpl(state: IModelState, format: VertexFormat, bakedTextureGetter: Function<ResourceLocation, TextureAtlasSprite>) =
         BakedItemModel(
             this.parts.getQuads(format, bakedTextureGetter),
             bakedTextureGetter.apply(this.textureMap.getOrDefault("particle", ResourceLocation("missingno"))),
