@@ -33,5 +33,17 @@
     {
       "moles":5
     }
+  ],
+  "modifiers": [
+    {
+      "conditions": [
+        {
+          "type": "ematter:meta",
+          "meta": 0
+        }
+      ],
+      "type": "ematter:plus",
+      "value": 100
+    }
   ]
 }

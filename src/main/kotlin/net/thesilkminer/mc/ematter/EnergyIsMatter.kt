@@ -45,6 +45,7 @@ import net.thesilkminer.mc.ematter.common.attachItemsListener
 import net.thesilkminer.mc.ematter.common.mole.condition.attachMoleTableConditionSerializersListener
 import net.thesilkminer.mc.ematter.common.mole.freezeMoleTables
 import net.thesilkminer.mc.ematter.common.mole.loadMoleTables
+import net.thesilkminer.mc.ematter.common.mole.modifer.attachMoleTableModifierSerializersListener
 import net.thesilkminer.mc.ematter.common.network.GuiHandler
 import net.thesilkminer.mc.ematter.common.network.setUpNetworkChannel
 import net.thesilkminer.mc.ematter.common.recipe.mad.capability.MadRecipeCapabilityHandler
@@ -70,6 +71,7 @@ object EnergyIsMatter {
             attachSteppingFunctionListener(it)
             attachTemperatureTableConditionSerializersListener(it)
             attachMoleTableConditionSerializersListener(it)
+            attachMoleTableModifierSerializersListener(it)
             it.register(TileEntityRegistration)
             it.register(CompatibilityProviderHandler)
         }

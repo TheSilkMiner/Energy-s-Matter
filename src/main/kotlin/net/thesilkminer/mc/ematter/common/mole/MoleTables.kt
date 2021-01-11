@@ -9,32 +9,48 @@ internal typealias Moles = Int
 /*
  * Format writeup:
  *
- * {
- *   "entries": [
- *     {
- *       "conditions": [
- *         {
- *           "type": "see net/thesilkminer/mc/ematter/common/mole/condition/MoleTableConditionSerializers.kt",
- *           "data": "condition_based"
- *         }
- *       ],
- *       "moles": 10
- *     },
- *     {
- *       "moles": 5
- *     }
- *   ]
- * }
+ *  {
+ *    "entries": [
+ *      {
+ *        "conditions": [
+ *          {
+ *            "type": "modid:name"          // see "net/thesilkminer/mc/ematter/common/mole/condition/MoleTableConditionSerializers.kt"
+ *            "data": "condition_based"
+ *          ]
+ *        ],
+ *        "moles": 10
+ *      },
+ *      {
+ *        "moles": 5
+ *      }
+ *    ],
+ *    "modifiers": [
+ *      {
+ *        "conditions": [
+ *          {
+ *            "type": "modid:name"          // see "net/thesilkminer/mc/ematter/common/mole/condition/MoleTableConditionSerializers.kt"
+ *            "data": "condition_based"
+ *          }
+ *        ],
+ *        "type": "modid:name"              // see "net/thesilkminer/mc/ematter/common/mole/modifier/MoleTableModifierSerializers.kt"
+ *        "data": "modifer_based"
+ *      }
+ *    ]
+ *  }
  *
- * No condition limit, the first which matches will be taken. Exactly one catch all condition must be present.
+ * For entries either zero or one catch-all conditions must be present. If there is non, it defaults to 0 as mole count. If there are more than one it fails to parse the json.
+ * The first entry where all conditions are satisfied will be taken (so put your catch-all condition at the bottom).
+ *
+ * For modifiers there are no limitations regarding catch-all conditions. They will just get applied every time.
+ * Each modifier where all conditions are satisfied will be applied in the order of declaration.
  */
 
 internal object MoleTables {
 
     private val l = L(MOD_NAME, "Mole Tables")
-    private val tables = mutableMapOf<Item, (MoleContext) -> Moles>()
+    private val tables: MutableMap<Item, (MoleContext) -> Moles> = mutableMapOf()
 
-    private val defaultTable = { _: MoleContext -> 0 }
+    private val defaultTable: (MoleContext) -> Moles = { _ -> 0 }
 
     private var locked = false
 
