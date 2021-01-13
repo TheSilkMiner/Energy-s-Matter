@@ -139,5 +139,5 @@ internal class JustEnoughItemsPlugin : IModPlugin {
     private fun <T : Container> IRecipeTransferRegistry.addRecipeTransferHandler(containerClass: KClass<T>, categoryId: String,
                                                                                  recipeSlots: Pair<Int, Int>, inventorySlots: Pair<Int, Int>) =
             this.addRecipeTransferHandler(containerClass.java, categoryId, recipeSlots.first,
-                    recipeSlots.second - recipeSlots.first, inventorySlots.first, inventorySlots.second - inventorySlots.first)
+                    recipeSlots.second - recipeSlots.first + 1, inventorySlots.first, inventorySlots.second - inventorySlots.first + 1)
 }
