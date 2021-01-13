@@ -142,10 +142,14 @@ repositories {
     flatDir {
         dirs 'Boson/libs' // TODO: Remove this once I get a Maven
     }
-    // Moved to the bottom to ensure that this is the last place we look into
+    // Moved to the bottom to ensure that these are the last places we look into
     maven {
         name 'ModMaven'
         url 'https://modmaven.k-4u.nl/'
+    }
+    maven {
+        name 'CurseMaven'
+        url 'https://www.cursemaven.com/'
     }
 }
 
@@ -168,7 +172,7 @@ dependencies {
     }
 
     // Hwyla API
-    deobfProvided group: 'mcp.mobius.waila', name: 'Hwyla', version: '1.8.26-B41_1.12.2', classifier: 'api'
+    deobfProvided group: 'curse.maven', name: 'hwyla-253449', version: '2568753'
 
     // JustEnoughItems API
     deobfProvided group: 'mezz.jei', name: 'jei_1.12.2', version: '4.15.0.293', classifier: 'api'
@@ -192,7 +196,7 @@ dependencies {
     }
 
     // Hwyla
-    runtime group: 'mcp.mobius.waila', name: 'Hwyla', version: '1.8.26-B41_1.12.2'
+    runtime group: 'curse.maven', name: 'hwyla-253449', version: '2568751'
 
     // JustEnoughItems
     runtime group: 'mezz.jei', name: 'jei_1.12.2', version: '4.15.0.293'
