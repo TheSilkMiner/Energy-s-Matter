@@ -10,3 +10,5 @@ data class MoleContext(val meta: Int, val maxDurability: Int, val durability: In
 }
 
 fun ItemStack.createMoleContext() = MoleContext(this.metadata, this.maxDamage)
+
+val ItemStack.moles get() = MoleTables[this.item](this.createMoleContext())
