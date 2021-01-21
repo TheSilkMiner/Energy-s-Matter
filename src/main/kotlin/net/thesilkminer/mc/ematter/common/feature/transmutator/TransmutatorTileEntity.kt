@@ -10,6 +10,7 @@ import net.minecraft.util.EnumFacing
 import net.minecraft.util.ITickable
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.util.Constants
+import net.minecraftforge.fml.common.registry.ForgeRegistries
 import net.minecraftforge.items.CapabilityItemHandler
 import net.minecraftforge.items.ItemHandlerHelper
 import net.thesilkminer.kotlin.commons.lang.reloadableLazy
@@ -19,11 +20,14 @@ import net.thesilkminer.mc.boson.api.direction.Direction
 import net.thesilkminer.mc.boson.api.energy.Consumer
 import net.thesilkminer.mc.boson.api.energy.Holder
 import net.thesilkminer.mc.boson.api.id.NameSpacedString
+import net.thesilkminer.mc.boson.prefab.energy.consumerCapability
 import net.thesilkminer.mc.boson.prefab.tag.blockTagType
 import net.thesilkminer.mc.boson.prefab.tag.isInTag
 import net.thesilkminer.mc.ematter.MOD_ID
 import net.thesilkminer.mc.ematter.common.Items
 import net.thesilkminer.mc.ematter.common.mole.*
+import net.thesilkminer.mc.ematter.common.recipe.transmutator.TransmutationInventoryCrafting
+import net.thesilkminer.mc.ematter.common.recipe.transmutator.TransmutationRecipe
 import net.thesilkminer.mc.ematter.common.temperature.TemperatureTables
 import net.thesilkminer.mc.ematter.common.temperature.createTemperatureContext
 import kotlin.math.roundToInt
@@ -35,10 +39,6 @@ class TransmutatorTileEntity : TileEntity(), ITickable, Holder, Consumer {
     internal companion object {
 
         private val MAX_CAPACITY = 248_139UL
-
-        // TODO("this thingy needs some recipes")
-        private const val MOLES_NEEDED: Moles = 10
-        private const val ENERGY_NEEDED = 1_000UL
 
         private const val WASTE_TIME = 20
         private const val PRODUCE_TIME = 100
@@ -56,15 +56,19 @@ class TransmutatorTileEntity : TileEntity(), ITickable, Holder, Consumer {
 
     private var recalculationNeeded = true
 
-    private var output = ItemStack.EMPTY
+    private val inventory = TransmutationInventoryCrafting(ItemStack.EMPTY)
+    private var output = null as TransmutationRecipe?
+
+    private val powerNeeded get() = this.output?.power ?: 0UL
+    private val molesNeeded get() = this.output?.moles ?: 0
 
     private val handler = MoleHandler()
     private val moles = IntArray(4)
 
-    private var wasteTimer: Int = WASTE_TIME
-    private var produceTimer: Int = PRODUCE_TIME
+    private var wasteTimer = WASTE_TIME
+    private var produceTimer = PRODUCE_TIME
 
-    private var powerStored: ULong = 0UL
+    private var powerStored = MAX_CAPACITY // TODO("testing only; no other way to get energy into the mt")
 
     // ITickable >>
     override fun update() {
@@ -96,9 +100,11 @@ class TransmutatorTileEntity : TileEntity(), ITickable, Holder, Consumer {
         if (--this.produceTimer > 0) return
         this.produceTimer = PRODUCE_TIME
 
+        if (this.output == null) return
+
         when {
-            this.powerStored < ENERGY_NEEDED -> this.performClear()
-            this.moles.reduce(Int::plus) < MOLES_NEEDED -> this.performFail()
+            this.powerStored < this.powerNeeded -> this.performClear()
+            this.moles.reduce(Int::plus) < this.molesNeeded -> this.performFail()
             else -> this.performSuccess()
         }
 
@@ -113,22 +119,22 @@ class TransmutatorTileEntity : TileEntity(), ITickable, Holder, Consumer {
     }
 
     private fun performFail() {
-        this.powerStored -= ENERGY_NEEDED
+        this.powerStored -= this.powerNeeded
         this.moles.asSequence().map { 0 }.forEachIndexed(this.moles::set)
         this.output(ItemStack(Items.waste.get(), Random.Default.nextInt(1, 4)))
     }
 
     private fun performSuccess() {
-        this.powerStored -= ENERGY_NEEDED
+        this.powerStored -= this.powerNeeded
 
         // remove the needed moles starting with the last element in the array
-        var needed = MOLES_NEEDED
+        var needed = this.molesNeeded
         this.moles.reversed().asSequence().map { moles ->
             if (moles - needed < 0) (0).also { needed -= moles }
             else (moles - needed).also { needed = 0 }
         }.toList().reversed().forEachIndexed(this.moles::set)
 
-        this.output(this.output.copy())
+        this.output(this.output?.getCraftingResult(this.inventory) ?: ItemStack.EMPTY)
     }
 
     private fun output(stack: ItemStack) {
@@ -163,16 +169,18 @@ class TransmutatorTileEntity : TileEntity(), ITickable, Holder, Consumer {
 
     // capability handling >>
     override fun hasCapability(capability: Capability<*>, facing: EnumFacing?): Boolean {
-        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && this.isInputSide(facing)) return true
+        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && facing == EnumFacing.UP) return true
+        if (capability == consumerCapability && this.isPowerInput(facing)) return true
         return super.hasCapability(capability, facing)
     }
 
     override fun <T : Any?> getCapability(capability: Capability<T>, facing: EnumFacing?): T? {
-        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && this.isInputSide(facing)) return this.handler.uncheckedCast()
+        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && facing == EnumFacing.UP) return this.handler.uncheckedCast()
+        if (capability == consumerCapability && this.isPowerInput(facing)) return this.uncheckedCast()
         return super.getCapability(capability, facing)
     }
 
-    private fun isInputSide(facing: EnumFacing?): Boolean = when (facing) {
+    private fun isPowerInput(facing: EnumFacing?): Boolean = when (facing) {
         null, EnumFacing.UP, EnumFacing.DOWN, this.getFacing(), this.getFacing().opposite -> false
         else -> true
     }
@@ -183,13 +191,15 @@ class TransmutatorTileEntity : TileEntity(), ITickable, Holder, Consumer {
         super.writeToNBT(compound).apply {
             this.setLong(NBT_POWER_KEY, this@TransmutatorTileEntity.powerStored.toLong())
             this.setIntArray(NBT_MOLES_KEY, this@TransmutatorTileEntity.moles)
-            this.setTag(NBT_OUTPUT_KEY, this@TransmutatorTileEntity.output.serializeNBT())
+            this@TransmutatorTileEntity.output?.let {
+                this.setTag(NBT_OUTPUT_KEY, it.getCraftingResult(this@TransmutatorTileEntity.inventory).serializeNBT())
+            }
         }
 
     override fun readFromNBT(compound: NBTTagCompound) {
         this.powerStored = compound.getLong(NBT_POWER_KEY).toULong()
         compound.getIntArray(NBT_MOLES_KEY).forEachIndexed { i, moles -> this.moles[i] = moles }
-        this.output.deserializeNBT(compound.getCompoundTag(NBT_OUTPUT_KEY))
+        this.changeOutput(if (compound.hasKey(NBT_OUTPUT_KEY)) ItemStack(compound.getCompoundTag(NBT_OUTPUT_KEY)) else ItemStack.EMPTY)
         super.readFromNBT(compound)
     }
     // << nbt handling
@@ -210,7 +220,11 @@ class TransmutatorTileEntity : TileEntity(), ITickable, Holder, Consumer {
         if (state.block !is TransmutatorBlock) EnumFacing.NORTH else state.getValue(TransmutatorBlock.FACING)
     }
 
-    internal fun changeOutput(stack: ItemStack) = Unit.also { this.output = stack.copy().apply { this.count = 1 } }
+    internal fun changeOutput(stack: ItemStack) = Unit.also {
+        this.inventory.result = stack
+        ForgeRegistries.RECIPES.entries.map { it.value }.find { it.matches(this.inventory, this.world) }
+    }
+
     internal fun requestRecalculation() = Unit.also { this.recalculationNeeded = true }
 
     private inline fun <T> andNotify(block: () -> T) = block().also { this.markDirty() }.also { this.notifyUpdate() }
