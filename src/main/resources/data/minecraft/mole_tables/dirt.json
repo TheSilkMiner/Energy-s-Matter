@@ -1,0 +1,17 @@
+{
+  "entries": [
+    {
+      "moles": 10
+    }
+  ],
+  "modifiers": [
+    {
+      "type": "ematter:plus",
+      "value": 10
+    },
+    {
+      "type": "ematter:times",
+      "value": 10
+    }
+  ]
+}

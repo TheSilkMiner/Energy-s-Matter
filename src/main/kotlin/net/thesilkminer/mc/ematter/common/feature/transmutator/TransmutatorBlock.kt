@@ -11,7 +11,11 @@ import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumHand
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.text.ITextComponent
+import net.minecraft.util.text.TextComponentString
 import net.minecraft.world.World
+import net.thesilkminer.mc.ematter.common.mole.MoleTables
+import net.thesilkminer.mc.ematter.common.mole.createMoleContext
 
 class TransmutatorBlock : Block(Material.IRON) {
 
@@ -32,6 +36,7 @@ class TransmutatorBlock : Block(Material.IRON) {
         worldIn.getTileEntity(pos).let { te ->
             if (te !is TransmutatorTileEntity) return false
             te.changeOutput(playerIn.getHeldItem(hand))
+            playerIn.sendMessage(TextComponentString(MoleTables[playerIn.getHeldItem(hand).item](playerIn.getHeldItem(hand).createMoleContext()).toString())) // testing purpose
             return true
         }
     }
