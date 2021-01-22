@@ -46,6 +46,7 @@ internal class MoleDivisionModifierSerializer : IForgeRegistryEntry.Impl<MoleTab
         val value: Double = json["value"].asDouble
 
         if (value < 0) throw JsonParseException("Failed to parse mole table division modifier: value was negative! A negative amount of moles makes no sense.")
+        if (value == 0.0) throw JsonParseException("Failed to parse mole table division modifier: value was 0! Division by 0 not possible!")
 
         return { _, it -> (it / value).roundToInt() }
     }
