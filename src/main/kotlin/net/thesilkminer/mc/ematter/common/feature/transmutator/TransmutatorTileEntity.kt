@@ -68,7 +68,7 @@ class TransmutatorTileEntity : TileEntity(), ITickable, Holder, Consumer {
     private var wasteTimer = WASTE_TIME
     private var produceTimer = PRODUCE_TIME
 
-    private var powerStored = 0
+    private var powerStored = 0UL
 
     // ITickable >>
     override fun update() {
