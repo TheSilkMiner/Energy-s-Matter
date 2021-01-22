@@ -33,7 +33,7 @@ import net.thesilkminer.mc.ematter.common.temperature.createTemperatureContext
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
-@Suppress("EXPERIMENTAL_API_USAGE", "EXPERIMENTAL_OVERRIDE", "EXPERIMENTAL_UNSIGNED_LITERALS")
+@Suppress("experimental_api_usage", "experimental_override", "experimental_unsigned_literals")
 class TransmutatorTileEntity : TileEntity(), ITickable, Holder, Consumer {
 
     internal companion object {
@@ -68,7 +68,7 @@ class TransmutatorTileEntity : TileEntity(), ITickable, Holder, Consumer {
     private var wasteTimer = WASTE_TIME
     private var produceTimer = PRODUCE_TIME
 
-    private var powerStored = MAX_CAPACITY // TODO("testing only; no other way to get energy into the mt")
+    private var powerStored = 0
 
     // ITickable >>
     override fun update() {
@@ -100,6 +100,9 @@ class TransmutatorTileEntity : TileEntity(), ITickable, Holder, Consumer {
         if (--this.produceTimer > 0) return
         this.produceTimer = PRODUCE_TIME
 
+        this.moles[0] += this.handler.moles
+        this.handler.moles = 0
+
         if (this.output == null) return
 
         when {
@@ -107,9 +110,6 @@ class TransmutatorTileEntity : TileEntity(), ITickable, Holder, Consumer {
             this.moles.reduce(Int::plus) < this.molesNeeded -> this.performFail()
             else -> this.performSuccess()
         }
-
-        this.moles[0] += this.handler.moles
-        this.handler.moles = 0
     }
 
     private fun performClear() {
@@ -222,7 +222,7 @@ class TransmutatorTileEntity : TileEntity(), ITickable, Holder, Consumer {
 
     internal fun changeOutput(stack: ItemStack) = Unit.also {
         this.inventory.result = stack
-        ForgeRegistries.RECIPES.entries.map { it.value }.find { it.matches(this.inventory, this.world) }
+        this.output = ForgeRegistries.RECIPES.entries.map { it.value }.find { it.matches(this.inventory, this.world) } as? TransmutationRecipe
     }
 
     internal fun requestRecalculation() = Unit.also { this.recalculationNeeded = true }
