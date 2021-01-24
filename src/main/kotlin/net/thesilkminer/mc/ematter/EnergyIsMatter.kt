@@ -77,7 +77,7 @@ object EnergyIsMatter {
         MinecraftForge.EVENT_BUS.let {
             l.info("Setting up additional event handlers")
             it.register(MadRecipeCapabilityHandler)
-            onlyOn(Distribution.CLIENT) { { it.register(SidedEventHandler) } }
+            onlyOn(Distribution.CLIENT) { { SidedEventHandler.setUpSidedHandlers(it) } }
         }
         CompatibilityProviderHandler.firePreInitializationEvent()
         // Since model loading happens between pre-init and init, I'm assuming this is where model loaders

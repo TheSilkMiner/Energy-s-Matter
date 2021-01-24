@@ -32,8 +32,10 @@ import net.minecraft.item.Item
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.ModelRegistryEvent
 import net.minecraftforge.client.model.ModelLoader
+import net.minecraftforge.fml.common.eventhandler.EventBus
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.thesilkminer.mc.boson.api.registry.RegistryObject
+import net.thesilkminer.mc.ematter.client.feature.thermometer.ThermometerOverlay
 import net.thesilkminer.mc.ematter.client.shared.TriangleBasedModelLoader
 import net.thesilkminer.mc.ematter.common.ItemBlocks
 import net.thesilkminer.mc.ematter.common.feature.mad.MadTier
@@ -41,6 +43,11 @@ import net.thesilkminer.mc.ematter.common.items
 
 object SidedEventHandler {
     private val customModelItems = listOf<RegistryObject<out Item>>(ItemBlocks.molecularAssemblerDevice)
+
+    internal fun setUpSidedHandlers(bus: EventBus) {
+        bus.register(this)
+        bus.register(ThermometerOverlay)
+    }
 
     internal fun registerCustomModelLoaders() {
         TriangleBasedModelLoader().register()
