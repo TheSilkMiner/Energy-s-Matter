@@ -32,8 +32,10 @@ package net.thesilkminer.mc.ematter.common.network
 import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraftforge.fml.common.network.NetworkRegistry
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper
 import net.minecraftforge.fml.relauncher.Side
+import net.thesilkminer.mc.boson.api.distribution.Distribution
 import net.thesilkminer.mc.boson.api.log.L
 import net.thesilkminer.mc.ematter.MOD_CHANNEL_ID
 import net.thesilkminer.mc.ematter.MOD_NAME
@@ -43,6 +45,7 @@ import net.thesilkminer.mc.ematter.common.network.mad.MadRecipeSwitchButtonClick
 import net.thesilkminer.mc.ematter.common.network.mad.MadRecipeSwitchButtonClickPacketHandler
 import net.thesilkminer.mc.ematter.common.network.thermometer.ThermometerSendTemperaturePacket
 import net.thesilkminer.mc.ematter.common.network.thermometer.ThermometerSendTemperaturePacketHandler
+import kotlin.reflect.KClass
 
 private val l = L(MOD_NAME, "Network Manager")
 
@@ -53,9 +56,9 @@ internal fun setUpNetworkChannel() {
     networkChannel = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_CHANNEL_ID)
 
     var id = 0
-    networkChannel.registerMessage(MadRecipeCapabilitySyncPacketHandler::class.java, MadRecipeCapabilitySyncPacket::class.java, id++, Side.CLIENT)
-    networkChannel.registerMessage(MadRecipeSwitchButtonClickPacketHandler::class.java, MadRecipeSwitchButtonClickPacket::class.java, id++, Side.SERVER)
-    networkChannel.registerMessage(ThermometerSendTemperaturePacketHandler::class.java, ThermometerSendTemperaturePacket::class.java, id++, Side.CLIENT)
+    networkChannel.register(id++, MadRecipeCapabilitySyncPacket::class, MadRecipeCapabilitySyncPacketHandler::class, Distribution.CLIENT)
+    networkChannel.register(id++, MadRecipeSwitchButtonClickPacket::class, MadRecipeSwitchButtonClickPacketHandler::class, Distribution.DEDICATED_SERVER)
+    networkChannel.register(id++, ThermometerSendTemperaturePacket::class, ThermometerSendTemperaturePacketHandler::class, Distribution.CLIENT)
     l.info("Successfully registered a total of $id packets")
 }
 
@@ -63,3 +66,11 @@ internal fun EntityPlayerMP.sendPacket(packet: IMessage) = packet.sendToPlayer(t
 internal fun IMessage.sendToPlayer(player: EntityPlayerMP) = networkChannel.sendTo(this, player)
 internal fun IMessage.sendToAll() = networkChannel.sendToAll(this)
 internal fun IMessage.sendToServer() = networkChannel.sendToServer(this)
+
+private fun <M : IMessage, R : IMessage?> SimpleNetworkWrapper.register(id: Int, packet: KClass<M>, handler: KClass<out IMessageHandler<M, R>>, receivingDist: Distribution) =
+        this.registerMessage(handler.java, packet.java, id, receivingDist.toSide())
+
+private fun Distribution.toSide() = when (this) {
+    Distribution.CLIENT -> Side.CLIENT
+    Distribution.DEDICATED_SERVER -> Side.SERVER
+}
