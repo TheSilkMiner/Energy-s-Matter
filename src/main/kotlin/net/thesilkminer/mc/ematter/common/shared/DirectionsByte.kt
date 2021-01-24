@@ -11,6 +11,8 @@ inline class DirectionsByte(val byte: Byte) : Iterable<Direction> {
 
     operator fun contains(side: Direction) = this.byte.toInt() and (1 shl side.ordinal) != 0
 
+    operator fun get(side: Direction) = side in this
+
     fun hasNorth() = Direction.NORTH in this
     fun hasEast() = Direction.EAST in this
     fun hasWest() = Direction.WEST in this
