@@ -18,6 +18,8 @@ internal class ThermometerOverlay(private val minecraft: Minecraft) : Gui() {
         private const val DISTANCE_FROM_RIGHT_BORDER = 10
         private const val MIDDLE_SHIFTING = -(TEXTURE_HEIGHT / 2 - 20)
 
+        private val textShift = 5 to 10
+
         private val thermometerOverlayTexture = NameSpacedString(MOD_ID, "textures/gui/hud/thermometer.png")
 
         private var currentOverlay = null as ThermometerOverlay?
@@ -32,6 +34,8 @@ internal class ThermometerOverlay(private val minecraft: Minecraft) : Gui() {
                 this.currentOverlay!!.render()
             } else if (this.currentOverlay != null) {
                 this.currentOverlay = null
+                // TODO("Make the unset only happen when the client exits the world?")
+                TemperatureStorage.unset()
             }
         }
 
@@ -42,10 +46,24 @@ internal class ThermometerOverlay(private val minecraft: Minecraft) : Gui() {
     private fun render() = withStateRestoring {
         GlStateManager.pushMatrix()
         val scaledResolution = ScaledResolution(this.minecraft)
+        this.renderBackground(scaledResolution)
+        this.renderTemperature(scaledResolution)
+        GlStateManager.popMatrix()
+    }
+
+    private fun renderBackground(scaledResolution: ScaledResolution) {
         val x = scaledResolution.scaledWidth - TEXTURE_WIDTH - DISTANCE_FROM_RIGHT_BORDER
         val y = scaledResolution.scaledHeight / 2 + MIDDLE_SHIFTING
         this.drawTexturedModalRect(x, y, 0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT)
-        GlStateManager.popMatrix()
+    }
+
+    private fun renderTemperature(scaledResolution: ScaledResolution) =
+            this.renderTemperature(scaledResolution, if (TemperatureStorage.hasTemperature) TemperatureStorage.temperature.toString() else "---")
+
+    private fun renderTemperature(scaledResolution: ScaledResolution, temperature: String) {
+        val x = scaledResolution.scaledWidth - TEXTURE_WIDTH - DISTANCE_FROM_RIGHT_BORDER + textShift.first
+        val y = scaledResolution.scaledHeight / 2 + MIDDLE_SHIFTING + textShift.second
+        this.minecraft.fontRenderer.drawString(temperature, x, y, 0xFFFFFF)
     }
 
     private inline fun withStateRestoring(block: () -> Unit) {

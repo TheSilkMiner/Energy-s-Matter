@@ -41,6 +41,8 @@ import net.thesilkminer.mc.ematter.common.network.mad.MadRecipeCapabilitySyncPac
 import net.thesilkminer.mc.ematter.common.network.mad.MadRecipeCapabilitySyncPacketHandler
 import net.thesilkminer.mc.ematter.common.network.mad.MadRecipeSwitchButtonClickPacket
 import net.thesilkminer.mc.ematter.common.network.mad.MadRecipeSwitchButtonClickPacketHandler
+import net.thesilkminer.mc.ematter.common.network.thermometer.ThermometerSendTemperaturePacket
+import net.thesilkminer.mc.ematter.common.network.thermometer.ThermometerSendTemperaturePacketHandler
 
 private val l = L(MOD_NAME, "Network Manager")
 
@@ -53,6 +55,7 @@ internal fun setUpNetworkChannel() {
     var id = 0
     networkChannel.registerMessage(MadRecipeCapabilitySyncPacketHandler::class.java, MadRecipeCapabilitySyncPacket::class.java, id++, Side.CLIENT)
     networkChannel.registerMessage(MadRecipeSwitchButtonClickPacketHandler::class.java, MadRecipeSwitchButtonClickPacket::class.java, id++, Side.SERVER)
+    networkChannel.registerMessage(ThermometerSendTemperaturePacketHandler::class.java, ThermometerSendTemperaturePacket::class.java, id++, Side.CLIENT)
     l.info("Successfully registered a total of $id packets")
 }
 
