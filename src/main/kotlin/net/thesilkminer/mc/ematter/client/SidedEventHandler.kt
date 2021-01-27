@@ -37,6 +37,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.thesilkminer.mc.boson.api.event.ConfigurationRegisterEvent
 import net.thesilkminer.mc.boson.api.registry.RegistryObject
 import net.thesilkminer.mc.ematter.client.feature.thermometer.ThermometerOverlay
+import net.thesilkminer.mc.ematter.client.shared.CustomHighlightManager
 import net.thesilkminer.mc.ematter.client.shared.TriangleBasedModelLoader
 import net.thesilkminer.mc.ematter.common.ItemBlocks
 import net.thesilkminer.mc.ematter.common.feature.mad.MadTier
@@ -48,6 +49,7 @@ object SidedEventHandler {
     internal fun setUpSidedHandlers(bus: EventBus) {
         bus.register(this)
         bus.register(ThermometerOverlay)
+        bus.register(CustomHighlightManager.also { it.registerCustomHighlightManagers() })
     }
 
     internal fun registerCustomModelLoaders() {
