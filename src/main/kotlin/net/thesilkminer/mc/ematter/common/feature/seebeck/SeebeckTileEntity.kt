@@ -53,6 +53,7 @@ import net.thesilkminer.mc.ematter.common.temperature.TemperatureContext
 import net.thesilkminer.mc.ematter.common.temperature.TemperatureTables
 import kotlin.math.abs
 import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
 @Suppress("EXPERIMENTAL_API_USAGE", "EXPERIMENTAL_OVERRIDE", "EXPERIMENTAL_UNSIGNED_LITERALS")
 internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
@@ -85,12 +86,13 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
     private var producingBurst = BURST_TIME
     private var pushingBurst = BURST_TIME
 
-    private var powerProduced = 0UL
+    private var nextPower = 0.0
     private var powerStored = 0UL
 
     private var currentDayMoment: TemperatureContext.DayMoment = TemperatureContext.DayMoment.DAY
 
-    override val producedPower get() = this.powerProduced
+    override val producedPower get() = (this.nextPower * BURST_TIME.toDouble()).roundToLong().toULong()
+    override val productionRate get() = BURST_TIME.toUInt()
     override val storedPower get() = this.powerStored
     override val maximumCapacity get() = MAX_CAPACITY
 
@@ -122,16 +124,15 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
         // first
         if (this.storedPower >= MAX_CAPACITY) return
 
-        val nextPower = this.tempDifference.toDouble() * SEEBECK_CONVERSION_DATA * this.effectiveness * POWER_MULTIPLIER
-        this.powerProduced = nextPower.roundToInt().toULong() // This way the value is always updated regardless of burst
+        this.nextPower = this.tempDifference.toDouble() * SEEBECK_CONVERSION_DATA * this.effectiveness * POWER_MULTIPLIER
 
         --this.producingBurst
         if (this.producingBurst > 0) return
 
-        (nextPower * BURST_TIME.toDouble()).roundToInt().toULong().let {
+        (this.nextPower * BURST_TIME.toDouble()).roundToInt().toULong().let {
             if (this.powerStored + it > MAX_CAPACITY) {
                 this.powerStored = MAX_CAPACITY
-                this.powerProduced = 0UL
+                this.nextPower = 0.0
             } else {
                 this.powerStored += it
             }
@@ -226,7 +227,7 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
         // For every non cooled heat source the effectiveness reduces; if there are 5 heat sources or coolants the effectiveness is 0
         this.effectiveness = 1.0 - 0.2 * (heatSources - coolants * 2).let { if (it >= 0) it else if (coolants == 5) 5 else 0 }
         if (this.effectiveness == 0.0) {
-            this.powerProduced = 0UL
+            this.nextPower = 0.0
             this.producingBurst = BURST_TIME
         }
 
