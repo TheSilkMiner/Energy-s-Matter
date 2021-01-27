@@ -39,17 +39,23 @@ import net.thesilkminer.mc.boson.api.registry.DeferredRegister
 import net.thesilkminer.mc.boson.api.registry.RegistryObject
 import net.thesilkminer.mc.ematter.MOD_ID
 import net.thesilkminer.mc.ematter.common.feature.mad.MadTier
+import net.thesilkminer.mc.ematter.common.feature.thermometer.ThermometerItem
 
 private val customItemBlocks = listOf<RegistryObject<out Block>>(Blocks.molecularAssemblerDevice)
 
 private val itemList = mutableListOf<RegistryObject<out Item>>()
 private val itemRegistry = DeferredRegister(MOD_ID, ForgeRegistries.ITEMS).also { registerItemBlocks(it) }
 
-internal object Items
+@Suppress("unused")
+internal object Items {
+    val thermometer = register("thermometer") {
+        ThermometerItem().setCreativeTab(mainItemGroup).setTranslationKey("ematter.thermometer").setMaxStackSize(1).setFull3D()
+    }
+}
 
 internal object ItemBlocks {
     val molecularAssemblerDevice = register(Blocks.molecularAssemblerDevice.name.path) {
-        ItemMultiTexture(Blocks.molecularAssemblerDevice(), Blocks.molecularAssemblerDevice(), ItemMultiTexture.Mapper { MadTier.fromMeta(it.metadata).translationKey })
+        ItemMultiTexture(Blocks.molecularAssemblerDevice(), Blocks.molecularAssemblerDevice()) { MadTier.fromMeta(it.metadata).translationKey }
     }
 }
 
