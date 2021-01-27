@@ -30,19 +30,51 @@ package net.thesilkminer.mc.ematter.common.feature.seebeck
 import net.minecraft.block.Block
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
+import net.minecraft.entity.Entity
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.BlockRenderLayer
+import net.minecraft.util.math.AxisAlignedBB
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.RayTraceResult
+import net.minecraft.util.math.Vec3d
+import net.minecraft.world.IBlockAccess
 import net.minecraft.world.World
+import net.thesilkminer.mc.ematter.common.feature.mad.MadBlock
+import net.thesilkminer.mc.ematter.common.shared.emptyVolume
+import net.thesilkminer.mc.ematter.common.shared.volumes
 
 internal class SeebeckBlock : Block(Material.IRON) {
+    internal companion object {
+        internal val volumes = volumes {
+            this.box(15, 2, 2, 16, 14, 14) // east_plate
+            this.box(2, 0,2, 14, 1, 14) // down_plate
+            this.box(2, 2, 0, 14, 14, 1) // north_plate
+            this.box(2, 2, 15, 14, 14, 16) // south_plate
+            this.box(0, 2, 2, 1, 14, 14) // west_plate
+            this.box(7, 7, 1, 9, 9, 15) // ns_connector
+            this.box(1, 7, 7, 15, 9, 9) // ew_connector
+            this.box(7, 1, 7, 9, 9, 9) // d_connector
+            this.box(4, 4, 4, 12, 12, 12) // housing
+            this.box(7, 7, 7, 9, 16, 9) // wire
+        }
+    }
+
     override fun createTileEntity(world: World, state: IBlockState): TileEntity? = SeebeckTileEntity()
     override fun hasTileEntity(state: IBlockState): Boolean = true
 
     override fun neighborChanged(state: IBlockState, worldIn: World, pos: BlockPos, blockIn: Block, fromPos: BlockPos) =
             if (worldIn.isRemote || pos.up() == fromPos) Unit else (worldIn.getTileEntity(pos) as? SeebeckTileEntity)?.requestRecalculation() ?: Unit
 
+    override fun addCollisionBoxToList(state: IBlockState, worldIn: World, pos: BlockPos, entityBox: AxisAlignedBB,
+                                       collidingBoxes: MutableList<AxisAlignedBB>, entityIn: Entity?, isActualState: Boolean) {
+        collidingBoxes.addAll(volumes.map { it.offset(pos) }.filter { entityBox.intersects(it) })
+    }
+
+    override fun collisionRayTrace(blockState: IBlockState, worldIn: World, pos: BlockPos, start: Vec3d, end: Vec3d): RayTraceResult? =
+            MadBlock.volumes.map { this.rayTrace(pos, start, end, it) }.firstOrNull { it != null }
+
     override fun isOpaqueCube(state: IBlockState) = false
     override fun isFullCube(state: IBlockState) = false
     override fun getRenderLayer() = BlockRenderLayer.CUTOUT
+    override fun getBoundingBox(state: IBlockState, source: IBlockAccess, pos: BlockPos) = emptyVolume
 }
