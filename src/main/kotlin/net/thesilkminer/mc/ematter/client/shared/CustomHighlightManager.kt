@@ -2,6 +2,7 @@
 
 package net.thesilkminer.mc.ematter.client.shared
 
+import net.minecraft.block.Block
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderGlobal
@@ -9,10 +10,10 @@ import net.minecraft.util.math.AxisAlignedBB
 import net.minecraft.util.math.RayTraceResult
 import net.minecraftforge.client.event.DrawBlockHighlightEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.thesilkminer.mc.ematter.client.feature.mad.MadHighlightProvider
-
-// Nik, however did you find this... what the fuck?
-private const val HIGHLIGHT_EXPANSION_FACTOR = 0.0020000000949949026
+import net.thesilkminer.mc.boson.api.registry.RegistryObject
+import net.thesilkminer.mc.ematter.common.Blocks
+import net.thesilkminer.mc.ematter.common.feature.mad.MadBlock
+import net.thesilkminer.mc.ematter.common.feature.seebeck.SeebeckBlock
 
 internal interface CustomHighlightProvider {
     fun matches(state: IBlockState): Boolean
@@ -23,7 +24,8 @@ internal object CustomHighlightManager {
     private val highlightProviders = mutableListOf<CustomHighlightProvider>()
 
     internal fun registerCustomHighlightManagers() {
-        this.highlightProviders += MadHighlightProvider()
+        this.highlightProviders += DefaultCustomHighlightProvider(Blocks.molecularAssemblerDevice, MadBlock.volumes)
+        this.highlightProviders += DefaultCustomHighlightProvider(Blocks.seebeckGenerator, SeebeckBlock.volumes)
     }
 
     @SubscribeEvent
@@ -66,8 +68,23 @@ internal object CustomHighlightManager {
     }
 }
 
-internal fun AxisAlignedBB.expandForHighlight() = this.grow(HIGHLIGHT_EXPANSION_FACTOR)
+private class DefaultCustomHighlightProvider(block: RegistryObject<Block>, private val volumes: Sequence<AxisAlignedBB>) : CustomHighlightProvider {
+    // Nik, however did you find this... what the fuck?
+    companion object {
+        private const val HIGHLIGHT_EXPANSION_FACTOR = 0.0020000000949949026
+    }
 
-internal fun renderDefaultHighlight(volume: AxisAlignedBB) {
-    RenderGlobal.drawSelectionBoundingBox(volume,0.0F, 0.0F, 0.0F, 0.4F)
+    private val block by lazy(block::get)
+
+    override fun matches(state: IBlockState): Boolean = state.block == this.block
+
+    override fun renderBoundingBox(state: IBlockState, x: Double, y: Double, z: Double) {
+        this.volumes.map { it.expandForHighlight().offset(x, y, z) }.forEach { it.renderDefaultHighlight() }
+    }
+
+    private fun AxisAlignedBB.expandForHighlight() = this.grow(HIGHLIGHT_EXPANSION_FACTOR)
+
+    private fun AxisAlignedBB.renderDefaultHighlight() {
+        RenderGlobal.drawSelectionBoundingBox(this,0.0F, 0.0F, 0.0F, 0.4F)
+    }
 }
