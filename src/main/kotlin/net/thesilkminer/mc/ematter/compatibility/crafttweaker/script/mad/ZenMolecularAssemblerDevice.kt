@@ -60,6 +60,7 @@ internal object ZenMolecularAssemblerDevice {
     fun registerShaped(name: ZenNameSpacedString, group: String?, ingredients: Array<Array<IIngredient?>>, result: IItemStack, steppingFunction: ZenSteppingFunction?,
                        @Optional(valueBoolean = true) allowMirroring: Boolean, @Optional recipeFunction: IRecipeFunction?) {
         if (steppingFunction == null) return CraftTweakerAPI.logError("Unable to register recipe '$name': no valid stepping function supplier -- check the logs")
+        if (group != null && group.isEmpty()) return CraftTweakerAPI.logError("Unable to register recipe '$name': empty groups are invalid, use 'null' to specify no group")
         if (ingredients.isEmpty()) return CraftTweakerAPI.logError("Unable to register recipe '$name': ingredients array is empty")
         if (ingredients.any { it.isEmpty() }) return CraftTweakerAPI.logError("Unable to register recipe '$name': ingredients array contains an empty row")
         if (ingredients.map { it.count() }.distinct().count() != 1) return CraftTweakerAPI.logError("Unable to register recipe '$name': ingredients array lengths are uneven")
@@ -91,6 +92,7 @@ internal object ZenMolecularAssemblerDevice {
     fun registerShapeless(name: ZenNameSpacedString, group: String?, ingredients: Array<IIngredient?>, result: IItemStack, steppingFunction: ZenSteppingFunction?,
                           @Optional recipeFunction: IRecipeFunction?) {
         if (steppingFunction == null) return CraftTweakerAPI.logError("Unable to register recipe '$name': no valid stepping function supplied -- check the logs")
+        if (group != null && group.isEmpty()) return CraftTweakerAPI.logError("Unable to register recipe '$name': empty groups are invalid, use 'null' to specify no group")
         if (ingredients.isEmpty()) return CraftTweakerAPI.logError("Unable to register recipe '$name': ingredients array is empty")
         if (ingredients.any { it == null }) return CraftTweakerAPI.logError("Unable to register recipe '$name': shapeless recipes don't support 'null' ingredients")
 
