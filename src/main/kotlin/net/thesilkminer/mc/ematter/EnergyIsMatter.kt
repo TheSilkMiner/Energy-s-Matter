@@ -39,6 +39,7 @@ import net.thesilkminer.mc.boson.api.event.BosonPreAvailableEvent
 import net.thesilkminer.mc.boson.api.fingerprint.logViolationMessage
 import net.thesilkminer.mc.boson.api.log.L
 import net.thesilkminer.mc.ematter.client.SidedEventHandler
+import net.thesilkminer.mc.ematter.common.ConfigurationRegistrationHandler
 import net.thesilkminer.mc.ematter.common.TileEntityRegistration
 import net.thesilkminer.mc.ematter.common.attachBlocksListener
 import net.thesilkminer.mc.ematter.common.attachItemsListener
@@ -68,6 +69,8 @@ object EnergyIsMatter {
             attachTemperatureTableConditionSerializersListener(it)
             it.register(TileEntityRegistration)
             it.register(CompatibilityProviderHandler)
+            it.register(ConfigurationRegistrationHandler)
+            onlyOn(Distribution.CLIENT) { { SidedEventHandler.setUpSidedHandlers(it) } }
         }
     }
 
@@ -77,7 +80,6 @@ object EnergyIsMatter {
         MinecraftForge.EVENT_BUS.let {
             l.info("Setting up additional event handlers")
             it.register(MadRecipeCapabilityHandler)
-            onlyOn(Distribution.CLIENT) { { SidedEventHandler.setUpSidedHandlers(it) } }
         }
         CompatibilityProviderHandler.firePreInitializationEvent()
         // Since model loading happens between pre-init and init, I'm assuming this is where model loaders
