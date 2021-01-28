@@ -24,5 +24,3 @@ private class VoxelShapesBuilder : VolumeBuilder {
 internal val emptyVolume = AxisAlignedBB(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 
 internal fun volumes(builder: VolumeBuilder.() -> Unit): Sequence<AxisAlignedBB> = VoxelShapesBuilder().apply(builder).toSequence()
-
-
