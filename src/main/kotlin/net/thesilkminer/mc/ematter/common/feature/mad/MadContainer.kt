@@ -47,13 +47,13 @@ import net.thesilkminer.mc.ematter.common.recipe.mad.MadRecipe
 import net.thesilkminer.mc.ematter.common.recipe.mad.capability.craftedMadRecipesAmountCapability
 import net.thesilkminer.mc.ematter.common.shared.CraftingInventoryWrapper
 
-internal class MadContainer(private val te: MadTileEntity, private val playerInventory: InventoryPlayer) : Container() {
+internal class MadContainer(private val te: MadBlockEntity, private val playerInventory: InventoryPlayer) : Container() {
     private class FakeSlot(inventory: IInventory, index: Int, x: Int, y: Int) : Slot(inventory, index, x, y) {
         override fun isItemValid(stack: ItemStack) = false
         override fun canTakeStack(playerIn: EntityPlayer) = false
     }
 
-    private class PoweredCraftingSlot(private val te: MadTileEntity, private val recipe: () -> IRecipe?, private val player: EntityPlayer, matrix: InventoryCrafting,
+    private class PoweredCraftingSlot(private val te: MadBlockEntity, private val recipe: () -> IRecipe?, private val player: EntityPlayer, matrix: InventoryCrafting,
                                       craftResult: InventoryCraftResult, index: Int, x: Int, y: Int) : SlotCrafting(player, matrix, craftResult, index, x, y) {
         @Suppress("EXPERIMENTAL_API_USAGE")
         override fun canTakeStack(playerIn: EntityPlayer) = this.recipe().let { it != null && (it !is MadRecipe || it.getPowerRequiredFor(this.player) <= this.te.storedPower) }

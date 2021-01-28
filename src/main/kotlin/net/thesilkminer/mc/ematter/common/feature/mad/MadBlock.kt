@@ -97,7 +97,7 @@ internal class MadBlock : Block(Material.IRON) {
     override fun onBlockActivated(worldIn: World, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand,
                                   facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean {
         if (worldIn.isRemote) return true
-        if (worldIn.getTileEntity(pos) !is MadTileEntity) return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
+        if (worldIn.getTileEntity(pos) !is MadBlockEntity) return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
 
         playerIn.openGui(EnergyIsMatter, GuiHandler.MAD_GUI, worldIn, pos.x, pos.y, pos.z)
         return true
@@ -105,7 +105,7 @@ internal class MadBlock : Block(Material.IRON) {
 
     // TODO("Maybe getDrops is a better location for this?")
     override fun breakBlock(worldIn: World, pos: BlockPos, state: IBlockState) {
-        (worldIn.getTileEntity(pos) as? MadTileEntity)?.let { te ->
+        (worldIn.getTileEntity(pos) as? MadBlockEntity)?.let { te ->
             (0 until te.inventory.slots)
                     .map { te.inventory.getStackInSlot(it) }
                     .filterNot { it.isEmpty }
@@ -123,7 +123,7 @@ internal class MadBlock : Block(Material.IRON) {
             volumes.map { this.rayTrace(pos, start, end, it) }.firstOrNull { it != null }
 
     override fun hasTileEntity(state: IBlockState) = true
-    override fun createTileEntity(world: World, state: IBlockState): TileEntity? = MadTileEntity()
+    override fun createTileEntity(world: World, state: IBlockState): TileEntity? = MadBlockEntity()
     override fun createBlockState() = BlockStateContainer(this, TIER)
     override fun damageDropped(state: IBlockState) = state.getValue(TIER).targetMeta
     override fun getMetaFromState(state: IBlockState) = state.getValue(TIER).targetMeta

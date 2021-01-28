@@ -44,8 +44,8 @@ import net.thesilkminer.mc.ematter.client.feature.thermometer.ThermometerOverlay
 import net.thesilkminer.mc.ematter.client.shared.CustomHighlightManager
 import net.thesilkminer.mc.ematter.client.shared.TriangleBasedModelLoader
 import net.thesilkminer.mc.ematter.common.ItemBlocks
+import net.thesilkminer.mc.ematter.common.feature.mad.MadBlockEntity
 import net.thesilkminer.mc.ematter.common.feature.mad.MadTier
-import net.thesilkminer.mc.ematter.common.feature.mad.MadTileEntity
 import net.thesilkminer.mc.ematter.common.items
 import kotlin.reflect.KClass
 
@@ -63,7 +63,7 @@ object SidedEventHandler {
     }
 
     internal fun registerBlockEntityRenders() {
-        MadBlockEntityRender().bindTo(MadTileEntity::class)
+        MadBlockEntityRender().bindTo(MadBlockEntity::class)
     }
 
     @SubscribeEvent

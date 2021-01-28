@@ -59,11 +59,11 @@ internal class SeebeckBlock : Block(Material.IRON) {
         }
     }
 
-    override fun createTileEntity(world: World, state: IBlockState): TileEntity? = SeebeckTileEntity()
+    override fun createTileEntity(world: World, state: IBlockState): TileEntity? = SeebeckBlockEntity()
     override fun hasTileEntity(state: IBlockState): Boolean = true
 
     override fun neighborChanged(state: IBlockState, worldIn: World, pos: BlockPos, blockIn: Block, fromPos: BlockPos) =
-            if (worldIn.isRemote || pos.up() == fromPos) Unit else (worldIn.getTileEntity(pos) as? SeebeckTileEntity)?.requestRecalculation() ?: Unit
+            if (worldIn.isRemote || pos.up() == fromPos) Unit else (worldIn.getTileEntity(pos) as? SeebeckBlockEntity)?.requestRecalculation() ?: Unit
 
     override fun addCollisionBoxToList(state: IBlockState, worldIn: World, pos: BlockPos, entityBox: AxisAlignedBB,
                                        collidingBoxes: MutableList<AxisAlignedBB>, entityIn: Entity?, isActualState: Boolean) {

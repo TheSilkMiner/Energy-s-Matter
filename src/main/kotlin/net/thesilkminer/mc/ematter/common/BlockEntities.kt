@@ -25,7 +25,7 @@
  * E-mail: thesilkminer <at> outlook <dot> com
  */
 
-@file:JvmName("TE")
+@file:JvmName("BE")
 
 package net.thesilkminer.mc.ematter.common
 
@@ -37,18 +37,18 @@ import net.minecraftforge.fml.common.registry.GameRegistry
 import net.thesilkminer.mc.boson.api.log.L
 import net.thesilkminer.mc.ematter.MOD_ID
 import net.thesilkminer.mc.ematter.MOD_NAME
-import net.thesilkminer.mc.ematter.common.feature.mad.MadTileEntity
-import net.thesilkminer.mc.ematter.common.feature.seebeck.SeebeckTileEntity
+import net.thesilkminer.mc.ematter.common.feature.mad.MadBlockEntity
+import net.thesilkminer.mc.ematter.common.feature.seebeck.SeebeckBlockEntity
 
-internal object TileEntities
+internal object BlockEntities
 
-internal object TileEntityRegistration {
-    private val l = L(MOD_NAME, "TileEntity Registration")
+internal object BlockEntityRegistration {
+    private val l = L(MOD_NAME, "BlockEntity Registration")
 
     @SubscribeEvent
     fun onBlockRegistration(e: RegistryEvent.Register<Block>) {
-        l.info("Hijacking block registry event for tile entity registration")
-        GameRegistry.registerTileEntity(MadTileEntity::class.java, ResourceLocation(MOD_ID, "molecular_assembler_device"))
-        GameRegistry.registerTileEntity(SeebeckTileEntity::class.java, ResourceLocation(MOD_ID, "seebeck_generator"))
+        l.info("Hijacking block registry event for block entity registration")
+        GameRegistry.registerTileEntity(MadBlockEntity::class.java, ResourceLocation(MOD_ID, "molecular_assembler_device"))
+        GameRegistry.registerTileEntity(SeebeckBlockEntity::class.java, ResourceLocation(MOD_ID, "seebeck_generator"))
     }
 }

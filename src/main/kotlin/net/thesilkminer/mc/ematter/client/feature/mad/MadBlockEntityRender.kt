@@ -6,14 +6,12 @@ import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms
 import net.minecraft.client.renderer.texture.TextureMap
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
-import net.minecraft.init.Items
-import net.minecraft.item.ItemStack
 import net.minecraftforge.client.ForgeHooksClient
 import net.thesilkminer.mc.ematter.client.shared.withMatrix
 import net.thesilkminer.mc.ematter.common.feature.mad.MadBlock
-import net.thesilkminer.mc.ematter.common.feature.mad.MadTileEntity
+import net.thesilkminer.mc.ematter.common.feature.mad.MadBlockEntity
 
-internal class MadBlockEntityRender : TileEntitySpecialRenderer<MadTileEntity>() {
+internal class MadBlockEntityRender : TileEntitySpecialRenderer<MadBlockEntity>() {
     private companion object {
         private const val Y_OFFSET = -0.02083
         private const val ROTATION_SPEED_BASE_MULTIPLIER = 12.0F // TODO("Make faster spin the more expensive the recipe? Or depending on how charged the MAD is?")
@@ -33,7 +31,7 @@ internal class MadBlockEntityRender : TileEntitySpecialRenderer<MadTileEntity>()
 
     private val itemRenderer by lazy { Minecraft.getMinecraft().renderItem }
 
-    override fun render(te: MadTileEntity, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float) {
+    override fun render(te: MadBlockEntity, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float) {
         super.render(te, x, y, z, partialTicks, destroyStage, alpha)
         val inventory = te.inventory.let { inv ->
             (0 until inv.slots).asSequence()

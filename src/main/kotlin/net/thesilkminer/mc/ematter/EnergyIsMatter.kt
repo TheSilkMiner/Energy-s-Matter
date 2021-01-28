@@ -39,8 +39,8 @@ import net.thesilkminer.mc.boson.api.event.BosonPreAvailableEvent
 import net.thesilkminer.mc.boson.api.fingerprint.logViolationMessage
 import net.thesilkminer.mc.boson.api.log.L
 import net.thesilkminer.mc.ematter.client.SidedEventHandler
+import net.thesilkminer.mc.ematter.common.BlockEntityRegistration
 import net.thesilkminer.mc.ematter.common.ConfigurationRegistrationHandler
-import net.thesilkminer.mc.ematter.common.TileEntityRegistration
 import net.thesilkminer.mc.ematter.common.attachBlocksListener
 import net.thesilkminer.mc.ematter.common.attachItemsListener
 import net.thesilkminer.mc.ematter.common.network.GuiHandler
@@ -67,7 +67,7 @@ object EnergyIsMatter {
             attachItemsListener(it)
             attachSteppingFunctionListener(it)
             attachTemperatureTableConditionSerializersListener(it)
-            it.register(TileEntityRegistration)
+            it.register(BlockEntityRegistration)
             it.register(CompatibilityProviderHandler)
             it.register(ConfigurationRegistrationHandler)
             onlyOn(Distribution.CLIENT) { { SidedEventHandler.setUpSidedHandlers(it) } }

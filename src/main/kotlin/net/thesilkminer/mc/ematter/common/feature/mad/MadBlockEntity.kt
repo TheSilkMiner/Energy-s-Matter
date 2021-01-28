@@ -51,16 +51,16 @@ import kotlin.math.max
 import kotlin.math.min
 
 @Suppress("EXPERIMENTAL_API_USAGE", "EXPERIMENTAL_OVERRIDE")
-internal class MadTileEntity : TileEntity(), Consumer, Holder {
+internal class MadBlockEntity : TileEntity(), Consumer, Holder {
     private companion object {
         private const val INVENTORY_KEY = "inventory"
         private const val POWER_KEY = "power"
     }
 
     internal val inventory = object : ItemStackHandler(5 * 5) {
-        override fun onContentsChanged(slot: Int) = this@MadTileEntity.andNotify {
+        override fun onContentsChanged(slot: Int) = this@MadBlockEntity.andNotify {
             super.onContentsChanged(slot)
-            this@MadTileEntity.markDirty()
+            this@MadBlockEntity.markDirty()
         }
     }
 
@@ -128,8 +128,8 @@ internal class MadTileEntity : TileEntity(), Consumer, Holder {
     }
 
     override fun getUpdateTag(): NBTTagCompound = NBTTagCompound().apply {
-        this.setLong(POWER_KEY, this@MadTileEntity.currentPower.toLong())
-        this.setTag(INVENTORY_KEY, this@MadTileEntity.inventory.serializeNBT())
+        this.setLong(POWER_KEY, this@MadBlockEntity.currentPower.toLong())
+        this.setTag(INVENTORY_KEY, this@MadBlockEntity.inventory.serializeNBT())
     }
 
     override fun handleUpdateTag(tag: NBTTagCompound) {

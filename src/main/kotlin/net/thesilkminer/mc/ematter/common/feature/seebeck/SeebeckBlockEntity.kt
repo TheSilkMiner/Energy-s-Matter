@@ -56,7 +56,7 @@ import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
 @Suppress("EXPERIMENTAL_API_USAGE", "EXPERIMENTAL_OVERRIDE", "EXPERIMENTAL_UNSIGNED_LITERALS")
-internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
+internal class SeebeckBlockEntity : TileEntity(), Producer, Holder, ITickable {
     private companion object {
         private const val MAX_CAPACITY = 3_141UL //same storage the basic mad has
         // TODO("See if the actual capacity should be amped up by a small margin")
@@ -244,6 +244,6 @@ internal class SeebeckTileEntity : TileEntity(), Producer, Holder, ITickable {
         this.recalculationNeeded = false
     }
 
-    private fun IBlockState.isRecognized() = this isInTag this@SeebeckTileEntity.sources
-    private fun BlockPos.createTemperatureContext() = TemperatureContext(this@SeebeckTileEntity.world, this, this@SeebeckTileEntity.currentDayMoment)
+    private fun IBlockState.isRecognized() = this isInTag this@SeebeckBlockEntity.sources
+    private fun BlockPos.createTemperatureContext() = TemperatureContext(this@SeebeckBlockEntity.world, this, this@SeebeckBlockEntity.currentDayMoment)
 }

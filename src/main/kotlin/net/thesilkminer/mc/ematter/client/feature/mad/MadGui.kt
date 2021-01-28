@@ -39,15 +39,15 @@ import net.minecraftforge.common.MinecraftForge
 import net.thesilkminer.mc.boson.api.locale.toLocale
 import net.thesilkminer.mc.boson.prefab.energy.toUserFriendlyAmount
 import net.thesilkminer.mc.ematter.MOD_ID
+import net.thesilkminer.mc.ematter.common.feature.mad.MadBlockEntity
 import net.thesilkminer.mc.ematter.common.feature.mad.MadContainer
-import net.thesilkminer.mc.ematter.common.feature.mad.MadTileEntity
 import net.thesilkminer.mc.ematter.common.network.mad.MadRecipeSwitchButtonClickPacket
 import net.thesilkminer.mc.ematter.common.network.sendToServer
 import net.thesilkminer.mc.ematter.common.recipe.mad.MadRecipe
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-internal class MadGui(private val te: MadTileEntity, playerInventory: InventoryPlayer) : GuiContainer(MadContainer(te, playerInventory)) {
+internal class MadGui(private val te: MadBlockEntity, playerInventory: InventoryPlayer) : GuiContainer(MadContainer(te, playerInventory)) {
     private companion object {
         private val BACKGROUND = ResourceLocation(MOD_ID, "textures/gui/container/molecular_assembler_device.png")
     }
