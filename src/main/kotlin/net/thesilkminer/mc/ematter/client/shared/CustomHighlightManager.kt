@@ -50,8 +50,7 @@ internal object CustomHighlightManager {
     private fun findCoordinate(last: Double, current: Double, factor: Double, pos: Int): Double = this.lerp(last, current, factor) * -1 + pos.toDouble()
     @Suppress("SpellCheckingInspection") private fun lerp(last: Double, current: Double, factor: Double): Double = (last + (current - last) * factor)
 
-    private inline fun withHighlightState(block: () -> Unit) {
-        GlStateManager.pushMatrix()
+    private inline fun withHighlightState(block: () -> Unit) = withMatrix {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F)
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO)
@@ -64,7 +63,6 @@ internal object CustomHighlightManager {
         GlStateManager.glLineWidth(1.0F)
         GlStateManager.disableBlend()
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F)
-        GlStateManager.popMatrix()
     }
 }
 
