@@ -18,12 +18,13 @@ import net.thesilkminer.mc.boson.prefab.naming.toNameSpacedString
 import net.thesilkminer.mc.ematter.common.mole.Moles
 
 @ExperimentalUnsignedTypes
-internal class TransmutationRecipe(private val group: NameSpacedString?, val moles: Moles, val power: ULong, private val result: ItemStack) : IForgeRegistryEntry.Impl<IRecipe>(), IRecipe {
+internal class TransmutationRecipeImpl(private val group: NameSpacedString?, override val moles: Moles, override val power: ULong, private val result: ItemStack) :
+    IForgeRegistryEntry.Impl<IRecipe>(), TransmutationRecipe {
 
     override fun getGroup() = this.group?.toString() ?: ""
 
     override fun matches(inv: InventoryCrafting, worldIn: World) =
-        inv is TransmutationInventoryCrafting && inv.result.item == this.result.item
+        inv is TransmutationInventory && inv.result.item == this.result.item
 
     override fun getCraftingResult(inv: InventoryCrafting): ItemStack = this.result.copy()
 
@@ -47,10 +48,10 @@ internal class TransmutationRecipeSerializer : IRecipeFactory {
 
         val result = RecipeLoadingProcessor.getItemStack(JsonUtils.getJsonObject(json, "result"), context, parseNbt = true)
 
-        return TransmutationRecipe(if (group.isNotEmpty()) group.toNameSpacedString() else null, moles, power.toULong(), result)
+        return TransmutationRecipeImpl(if (group.isNotEmpty()) group.toNameSpacedString() else null, moles, power.toULong(), result)
     }
 }
 
-internal class TransmutationInventoryCrafting(var result: ItemStack) : InventoryCrafting(object : Container() {
+internal class TransmutationInventory(var result: ItemStack) : InventoryCrafting(object : Container() {
     override fun canInteractWith(playerIn: EntityPlayer): Boolean = true
 }, 0, 0)
