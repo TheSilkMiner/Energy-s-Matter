@@ -32,6 +32,7 @@ import net.thesilkminer.mc.boson.api.modid.CRAFT_TWEAKER_2
 import net.thesilkminer.mc.boson.prefab.compatibility.ModCompatibilityProvider
 import net.thesilkminer.mc.ematter.compatibility.EnergyIsMatterCompatibilityProvider
 import net.thesilkminer.mc.ematter.compatibility.crafttweaker.script.mad.ZenMolecularAssemblerDevice
+import net.thesilkminer.mc.ematter.compatibility.crafttweaker.script.transmutator.ZenMolecularTransmutator
 import net.thesilkminer.mc.ematter.compatibility.crafttweaker.step.attachCraftTweakerSteppingFunctionSerializerRegistry
 
 internal class CraftTweakerCompatibilityProvider : ModCompatibilityProvider(CRAFT_TWEAKER_2), EnergyIsMatterCompatibilityProvider {
@@ -42,5 +43,6 @@ internal class CraftTweakerCompatibilityProvider : ModCompatibilityProvider(CRAF
     @ExperimentalUnsignedTypes
     override fun onPreAvailable() {
         ZenMolecularAssemblerDevice.apply()
+        ZenMolecularTransmutator.apply()
     }
 }
