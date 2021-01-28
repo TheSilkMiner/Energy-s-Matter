@@ -27,7 +27,9 @@
 
 package net.thesilkminer.mc.ematter.common.feature.mad
 
+import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.network.NetworkManager
 import net.minecraft.network.play.server.SPacketUpdateTileEntity
@@ -39,6 +41,8 @@ import net.minecraftforge.items.CapabilityItemHandler
 import net.minecraftforge.items.ItemStackHandler
 import net.thesilkminer.kotlin.commons.lang.uncheckedCast
 import net.thesilkminer.mc.boson.api.direction.Direction
+import net.thesilkminer.mc.boson.api.distribution.Distribution
+import net.thesilkminer.mc.boson.api.distribution.onlyOn
 import net.thesilkminer.mc.boson.api.energy.Consumer
 import net.thesilkminer.mc.boson.api.energy.Holder
 import net.thesilkminer.mc.boson.prefab.energy.consumerCapability
@@ -59,6 +63,9 @@ internal class MadTileEntity : TileEntity(), Consumer, Holder {
             this@MadTileEntity.markDirty()
         }
     }
+
+    internal var clientPossibleRecipe: ItemStack = ItemStack.EMPTY
+        private set
 
     private var currentPower: ULong = 0.toULong()
     private var maxPower: ULong = 0.toULong()
@@ -128,6 +135,12 @@ internal class MadTileEntity : TileEntity(), Consumer, Holder {
     override fun handleUpdateTag(tag: NBTTagCompound) {
         this.currentPower = tag.getLong(POWER_KEY).toULong()
         this.inventory.deserializeNBT(tag.getCompoundTag(INVENTORY_KEY))
+        if (this.world != null && this.world.isRemote) {
+            // Let's try to compute a possible recipe
+            val fakeContainer = MadContainer(this, onlyOn(Distribution.CLIENT) { { Minecraft.getMinecraft().player } }!!.inventory)
+            val probableRecipe = fakeContainer.currentRecipe
+            this.clientPossibleRecipe = probableRecipe?.recipeOutput ?: ItemStack.EMPTY
+        }
     }
 
     override fun onDataPacket(net: NetworkManager, pkt: SPacketUpdateTileEntity) = this.handleUpdateTag(pkt.nbtCompound)

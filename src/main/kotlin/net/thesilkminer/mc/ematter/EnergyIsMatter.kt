@@ -93,6 +93,7 @@ object EnergyIsMatter {
         MadRecipeCapabilityHandler.registerCapability()
         setUpNetworkChannel()
         GuiHandler().register()
+        onlyOn(Distribution.CLIENT) { SidedEventHandler::registerBlockEntityRenders }
         loadTemperatureTables()
     }
 

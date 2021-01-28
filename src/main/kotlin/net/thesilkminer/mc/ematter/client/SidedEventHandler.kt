@@ -28,19 +28,26 @@
 package net.thesilkminer.mc.ematter.client
 
 import net.minecraft.client.renderer.block.model.ModelResourceLocation
+import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.item.Item
+import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.ModelRegistryEvent
 import net.minecraftforge.client.model.ModelLoader
+import net.minecraftforge.fml.client.registry.ClientRegistry
 import net.minecraftforge.fml.common.eventhandler.EventBus
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.thesilkminer.mc.boson.api.event.ConfigurationRegisterEvent
 import net.thesilkminer.mc.boson.api.registry.RegistryObject
+import net.thesilkminer.mc.ematter.client.feature.mad.MadBlockEntityRender
 import net.thesilkminer.mc.ematter.client.feature.thermometer.ThermometerOverlay
+import net.thesilkminer.mc.ematter.client.shared.CustomHighlightManager
 import net.thesilkminer.mc.ematter.client.shared.TriangleBasedModelLoader
 import net.thesilkminer.mc.ematter.common.ItemBlocks
 import net.thesilkminer.mc.ematter.common.feature.mad.MadTier
+import net.thesilkminer.mc.ematter.common.feature.mad.MadTileEntity
 import net.thesilkminer.mc.ematter.common.items
+import kotlin.reflect.KClass
 
 object SidedEventHandler {
     private val customModelItems = listOf<RegistryObject<out Item>>(ItemBlocks.molecularAssemblerDevice)
@@ -48,10 +55,15 @@ object SidedEventHandler {
     internal fun setUpSidedHandlers(bus: EventBus) {
         bus.register(this)
         bus.register(ThermometerOverlay)
+        bus.register(CustomHighlightManager.also { it.registerCustomHighlightManagers() })
     }
 
     internal fun registerCustomModelLoaders() {
         TriangleBasedModelLoader().register()
+    }
+
+    internal fun registerBlockEntityRenders() {
+        MadBlockEntityRender().bindTo(MadTileEntity::class)
     }
 
     @SubscribeEvent
@@ -72,4 +84,7 @@ object SidedEventHandler {
 
     private fun Item.registerDefaultModel(metadata: Int = 0, registryName: ResourceLocation = this.registryName!!) =
             ModelLoader.setCustomModelResourceLocation(this, metadata, ModelResourceLocation(registryName, "inventory"))
+
+    private fun <T : TileEntity> TileEntitySpecialRenderer<T>.bindTo(target: KClass<T>) =
+        ClientRegistry.bindTileEntitySpecialRenderer(target.java, this)
 }

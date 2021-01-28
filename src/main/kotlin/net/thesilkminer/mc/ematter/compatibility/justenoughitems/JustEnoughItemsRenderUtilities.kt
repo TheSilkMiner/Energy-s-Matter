@@ -35,6 +35,7 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.resources.SimpleReloadableResourceManager
 import net.minecraft.util.ResourceLocation
+import net.thesilkminer.mc.ematter.client.shared.withMatrix
 import org.lwjgl.opengl.GL11
 import kotlin.math.PI
 import kotlin.math.atan2
@@ -76,12 +77,6 @@ internal fun renderLine(minecraft: Minecraft, initialPosition: Pair<Double, Doub
 internal fun renderNormalText(minecraft: Minecraft, text: String, coordinates: Pair<Double, Double>, color: Int) = renderText(minecraft, minecraft.fontRenderer, text, coordinates, color)
 
 internal fun renderSmallText(minecraft: Minecraft, text: String, coordinates: Pair<Double, Double>, color: Int) = renderText(minecraft, smallFontRenderer, text, coordinates, color)
-
-internal inline fun withMatrix(block: () -> Unit) {
-    GlStateManager.pushMatrix()
-    block()
-    GlStateManager.popMatrix()
-}
 
 private fun renderText(minecraft: Minecraft, fontRenderer: FontRenderer, text: String, coordinates: Pair<Double, Double>, color: Int) {
     withColorAndWidth(minecraft, 0xFFFFFFFF.toInt(), 1.0) {
