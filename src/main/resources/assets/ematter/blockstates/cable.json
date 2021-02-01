@@ -1,0 +1,69 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "ematter:cable/core"
+      }
+    },
+    {
+      "when": {
+        "north": "true"
+      },
+      "apply": {
+        "model": "ematter:cable/rod",
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "when": {
+        "east": "true"
+      },
+      "apply": {
+        "model": "ematter:cable/rod",
+        "x": 0,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "south": "true"
+      },
+      "apply": {
+        "model": "ematter:cable/rod",
+        "x": 0,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "west": "true"
+      },
+      "apply": {
+        "model": "ematter:cable/rod",
+        "x": 0,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "up": "true"
+      },
+      "apply": {
+        "model": "ematter:cable/rod",
+        "x": 270,
+        "y": 0
+      }
+    },
+    {
+      "when": {
+        "down": "true"
+      },
+      "apply": {
+        "model": "ematter:cable/rod",
+        "x": 90,
+        "y": 0
+      }
+    }
+  ]
+}
