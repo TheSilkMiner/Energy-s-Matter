@@ -44,10 +44,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.thesilkminer.mc.boson.api.direction.Direction
 import net.thesilkminer.mc.boson.api.event.ConfigurationRegisterEvent
 import net.thesilkminer.mc.boson.api.registry.RegistryObject
-import net.thesilkminer.mc.ematter.client.shared.MultipartModelLoader
 import net.thesilkminer.mc.ematter.client.feature.mad.MadBlockEntityRender
 import net.thesilkminer.mc.ematter.client.feature.thermometer.ThermometerOverlay
 import net.thesilkminer.mc.ematter.client.shared.CustomHighlightManager
+import net.thesilkminer.mc.ematter.client.shared.MultipartModelLoader
 import net.thesilkminer.mc.ematter.client.shared.TriangleBasedModelLoader
 import net.thesilkminer.mc.ematter.common.Blocks
 import net.thesilkminer.mc.ematter.common.ItemBlocks
@@ -76,11 +76,13 @@ object SidedEventHandler {
         MadBlockEntityRender().bindTo(MadBlockEntity::class)
     }
 
+    @Suppress("unused")
     @SubscribeEvent
     fun onConfigurationRegistration(e: ConfigurationRegisterEvent) {
         e.configurationRegistry.registerConfiguration(clientConfiguration)
     }
 
+    @Suppress("unused", "unused_parameter")
     @SubscribeEvent
     fun onModelRegistration(e: ModelRegistryEvent) {
         // Loop for normal models
@@ -93,11 +95,10 @@ object SidedEventHandler {
     }
 
     private fun Item.registerDefaultModel(metadata: Int = 0, registryName: ResourceLocation = this.registryName!!) =
-            ModelLoader.setCustomModelResourceLocation(this, metadata, ModelResourceLocation(registryName, "inventory"))
+        ModelLoader.setCustomModelResourceLocation(this, metadata, ModelResourceLocation(registryName, "inventory"))
 
     private fun <T : TileEntity> TileEntitySpecialRenderer<T>.bindTo(target: KClass<T>) =
         ClientRegistry.bindTileEntitySpecialRenderer(target.java, this)
-        ModelLoader.setCustomModelResourceLocation(this, metadata, ModelResourceLocation(registryName, "inventory"))
 
     private const val AABB_GROW = 0.0020000000949949026
 
@@ -124,7 +125,12 @@ object SidedEventHandler {
 
 internal inline fun withBoundingBoxState(block: () -> Unit) {
     GlStateManager.enableBlend()
-    GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO)
+    GlStateManager.tryBlendFuncSeparate(
+        GlStateManager.SourceFactor.SRC_ALPHA,
+        GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
+        GlStateManager.SourceFactor.ONE,
+        GlStateManager.DestFactor.ZERO
+    )
     GlStateManager.glLineWidth(2.0f)
     GlStateManager.disableTexture2D()
     GlStateManager.depthMask(false)
