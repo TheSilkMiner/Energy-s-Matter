@@ -27,7 +27,7 @@
 
 @file:JvmName("TTL")
 
-package net.thesilkminer.mc.ematter.common.temperature
+package net.thesilkminer.mc.ematter.common.system.temperature
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -54,8 +54,8 @@ import net.thesilkminer.mc.boson.prefab.loader.progress.ProgressBarVisitor
 import net.thesilkminer.mc.boson.prefab.naming.toNameSpacedString
 import net.thesilkminer.mc.boson.prefab.naming.toResourceLocation
 import net.thesilkminer.mc.ematter.MOD_NAME
-import net.thesilkminer.mc.ematter.common.temperature.condition.get
-import net.thesilkminer.mc.ematter.common.temperature.condition.temperatureTableConditionSerializerRegistry
+import net.thesilkminer.mc.ematter.common.system.temperature.condition.get
+import net.thesilkminer.mc.ematter.common.system.temperature.condition.temperatureTableConditionSerializerRegistry
 
 private val l = L(MOD_NAME, "Temperature Tables")
 

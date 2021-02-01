@@ -25,7 +25,7 @@
  * E-mail: thesilkminer <at> outlook <dot> com
  */
 
-package net.thesilkminer.mc.ematter.common.temperature
+package net.thesilkminer.mc.ematter.common.system.temperature
 
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World

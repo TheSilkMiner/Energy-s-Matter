@@ -27,7 +27,7 @@
 
 @file:JvmName("DTTCS")
 
-package net.thesilkminer.mc.ematter.common.temperature.condition
+package net.thesilkminer.mc.ematter.common.system.temperature.condition
 
 import com.google.common.collect.HashBiMap
 import com.google.gson.JsonObject
@@ -44,7 +44,7 @@ import net.minecraftforge.registries.IForgeRegistryEntry
 import net.thesilkminer.kotlin.commons.lang.uncheckedCast
 import net.thesilkminer.mc.boson.prefab.naming.toNameSpacedString
 import net.thesilkminer.mc.boson.prefab.naming.toResourceLocation
-import net.thesilkminer.mc.ematter.common.temperature.TemperatureContext
+import net.thesilkminer.mc.ematter.common.system.temperature.TemperatureContext
 import java.util.Locale
 import kotlin.ClassCastException
 import kotlin.math.abs

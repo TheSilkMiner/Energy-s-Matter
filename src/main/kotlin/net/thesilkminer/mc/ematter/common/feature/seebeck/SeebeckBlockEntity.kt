@@ -49,8 +49,8 @@ import net.thesilkminer.mc.boson.prefab.energy.producerCapability
 import net.thesilkminer.mc.boson.prefab.tag.blockTagType
 import net.thesilkminer.mc.boson.prefab.tag.isInTag
 import net.thesilkminer.mc.ematter.MOD_ID
-import net.thesilkminer.mc.ematter.common.temperature.TemperatureContext
-import net.thesilkminer.mc.ematter.common.temperature.TemperatureTables
+import net.thesilkminer.mc.ematter.common.system.temperature.TemperatureContext
+import net.thesilkminer.mc.ematter.common.system.temperature.TemperatureTables
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong

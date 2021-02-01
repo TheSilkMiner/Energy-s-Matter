@@ -48,9 +48,9 @@ import net.thesilkminer.mc.ematter.common.network.GuiHandler
 import net.thesilkminer.mc.ematter.common.network.setUpNetworkChannel
 import net.thesilkminer.mc.ematter.common.recipe.mad.capability.MadRecipeCapabilityHandler
 import net.thesilkminer.mc.ematter.common.recipe.mad.step.attachSteppingFunctionListener
-import net.thesilkminer.mc.ematter.common.temperature.condition.attachTemperatureTableConditionSerializersListener
-import net.thesilkminer.mc.ematter.common.temperature.freezeTemperatureTables
-import net.thesilkminer.mc.ematter.common.temperature.loadTemperatureTables
+import net.thesilkminer.mc.ematter.common.system.temperature.condition.attachTemperatureTableConditionSerializersListener
+import net.thesilkminer.mc.ematter.common.system.temperature.freezeTemperatureTables
+import net.thesilkminer.mc.ematter.common.system.temperature.loadTemperatureTables
 import net.thesilkminer.mc.ematter.compatibility.CompatibilityProviderHandler
 
 @Mod(modid = MOD_ID, name = MOD_NAME, version = MOD_VERSION, dependencies = MOD_DEPENDENCIES,

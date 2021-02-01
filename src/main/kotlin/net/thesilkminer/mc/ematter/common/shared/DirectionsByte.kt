@@ -2,7 +2,7 @@ package net.thesilkminer.mc.ematter.common.shared
 
 import net.thesilkminer.mc.boson.api.direction.Direction
 
-@Suppress("unused")
+@Suppress("unused", "EXPERIMENTAL_FEATURE_WARNING")
 inline class DirectionsByte(val byte: Byte) : Iterable<Direction> {
 
     operator fun plus(side: Direction) = DirectionsByte((this.byte.toInt() or (1 shl side.ordinal)).toByte())

@@ -27,7 +27,7 @@
 
 @file:JvmName("TTCS@")
 
-package net.thesilkminer.mc.ematter.common.temperature.condition
+package net.thesilkminer.mc.ematter.common.system.temperature.condition
 
 import net.minecraftforge.fml.common.eventhandler.EventBus
 import net.thesilkminer.mc.boson.api.registry.DeferredRegister

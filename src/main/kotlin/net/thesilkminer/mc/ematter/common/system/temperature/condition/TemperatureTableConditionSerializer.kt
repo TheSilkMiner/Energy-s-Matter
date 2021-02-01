@@ -25,20 +25,17 @@
  * E-mail: thesilkminer <at> outlook <dot> com
  */
 
-@file:JvmName("TTCSH")
+@file:JvmName("TTCS")
 
-package net.thesilkminer.mc.ematter.common.temperature.condition
+package net.thesilkminer.mc.ematter.common.system.temperature.condition
 
 import com.google.gson.JsonObject
-import net.minecraft.util.JsonUtils
-import net.minecraftforge.registries.IForgeRegistry
-import net.thesilkminer.mc.boson.api.id.NameSpacedString
-import net.thesilkminer.mc.boson.prefab.naming.toNameSpacedString
-import net.thesilkminer.mc.boson.prefab.naming.toResourceLocation
+import net.minecraftforge.registries.IForgeRegistryEntry
+import net.minecraftforge.registries.RegistryManager
+import net.thesilkminer.mc.ematter.common.system.temperature.TemperatureContext
 
-private typealias Reg = IForgeRegistry<TemperatureTableConditionSerializer>
+internal val temperatureTableConditionSerializerRegistry by lazy { RegistryManager.ACTIVE.getRegistry(TemperatureTableConditionSerializer::class.java) }
 
-internal operator fun Reg.get(serialized: JsonObject) = this[JsonUtils.getString(serialized, "type")]
-internal operator fun Reg.get(name: String) = this[name.toNameSpacedString()]
-internal operator fun Reg.get(name: NameSpacedString) = this.getValue(name.toResourceLocation())
-        ?: throw IllegalStateException("No serializer with name '$name' exist")
+interface TemperatureTableConditionSerializer : IForgeRegistryEntry<TemperatureTableConditionSerializer> {
+    fun read(json: JsonObject): (TemperatureContext) -> Boolean
+}
