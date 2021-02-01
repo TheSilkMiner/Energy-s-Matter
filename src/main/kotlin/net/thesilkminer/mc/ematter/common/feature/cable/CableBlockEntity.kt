@@ -19,7 +19,7 @@ import net.thesilkminer.mc.ematter.common.feature.cable.capability.networkManage
 import net.thesilkminer.mc.ematter.common.shared.DirectionsByte
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-internal class CableTileEntity : TileEntity() {
+internal class CableBlockEntity : TileEntity() {
 
     var connections: DirectionsByte = DirectionsByte(0)
         private set
@@ -35,7 +35,7 @@ internal class CableTileEntity : TileEntity() {
         Direction.values().forEach { side ->
             this.world.getTileEntitySafely(this.pos.offset(side))?.let { te ->
                 if (te.hasEnergySupport(side.opposite)) this.connections = this.connections + side
-                if (te.isEnergyConsumer(side.opposite) && te !is CableTileEntity) {
+                if (te.isEnergyConsumer(side.opposite) && te !is CableBlockEntity) {
                     this.consumers = this.consumers + side
                     this.world.networkManager.addConsumer(this.pos, side)
                 }
@@ -79,7 +79,7 @@ internal class CableTileEntity : TileEntity() {
 
         this.world.getTileEntitySafely(this.pos.offset(side))?.let { te ->
             if (te.hasEnergySupport(side.opposite)) this.connections = this.connections + side
-            if (te.isEnergyConsumer(side.opposite) && te !is CableTileEntity) {
+            if (te.isEnergyConsumer(side.opposite) && te !is CableBlockEntity) {
                 this.consumers = this.consumers + side
                 this.world.networkManager.addConsumer(this.pos, side)
             }
@@ -128,10 +128,10 @@ internal class CableTileEntity : TileEntity() {
     // networking >>
     override fun getUpdateTag(): NBTTagCompound = NBTTagCompound().apply {
         // pos needed for mc to deserialize on chunk load; see NetHandlerPlayClient#handleChunkData
-        this.setInteger("x", this@CableTileEntity.pos.x)
-        this.setInteger("y", this@CableTileEntity.pos.y)
-        this.setInteger("z", this@CableTileEntity.pos.z)
-        this.setByte("connections", this@CableTileEntity.connections.byte)
+        this.setInteger("x", this@CableBlockEntity.pos.x)
+        this.setInteger("y", this@CableBlockEntity.pos.y)
+        this.setInteger("z", this@CableBlockEntity.pos.z)
+        this.setByte("connections", this@CableBlockEntity.connections.byte)
     }
 
     override fun handleUpdateTag(tag: NBTTagCompound) {

@@ -37,6 +37,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry
 import net.thesilkminer.mc.boson.api.log.L
 import net.thesilkminer.mc.ematter.MOD_ID
 import net.thesilkminer.mc.ematter.MOD_NAME
+import net.thesilkminer.mc.ematter.common.feature.cable.CableBlockEntity
 import net.thesilkminer.mc.ematter.common.feature.mad.MadBlockEntity
 import net.thesilkminer.mc.ematter.common.feature.seebeck.SeebeckBlockEntity
 
@@ -50,5 +51,6 @@ internal object BlockEntityRegistration {
         l.info("Hijacking block registry event for block entity registration")
         GameRegistry.registerTileEntity(MadBlockEntity::class.java, ResourceLocation(MOD_ID, "molecular_assembler_device"))
         GameRegistry.registerTileEntity(SeebeckBlockEntity::class.java, ResourceLocation(MOD_ID, "seebeck_generator"))
+        GameRegistry.registerTileEntity(CableBlockEntity::class.java, ResourceLocation(MOD_ID, "cable"))
     }
 }

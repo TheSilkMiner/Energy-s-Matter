@@ -56,23 +56,23 @@ internal class CableBlock : Block(MATERIAL_CABLE) {
 
     // TE >>
     override fun hasTileEntity(state: IBlockState): Boolean = true
-    override fun createTileEntity(world: World, state: IBlockState): TileEntity = CableTileEntity()
+    override fun createTileEntity(world: World, state: IBlockState): TileEntity = CableBlockEntity()
     // << TE
 
     // Lifecycle >>
     override fun onBlockAdded(worldIn: World, pos: BlockPos, state: IBlockState) {
-        (worldIn.getTileEntity(pos) as? CableTileEntity)?.onAdd() // this actually creates the te but that's fine since it would be created in the same tick anyways (at least I hope it's fine)
+        (worldIn.getTileEntity(pos) as? CableBlockEntity)?.onAdd() // this actually creates the te but that's fine since it would be created in the same tick anyways (at least I hope it's fine)
     }
 
     override fun breakBlock(worldIn: World, pos: BlockPos, state: IBlockState) {
-        (worldIn.getTileEntity(pos) as? CableTileEntity)?.onRemove()
+        (worldIn.getTileEntity(pos) as? CableBlockEntity)?.onRemove()
         super.breakBlock(worldIn, pos, state)
     }
     // << Lifecycle
 
     // Reactions >>
     override fun neighborChanged(state: IBlockState, worldIn: World, pos: BlockPos, blockIn: Block, fromPos: BlockPos) {
-        (worldIn.getTileEntity(pos) as? CableTileEntity)?.onNeighborChanged(Direction.values().find { pos.offset(it) == fromPos }!!)
+        (worldIn.getTileEntity(pos) as? CableBlockEntity)?.onNeighborChanged(Direction.values().find { pos.offset(it) == fromPos }!!)
     }
     // << Reactions
 
@@ -89,7 +89,7 @@ internal class CableBlock : Block(MATERIAL_CABLE) {
 
     override fun getMetaFromState(state: IBlockState) = 0 // mc expects us to override this; otherwise it crashes..
 
-    override fun getActualState(state: IBlockState, world: IBlockAccess, pos: BlockPos) = (world.getTileEntity(pos) as? CableTileEntity)?.connections?.let { directions ->
+    override fun getActualState(state: IBlockState, world: IBlockAccess, pos: BlockPos) = (world.getTileEntity(pos) as? CableBlockEntity)?.connections?.let { directions ->
         connections.asSequence().fold(state) { s, property -> s.withProperty(property.value, property.key in directions) }
     } ?: state // during world load te is null; we re render later, after te has loaded
     // << BlockState
