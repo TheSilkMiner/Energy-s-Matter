@@ -51,6 +51,7 @@ import net.thesilkminer.mc.boson.prefab.naming.toResourceLocation
 import net.thesilkminer.mc.ematter.common.recipe.mad.MadRecipe
 import net.thesilkminer.mc.ematter.common.recipe.mad.capability.craftedMadRecipesAmount
 import net.thesilkminer.mc.ematter.common.recipe.mad.step.SteppingFunction
+import net.thesilkminer.mc.ematter.compatibility.justenoughitems.justEnoughItemsConfiguration
 import net.thesilkminer.mc.ematter.compatibility.justenoughitems.renderArrow
 import net.thesilkminer.mc.ematter.compatibility.justenoughitems.renderLine
 import net.thesilkminer.mc.ematter.compatibility.justenoughitems.renderNormalText
@@ -115,6 +116,8 @@ internal class JeiMadRecipeWrapper(private val helpers: IJeiHelpers, val recipe:
         private const val FORMULA_TEXT_COLOR = 0x000000FF
         private const val FORMULA_ERROR_TEXT_COLOR = 0xFF0000FF.toInt()
         private const val FORMULA_WARNING_TEXT_COLOR = 0xFFD700FF.toInt()
+
+        private val missingOnCrafting = justEnoughItemsConfiguration["recipes", "molecular_assembler_device"]["missing_on_crafting"]
 
         private val fieldReferences = mutableMapOf<KClass<*>, Field?>()
         private val fieldReferenceComputingFunction = this::computeSteppingFunctionField
@@ -264,7 +267,7 @@ internal class JeiMadRecipeWrapper(private val helpers: IJeiHelpers, val recipe:
 
     @ExperimentalUnsignedTypes
     private fun MadRecipe.findSteppingFunction() = when (this) {
-        is FakeShapelessMadRecipe -> FakeDoNothingSteppingFunction.let { null } // TODO("Configuration option")
+        is FakeShapelessMadRecipe -> if (missingOnCrafting().boolean) null else FakeDoNothingSteppingFunction
         else -> fieldReferences.computeIfAbsent(this::class, fieldReferenceComputingFunction)?.let { it[this].uncheckedCast<SteppingFunction>() }
     }
 
