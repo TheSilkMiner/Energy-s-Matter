@@ -49,7 +49,7 @@ import net.thesilkminer.mc.boson.api.locale.toLocale
 import net.thesilkminer.mc.boson.prefab.energy.toUserFriendlyAmount
 import net.thesilkminer.mc.boson.prefab.naming.toResourceLocation
 import net.thesilkminer.mc.ematter.common.recipe.mad.MadRecipe
-import net.thesilkminer.mc.ematter.common.recipe.mad.capability.craftedMadRecipesAmountCapability
+import net.thesilkminer.mc.ematter.common.recipe.mad.capability.craftedMadRecipesAmount
 import net.thesilkminer.mc.ematter.common.recipe.mad.step.SteppingFunction
 import net.thesilkminer.mc.ematter.compatibility.justenoughitems.renderArrow
 import net.thesilkminer.mc.ematter.compatibility.justenoughitems.renderLine
@@ -155,7 +155,7 @@ internal class JeiMadRecipeWrapper(private val helpers: IJeiHelpers, val recipe:
 
         if (this.recipeSteppingFunction == null) return this.renderSteppingFunctionError(minecraft)
 
-        val currentAmount = minecraft.player.getCapability(craftedMadRecipesAmountCapability, null)?.findAmountFor(this.recipe) ?: return this.renderSteppingFunctionError(minecraft)
+        val currentAmount = minecraft.player.craftedMadRecipesAmount?.findAmountFor(this.recipe) ?: return this.renderSteppingFunctionError(minecraft)
 
         val steppingFunctionValues = (currentAmount until currentAmount + graphXMarkers.size)
                 .map { it - 1 }
@@ -245,7 +245,7 @@ internal class JeiMadRecipeWrapper(private val helpers: IJeiHelpers, val recipe:
                 val distances = graphXMarkers.map { abs(it - exactMouseX) }
                 val nearest = distances.min()!! // I know there's at least one element
                 val targetX = distances.asSequence().mapIndexed { index, value -> index to value }.first { it.second == nearest }.first
-                val capability = Minecraft.getMinecraft().player.getCapability(craftedMadRecipesAmountCapability, null)!!.findAmountFor(this.recipe)
+                val capability = Minecraft.getMinecraft().player.craftedMadRecipesAmount!!.findAmountFor(this.recipe)
                 if (capability == 0L && targetX == 0) {
                     "gui.ematter.jei.mad.step.none".toLocale(color = Color.GOLD)
                 } else {

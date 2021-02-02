@@ -44,7 +44,7 @@ import net.minecraft.network.play.server.SPacketSetSlot
 import net.minecraft.world.World
 import net.thesilkminer.mc.ematter.common.shared.bindPlayerInventory
 import net.thesilkminer.mc.ematter.common.recipe.mad.MadRecipe
-import net.thesilkminer.mc.ematter.common.recipe.mad.capability.craftedMadRecipesAmountCapability
+import net.thesilkminer.mc.ematter.common.recipe.mad.capability.craftedMadRecipesAmount
 import net.thesilkminer.mc.ematter.common.shared.CraftingInventoryWrapper
 
 internal class MadContainer(private val te: MadBlockEntity, private val playerInventory: InventoryPlayer) : Container() {
@@ -60,7 +60,7 @@ internal class MadContainer(private val te: MadBlockEntity, private val playerIn
 
         override fun onCrafting(stack: ItemStack) {
             if (!this.player.world.isRemote) {
-                (this.inventory as? InventoryCraftResult)?.recipeUsed?.let { this.player.getCapability(craftedMadRecipesAmountCapability, null)!!.increaseAmountFor(it) }
+                (this.inventory as? InventoryCraftResult)?.recipeUsed?.let { this.player.craftedMadRecipesAmount!!.increaseAmountFor(it) }
             }
             super.onCrafting(stack)
         }
@@ -211,7 +211,7 @@ internal class MadContainer(private val te: MadBlockEntity, private val playerIn
     }
 
     internal fun switchToNextRecipe() {
-        (this.currentMain + 1).orWrap()
+        this.currentMain = (this.currentMain + 1).orWrap()
         if (this.playerInventory.player.world.isRemote) {
             this.updateClientRecipeStatus()
         } else {

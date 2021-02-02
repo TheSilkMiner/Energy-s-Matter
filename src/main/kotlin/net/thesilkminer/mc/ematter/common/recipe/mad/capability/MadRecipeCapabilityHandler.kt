@@ -89,8 +89,8 @@ internal object MadRecipeCapabilityHandler {
     @Suppress("unused")
     fun onPlayerClone(event: PlayerEvent.Clone) {
         if (!event.isWasDeath) return
-        val oldData = event.original.getCapability(craftedMadRecipesAmountCapability, null) ?: return
-        val newData = event.entityPlayer.getCapability(craftedMadRecipesAmountCapability, null) ?: return
+        val oldData = event.original.craftedMadRecipesAmount ?: return
+        val newData = event.entityPlayer.craftedMadRecipesAmount ?: return
         newData.deserializeNBT(oldData.serializeNBT())
     }
 
@@ -124,7 +124,7 @@ internal object MadRecipeCapabilityHandler {
 
     private fun syncCapabilities(player: EntityPlayer) {
         if (player !is EntityPlayerMP) return
-        val cap = player.getCapability(craftedMadRecipesAmountCapability, null) ?: return
+        val cap = player.craftedMadRecipesAmount ?: return
         val compound = cap.serializeNBT()
         player.sendPacket(MadRecipeCapabilitySyncPacket(compound))
     }

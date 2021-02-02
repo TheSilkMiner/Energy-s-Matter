@@ -36,7 +36,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
 import net.thesilkminer.mc.boson.api.distribution.Distribution
 import net.thesilkminer.mc.boson.api.distribution.onlyOn
-import net.thesilkminer.mc.ematter.common.recipe.mad.capability.craftedMadRecipesAmountCapability
+import net.thesilkminer.mc.ematter.common.recipe.mad.capability.craftedMadRecipesAmount
 
 internal class MadRecipeCapabilitySyncPacket(private var capabilityTag: NBTTagCompound?) : IMessage {
     constructor() : this(null)
@@ -66,8 +66,7 @@ internal class MadRecipeCapabilitySyncPacketHandler : IMessageHandler<MadRecipeC
         onlyOn(Distribution.CLIENT) {
             {
                 Minecraft.getMinecraft().addScheduledTask {
-                    val cap = Minecraft.getMinecraft().player.getCapability(craftedMadRecipesAmountCapability, null)
-                            ?: throw IllegalStateException("Capability was not attached to client player")
+                    val cap = Minecraft.getMinecraft().player.craftedMadRecipesAmount ?: throw IllegalStateException("Capability was not attached to client player")
                     cap.deserializeNBT(message.tag)
                 }
             }
