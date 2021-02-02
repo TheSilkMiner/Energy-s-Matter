@@ -17,7 +17,7 @@ internal class CableHighlightProvider : CustomHighlightProvider {
 
     override fun renderBoundingBox(state: IBlockState, x: Double, y: Double, z: Double) {
         directions.filter { state.getValue(CableBlock.connections[it] ?: throw IllegalStateException("No property for direction '$it' found: this is a critical error")) }
-                .map { CableBlock.boxes[it]?.expandForHighlight()?.offset(x, y, z) }
+                .map { CableBlock.volumes[it]?.expandForHighlight()?.offset(x, y, z) }
                 .filterNotNull()
                 .forEach { it.renderDefaultHighlight() }
     }

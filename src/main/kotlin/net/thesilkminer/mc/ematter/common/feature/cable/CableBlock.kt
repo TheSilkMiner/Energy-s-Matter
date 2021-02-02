@@ -42,9 +42,9 @@ internal class CableBlock : Block(MATERIAL_CABLE) {
         private const val rodMin = 0.4375
         private const val rodMax = 0.5625
 
-        val coreAABB = AxisAlignedBB(coreMin, coreMin, coreMin, coreMax, coreMax, coreMax)
+        val coreVolume = AxisAlignedBB(coreMin, coreMin, coreMin, coreMax, coreMax, coreMax)
 
-        val boxes = mapOf(
+        val volumes = mapOf(
             Direction.NORTH to AxisAlignedBB(rodMin, rodMin, 0.0, rodMax, rodMax, coreMin),
             Direction.EAST to AxisAlignedBB(coreMax, rodMin, rodMin, 1.0, rodMax, rodMax),
             Direction.SOUTH to AxisAlignedBB(rodMin, rodMin, coreMax, rodMax, rodMax, 1.0),
@@ -99,7 +99,7 @@ internal class CableBlock : Block(MATERIAL_CABLE) {
     override fun isFullCube(state: IBlockState) = false
 
     override fun getBoundingBox(state: IBlockState, source: IBlockAccess, pos: BlockPos): AxisAlignedBB {
-        return coreAABB
+        return coreVolume
     }
 
     override fun addCollisionBoxToList(
@@ -111,24 +111,24 @@ internal class CableBlock : Block(MATERIAL_CABLE) {
         entityIn: Entity?,
         isActualState: Boolean
     ) {
-        if (entityBox.intersects(coreAABB.offset(pos))) collidingBoxes.add(coreAABB.offset(pos))
+        if (entityBox.intersects(coreVolume.offset(pos))) collidingBoxes.add(coreVolume.offset(pos))
 
         state.getActualState(worldIn, pos).let { actual ->
             Direction.values().asSequence()
                 .filter { actual.getValue(connections.getValue(it)) }
-                .map { boxes.getValue(it).offset(pos) }
+                .map { volumes.getValue(it).offset(pos) }
                 .filter { entityBox.intersects(it) }
                 .forEach { collidingBoxes.add(it) }
         }
     }
 
     override fun collisionRayTrace(state: IBlockState, worldIn: World, pos: BlockPos, start: Vec3d, end: Vec3d): RayTraceResult? {
-        this.rayTrace(pos, start, end, coreAABB)?.let { return it }
+        this.rayTrace(pos, start, end, coreVolume)?.let { return it }
 
         state.getActualState(worldIn, pos).let { actual ->
             Direction.values().asSequence()
                 .filter { actual.getValue(connections.getValue(it)) }
-                .forEach { this.rayTrace(pos, start, end, boxes.getValue(it))?.let { target -> return target } }
+                .forEach { this.rayTrace(pos, start, end, volumes.getValue(it))?.let { target -> return target } }
         }
 
         return null
