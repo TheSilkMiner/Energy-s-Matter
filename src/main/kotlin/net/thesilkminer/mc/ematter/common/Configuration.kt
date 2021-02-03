@@ -32,6 +32,23 @@ internal val commonConfiguration = configuration {
                 }
             }
         }
+        "performance" {
+            comment = "Manage disabling and enabling of certain features that may be taxing on performance"
+
+            subCategories {
+                "molecular_assembler_device" {
+                    comment = "Manage the Molecular Assembler Device most performance intensive behavior"
+
+                    entries {
+                        "thread_the_hole"(EntryType.BOOLEAN) {
+                            comment = "Whether the volume of the Molecular Assembler Device should accurately represent the block. This is VERY COSTLY ON PERFORMANCE!"
+                            default = true
+                            requiresGameRestart() // Not really, but we force it so that this cannot be abused
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

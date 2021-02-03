@@ -12,22 +12,23 @@ import net.minecraftforge.client.event.DrawBlockHighlightEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.thesilkminer.mc.boson.api.registry.RegistryObject
 import net.thesilkminer.mc.ematter.client.feature.cable.CableHighlightProvider
+import net.thesilkminer.mc.ematter.client.feature.mad.MadHighlightProvider
 import net.thesilkminer.mc.ematter.common.Blocks
 import net.thesilkminer.mc.ematter.common.feature.mad.MadBlock
 import net.thesilkminer.mc.ematter.common.feature.seebeck.SeebeckBlock
 
 internal interface CustomHighlightProvider {
     fun matches(state: IBlockState): Boolean
-    fun renderBoundingBox(state: IBlockState, x: Double, y: Double, z: Double)
+    fun renderHighlight(state: IBlockState, x: Double, y: Double, z: Double)
 }
 
 internal object CustomHighlightManager {
     private val highlightProviders = mutableListOf<CustomHighlightProvider>()
 
     internal fun registerCustomHighlightManagers() {
-        this.highlightProviders += DefaultCustomHighlightProvider(Blocks.molecularAssemblerDevice, MadBlock.volumes)
-        this.highlightProviders += DefaultCustomHighlightProvider(Blocks.seebeckGenerator, SeebeckBlock.volumes)
         this.highlightProviders += CableHighlightProvider()
+        this.highlightProviders += DefaultCustomHighlightProvider(Blocks.seebeckGenerator, SeebeckBlock.volumes)
+        this.highlightProviders += MadHighlightProvider()
     }
 
     @SubscribeEvent
@@ -46,7 +47,7 @@ internal object CustomHighlightManager {
         val y = this.findCoordinate(player.lastTickPosY, player.posY, factor, pos.y)
         val z = this.findCoordinate(player.lastTickPosZ, player.posZ, factor, pos.z)
 
-        withHighlightState { highlighters.forEach { it.renderBoundingBox(state, x, y, z) } }
+        withHighlightState { highlighters.forEach { it.renderHighlight(state, x, y, z) } }
     }
 
     private fun findCoordinate(last: Double, current: Double, factor: Double, pos: Int): Double = this.lerp(last, current, factor) * -1 + pos.toDouble()
@@ -73,13 +74,13 @@ private class DefaultCustomHighlightProvider(block: RegistryObject<Block>, priva
 
     override fun matches(state: IBlockState): Boolean = state.block == this.block
 
-    override fun renderBoundingBox(state: IBlockState, x: Double, y: Double, z: Double) {
+    override fun renderHighlight(state: IBlockState, x: Double, y: Double, z: Double) {
         this.volumes.map { it.expandForHighlight().offset(x, y, z) }.forEach { it.renderDefaultHighlight() }
     }
 }
 
 // Nik, however did you find this... what the fuck?
-private const val HIGHLIGHT_EXPANSION_FACTOR = 0.0020000000949949026
+internal const val HIGHLIGHT_EXPANSION_FACTOR = 0.0020000000949949026
 
 internal fun AxisAlignedBB.expandForHighlight() = this.grow(HIGHLIGHT_EXPANSION_FACTOR)
 

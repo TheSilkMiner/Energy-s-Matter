@@ -49,6 +49,7 @@ import net.minecraft.util.math.Vec3d
 import net.minecraft.world.IBlockAccess
 import net.minecraft.world.World
 import net.thesilkminer.mc.ematter.EnergyIsMatter
+import net.thesilkminer.mc.ematter.common.commonConfiguration
 import net.thesilkminer.mc.ematter.common.network.GuiHandler
 import net.thesilkminer.mc.ematter.common.shared.emptyVolume
 import net.thesilkminer.mc.ematter.common.shared.volumes
@@ -56,6 +57,9 @@ import net.thesilkminer.mc.ematter.common.shared.volumes
 internal class MadBlock : Block(Material.IRON) {
     internal companion object {
         internal val TIER = PropertyEnum.create("tier", MadTier::class.java)
+
+        internal val simpleVolume = volumes { this.box(0, 0, 0, 16, 11, 16) }.single()
+        internal val useSimpleVolume by lazy { !commonConfiguration["performance", "molecular_assembler_device"]["thread_the_hole"]().boolean }
 
         internal val volumes = volumes {
             this.box(1, 10, 1, 3, 11, 3) // nw
@@ -116,11 +120,12 @@ internal class MadBlock : Block(Material.IRON) {
 
     override fun addCollisionBoxToList(state: IBlockState, worldIn: World, pos: BlockPos, entityBox: AxisAlignedBB,
                                        collidingBoxes: MutableList<AxisAlignedBB>, entityIn: Entity?, isActualState: Boolean) {
+        // not using simple volume here because it doesn't work, for some reason
         collidingBoxes.addAll(volumes.map { it.offset(pos) }.filter { entityBox.intersects(it) })
     }
 
     override fun collisionRayTrace(blockState: IBlockState, worldIn: World, pos: BlockPos, start: Vec3d, end: Vec3d): RayTraceResult? =
-            volumes.map { this.rayTrace(pos, start, end, it) }.firstOrNull { it != null }
+            if (useSimpleVolume) this.rayTrace(pos, start, end, simpleVolume) else volumes.map { this.rayTrace(pos, start, end, it) }.firstOrNull { it != null }
 
     override fun hasTileEntity(state: IBlockState) = true
     override fun createTileEntity(world: World, state: IBlockState): TileEntity? = MadBlockEntity()
