@@ -35,10 +35,30 @@ internal val commonConfiguration = configuration {
     }
 }
 
+internal val kernelConfiguration = configuration {
+    owner = MOD_ID
+    name = "kernel"
+    type = ConfigurationFormat.JSON
+
+    categories {
+        "scheduler" {
+            comment = "Scheduler component"
+
+            entries {
+                "seebeck"(EntryType.LIST_OF_STRINGS) {
+                    comment = "Manages the scheduling for the seebeck"
+                    default = listOf("1.0", "60", "40")
+                    requiresGameRestart()
+                }
+            }
+        }
+    }
+}
+
 internal object ConfigurationRegistrationHandler {
     @SubscribeEvent
     fun onConfigurationRegistration(e: ConfigurationRegisterEvent) {
-        e.configurationRegistry.registerConfiguration(commonConfiguration)
+        e.configurationRegistry.registerConfigurations(commonConfiguration, kernelConfiguration)
         // I don't particularly like this, but it is the most sensible thing to do, even if it is slightly reaching
         // across modules
         CompatibilityProviderHandler.fireConfigurationRegistry(e.configurationRegistry)

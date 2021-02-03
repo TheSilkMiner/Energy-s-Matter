@@ -49,6 +49,7 @@ import net.thesilkminer.mc.boson.prefab.energy.producerCapability
 import net.thesilkminer.mc.boson.prefab.tag.blockTagType
 import net.thesilkminer.mc.boson.prefab.tag.isInTag
 import net.thesilkminer.mc.ematter.MOD_ID
+import net.thesilkminer.mc.ematter.common.kernelConfiguration
 import net.thesilkminer.mc.ematter.common.system.temperature.TemperatureContext
 import net.thesilkminer.mc.ematter.common.system.temperature.TemperatureTables
 import kotlin.math.abs
@@ -58,21 +59,26 @@ import kotlin.math.roundToLong
 @Suppress("EXPERIMENTAL_API_USAGE", "EXPERIMENTAL_OVERRIDE", "EXPERIMENTAL_UNSIGNED_LITERALS")
 internal class SeebeckBlockEntity : TileEntity(), Producer, Holder, ITickable {
     private companion object {
-        private const val MAX_CAPACITY = 3_141UL //same storage the basic mad has
-        // TODO("See if the actual capacity should be amped up by a small margin")
+        private const val MAX_CAPACITY = 3_141UL
 
         private const val TRANSFER_RATE = 3L
         private const val SEEBECK_CONVERSION_DATA = 0.001
-
-        // TODO("move this into a config file")
-        private const val POWER_MULTIPLIER = 1.0
-        private const val WARM_UP_TIME = 60
-        private const val BURST_TIME = 40
 
         private const val NBT_POWER_KEY = "power"
         private const val NBT_THRESHOLD_KEY = "threshold_time"
         private const val NBT_PRODUCING_BURST_KEY = "producing_time"
         private const val NBT_PUSHING_BURST_KEY = "pushing_time"
+
+        private val powerMultiplier: Double
+        private val warmUpTime: Int
+        private val burstTime: Int
+
+        init {
+            val kernelData = kernelConfiguration["scheduler"]["seebeck"]().asList<String>()
+            this.powerMultiplier = kernelData[0].toDouble()
+            this.warmUpTime = kernelData[1].toInt()
+            this.burstTime = kernelData[2].toInt()
+        }
     }
 
     private val airTemperature = reloadableLazy { TemperatureTables[Blocks.AIR](this.pos.createTemperatureContext()) }
@@ -82,17 +88,17 @@ internal class SeebeckBlockEntity : TileEntity(), Producer, Holder, ITickable {
     private var effectiveness = 0.0
     private var recalculationNeeded = false
 
-    private var warmUp = WARM_UP_TIME
-    private var producingBurst = BURST_TIME
-    private var pushingBurst = BURST_TIME
+    private var warmUp = warmUpTime
+    private var producingBurst = burstTime
+    private var pushingBurst = burstTime
 
     private var nextPower = 0.0
     private var powerStored = 0UL
 
     private var currentDayMoment: TemperatureContext.DayMoment = TemperatureContext.DayMoment.DAY
 
-    override val producedPower get() = (this.nextPower * BURST_TIME.toDouble()).roundToLong().toULong()
-    override val productionRate get() = BURST_TIME.toUInt()
+    override val producedPower get() = (this.nextPower * burstTime.toDouble()).roundToLong().toULong()
+    override val productionRate get() = burstTime.toUInt()
     override val storedPower get() = this.powerStored
     override val maximumCapacity get() = MAX_CAPACITY
 
@@ -124,12 +130,12 @@ internal class SeebeckBlockEntity : TileEntity(), Producer, Holder, ITickable {
         // first
         if (this.storedPower >= MAX_CAPACITY) return
 
-        this.nextPower = this.tempDifference.toDouble() * SEEBECK_CONVERSION_DATA * this.effectiveness * POWER_MULTIPLIER
+        this.nextPower = this.tempDifference.toDouble() * SEEBECK_CONVERSION_DATA * this.effectiveness * powerMultiplier
 
         --this.producingBurst
         if (this.producingBurst > 0) return
 
-        (this.nextPower * BURST_TIME.toDouble()).roundToInt().toULong().let {
+        (this.nextPower * burstTime.toDouble()).roundToInt().toULong().let {
             if (this.powerStored + it > MAX_CAPACITY) {
                 this.powerStored = MAX_CAPACITY
                 this.nextPower = 0.0
@@ -138,7 +144,7 @@ internal class SeebeckBlockEntity : TileEntity(), Producer, Holder, ITickable {
             }
         }
 
-        this.producingBurst = BURST_TIME
+        this.producingBurst = burstTime
     }
 
     private fun pushPower() {
@@ -146,13 +152,13 @@ internal class SeebeckBlockEntity : TileEntity(), Producer, Holder, ITickable {
         --this.pushingBurst
         if (this.pushingBurst > 0) return
 
-        val powerToPush = (TRANSFER_RATE * BURST_TIME.toLong()).toULong()
+        val powerToPush = (TRANSFER_RATE * burstTime.toLong()).toULong()
         if (this.storedPower < powerToPush) return
 
         this.world.getTileEntity(this.pos.up())?.getCapability(consumerCapability, Direction.DOWN.toFacing())?.let {
             this.powerStored -= it.tryAccept(powerToPush, Direction.DOWN)
         }
-        this.pushingBurst = BURST_TIME
+        this.pushingBurst = burstTime
     }
 
     // TODO("Do we really need to save the producing and pushing burst values?")
@@ -228,7 +234,7 @@ internal class SeebeckBlockEntity : TileEntity(), Producer, Holder, ITickable {
         this.effectiveness = 1.0 - 0.2 * (heatSources - coolants * 2).let { if (it >= 0) it else if (coolants == 5) 5 else 0 }
         if (this.effectiveness == 0.0) {
             this.nextPower = 0.0
-            this.producingBurst = BURST_TIME
+            this.producingBurst = burstTime
         }
 
         // Every time a block gets changed the sbg needs a short amount of time to restart
@@ -238,7 +244,7 @@ internal class SeebeckBlockEntity : TileEntity(), Producer, Holder, ITickable {
         // Only in such a case would the warm-up be reset
         val hasEffectivenessChanged = abs(this.effectiveness - previousEffectiveness) <= 0.0001
         val hasTemperatureChanged = abs(previousDifference.toLong() - this.tempDifference.toLong()) < 15L
-        if (hasEffectivenessChanged || hasTemperatureChanged) this.warmUp = WARM_UP_TIME
+        if (hasEffectivenessChanged || hasTemperatureChanged) this.warmUp = warmUpTime
 
         // Disable the need for a recalculation
         this.recalculationNeeded = false
