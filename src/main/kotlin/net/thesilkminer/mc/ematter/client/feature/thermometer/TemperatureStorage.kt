@@ -12,7 +12,7 @@ internal object TemperatureStorage {
     var temperature: Int
         get() = internalTemperature!!
         set(value) {
-            internalTemperature = (value + Random.nextInt(from = -5, until = 6)) // TODO("Config check for accuracy")
+            internalTemperature = value
             this.dark = Random.nextBoolean() // TODO("make this more meaningful")
         }
 
