@@ -18,7 +18,7 @@ import net.thesilkminer.mc.boson.prefab.naming.toNameSpacedString
 import net.thesilkminer.mc.ematter.common.mole.Moles
 
 @ExperimentalUnsignedTypes
-internal class TransmutationRecipe(private val group: NameSpacedString?, val moles: Moles, val power: ULong, private val result: ItemStack) : IForgeRegistryEntry.Impl<IRecipe>(), IRecipe {
+class TransmutationRecipe(private val group: NameSpacedString?, val moles: Moles, val power: ULong, private val result: ItemStack) : IForgeRegistryEntry.Impl<IRecipe>(), IRecipe {
 
     override fun getGroup() = this.group?.toString() ?: ""
 
@@ -42,7 +42,7 @@ internal class TransmutationRecipeSerializer : IRecipeFactory {
         val moles = JsonUtils.getInt(json, "moles")
         if (moles < 1) throw JsonSyntaxException("Only a positive mole amount is allowed")
 
-        val power = JsonUtils.getInt(json, "moles")
+        val power = JsonUtils.getInt(json, "power")
         if (power < 1) throw JsonSyntaxException("Only a positive power is allowed")
 
         val result = RecipeLoadingProcessor.getItemStack(JsonUtils.getJsonObject(json, "result"), context, parseNbt = true)
