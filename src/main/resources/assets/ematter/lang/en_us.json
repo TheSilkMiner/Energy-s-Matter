@@ -1,6 +1,7 @@
 {
   "gui.ematter.mad.power_level": "%1$s / %2$s",
   "gui.ematter.jei.mad.category": "MAD Crafting",
+  "gui.ematter.jei.transmutation.category": "Molecular Transmutation",
   "gui.ematter.jei.shared.recipe_by": "Recipe added by %1$s",
   "gui.ematter.jei.shared.recipe_name": "Recipe Name: %1$s",
   "gui.ematter.jei.shared.unknown_mod": "<unknown>",

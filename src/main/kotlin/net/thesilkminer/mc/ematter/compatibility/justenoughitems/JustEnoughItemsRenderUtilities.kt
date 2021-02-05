@@ -39,7 +39,7 @@ import org.lwjgl.opengl.GL11
 import kotlin.math.PI
 import kotlin.math.atan2
 
-private val smallFontRenderer by lazy {
+val smallFontRenderer by lazy {
     Minecraft.getMinecraft().let {
         FontRenderer(it.gameSettings, ResourceLocation("textures/font/ascii.png"), it.textureManager, true).apply {
             (it.resourceManager as? SimpleReloadableResourceManager)?.registerReloadListener(this)

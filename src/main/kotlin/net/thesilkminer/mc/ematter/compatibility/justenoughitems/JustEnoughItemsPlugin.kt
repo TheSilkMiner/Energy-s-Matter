@@ -52,6 +52,7 @@ import net.thesilkminer.mc.ematter.common.Blocks
 import net.thesilkminer.mc.ematter.common.feature.mad.MadContainer
 import net.thesilkminer.mc.ematter.common.feature.mad.MadTier
 import net.thesilkminer.mc.ematter.common.recipe.mad.MadRecipe
+import net.thesilkminer.mc.ematter.common.recipe.transmutator.TransmutationRecipe
 import net.thesilkminer.mc.ematter.compatibility.justenoughitems.ingredient.mole.*
 import net.thesilkminer.mc.ematter.compatibility.justenoughitems.recipe.mad.JeiMadRecipeWrapper
 import net.thesilkminer.mc.ematter.compatibility.justenoughitems.recipe.mad.MadRecipeCategory
@@ -69,6 +70,7 @@ internal class JustEnoughItemsPlugin : IModPlugin {
         l.info("Registering categories")
         registry.jeiHelpers.guiHelper.let {
             registry.addRecipeCategories(MadRecipeCategory(it))
+            registry.addRecipeCategories((TransmutationRecipeCategory(it)))
         }
     }
 
@@ -101,6 +103,7 @@ internal class JustEnoughItemsPlugin : IModPlugin {
                 .sortedDescending()
                 .map { ItemStack(Blocks.molecularAssemblerDevice(), 1, it) }
                 .forEach { registry.addRecipeCatalyst(it, VanillaRecipeCategoryUid.CRAFTING, MadRecipeCategory.ID) }
+        registry.addRecipeCatalyst(ItemStack(Blocks.molecularTransmutator()), TransmutationRecipeCategory.ID)
     }
 
     private fun registerRecipes(registry: IModRegistry) {
@@ -111,6 +114,7 @@ internal class JustEnoughItemsPlugin : IModPlugin {
             registry.addRecipes(it.filterIsInstance<ShapedRecipes>(), MadRecipeCategory.ID)
             registry.addRecipes(it.filterIsInstance<ShapelessOreRecipe>(), MadRecipeCategory.ID)
             registry.addRecipes(it.filterIsInstance<ShapelessRecipes>(), MadRecipeCategory.ID)
+            registry.addRecipes(it.filterIsInstance<TransmutationRecipe>(), TransmutationRecipeCategory.ID)
         }
     }
 
@@ -121,6 +125,7 @@ internal class JustEnoughItemsPlugin : IModPlugin {
         registry.handleRecipes(MadRecipeCategory.ID, ShapedRecipes::class) { JeiMadRecipeWrapper(registry.jeiHelpers, it) }
         registry.handleRecipes(MadRecipeCategory.ID, ShapelessOreRecipe::class) { JeiMadRecipeWrapper(registry.jeiHelpers, it) }
         registry.handleRecipes(MadRecipeCategory.ID, ShapelessRecipes::class) { JeiMadRecipeWrapper(registry.jeiHelpers, it) }
+        registry.handleRecipes(TransmutationRecipeCategory.ID, TransmutationRecipe::class) { JeiTransmutationRecipeWrapper(registry.jeiHelpers, it) }
     }
 
     private fun registerClickAreas(registry: IModRegistry) {
