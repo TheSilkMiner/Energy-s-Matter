@@ -77,6 +77,18 @@ internal fun renderNormalText(minecraft: Minecraft, text: String, coordinates: P
 
 internal fun renderSmallText(minecraft: Minecraft, text: String, coordinates: Pair<Double, Double>, color: Int) = renderText(minecraft, smallFontRenderer, text, coordinates, color)
 
+internal inline fun withStackRenderState(block: () -> Unit) {
+    withMatrix {
+        GlStateManager.enableRescaleNormal()
+        GlStateManager.enableAlpha()
+        GlStateManager.alphaFunc(516, 0.1f)
+        GlStateManager.enableBlend()
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA)
+        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
+        block()
+    }
+}
+
 internal inline fun withMatrix(block: () -> Unit) {
     GlStateManager.pushMatrix()
     block()

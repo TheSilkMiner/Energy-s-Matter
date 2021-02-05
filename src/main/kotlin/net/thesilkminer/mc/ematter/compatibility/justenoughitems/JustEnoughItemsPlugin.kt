@@ -52,8 +52,11 @@ import net.thesilkminer.mc.ematter.common.Blocks
 import net.thesilkminer.mc.ematter.common.feature.mad.MadContainer
 import net.thesilkminer.mc.ematter.common.feature.mad.MadTier
 import net.thesilkminer.mc.ematter.common.recipe.mad.MadRecipe
+import net.thesilkminer.mc.ematter.compatibility.justenoughitems.ingredient.mole.*
 import net.thesilkminer.mc.ematter.compatibility.justenoughitems.recipe.mad.JeiMadRecipeWrapper
 import net.thesilkminer.mc.ematter.compatibility.justenoughitems.recipe.mad.MadRecipeCategory
+import net.thesilkminer.mc.ematter.compatibility.justenoughitems.recipe.transmutator.JeiTransmutationRecipeWrapper
+import net.thesilkminer.mc.ematter.compatibility.justenoughitems.recipe.transmutator.TransmutationRecipeCategory
 import kotlin.reflect.KClass
 
 @JEIPlugin
@@ -80,6 +83,7 @@ internal class JustEnoughItemsPlugin : IModPlugin {
 
     override fun registerIngredients(registry: IModIngredientRegistration) {
         l.info("Registering custom ingredients")
+        registry.register(MoleIngredientType, mutableSetOf(defaultMoleWrapper), MoleIngredientHelper, MoleIngredientRenderer)
     }
 
     override fun register(registry: IModRegistry) {
