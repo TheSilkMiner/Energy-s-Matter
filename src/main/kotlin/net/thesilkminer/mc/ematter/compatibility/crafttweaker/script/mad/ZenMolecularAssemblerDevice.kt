@@ -40,6 +40,7 @@ import net.thesilkminer.mc.boson.compatibility.crafttweaker.zenscriptx.sequence.
 import net.thesilkminer.mc.boson.prefab.naming.toNameSpacedString
 import net.thesilkminer.mc.ematter.common.recipe.mad.MadRecipe
 import net.thesilkminer.mc.ematter.compatibility.crafttweaker.script.mad.step.ZenSteppingFunction
+import net.thesilkminer.mc.ematter.compatibility.crafttweaker.script.shared.*
 import stanhebben.zenscript.annotations.Optional
 import stanhebben.zenscript.annotations.ZenClass
 import stanhebben.zenscript.annotations.ZenMethod
@@ -49,6 +50,7 @@ import stanhebben.zenscript.annotations.ZenMethod
 @ZenClass("mods.ematter.mad.MolecularAssemblerDevice")
 @ZenRegister
 internal object ZenMolecularAssemblerDevice {
+
     private val noopRecipeFunction = IRecipeFunction { output, _, _ -> output }
 
     private val recipesToAdd = mutableListOf<AddRecipeAction>()
@@ -57,8 +59,15 @@ internal object ZenMolecularAssemblerDevice {
 
     @ZenMethod("registerShaped")
     @JvmStatic
-    fun registerShaped(name: ZenNameSpacedString, group: String?, ingredients: Array<Array<IIngredient?>>, result: IItemStack, steppingFunction: ZenSteppingFunction?,
-                       @Optional(valueBoolean = true) allowMirroring: Boolean, @Optional recipeFunction: IRecipeFunction?) {
+    fun registerShaped(
+        name: ZenNameSpacedString,
+        group: String?,
+        ingredients: Array<Array<IIngredient?>>,
+        result: IItemStack,
+        steppingFunction: ZenSteppingFunction?,
+        @Optional(valueBoolean = true) allowMirroring: Boolean,
+        @Optional recipeFunction: IRecipeFunction?
+    ) {
         if (steppingFunction == null) return CraftTweakerAPI.logError("Unable to register recipe '$name': no valid stepping function supplier -- check the logs")
         if (ingredients.isEmpty()) return CraftTweakerAPI.logError("Unable to register recipe '$name': ingredients array is empty")
         if (ingredients.any { it.isEmpty() }) return CraftTweakerAPI.logError("Unable to register recipe '$name': ingredients array contains an empty row")
@@ -71,25 +80,30 @@ internal object ZenMolecularAssemblerDevice {
         if (ingredients.flatten().filterNotNull().any { it.hasTransformers() }) CraftTweakerAPI.logWarning("Recipe '$name' is using the old transformer pipeline: transformers won't run")
         if (steppingFunction.isUnsafe) CraftTweakerAPI.logWarning("Recipe '$name' is being registered with an unsafe stepping function")
 
-        val action = AddShapedRecipeAction(name.toNative(), result) {
+        this.recipesToAdd += AddShapedMadRecipeAction(name.toNative()) {
             ZenShapedMadRecipe(
-                    group = if (group != null && group.isEmpty()) null else group?.toNameSpacedString(),
-                    width = ingredients.first().count(),
-                    height = ingredients.count(),
-                    ingredients = ingredients.copyOf(),
-                    output = result,
-                    allowMirroring = allowMirroring,
-                    steppingFunction = steppingFunction,
-                    recipeFunction = recipeFunction ?: this.noopRecipeFunction
+                group = if (group != null && group.isEmpty()) null else group?.toNameSpacedString(),
+                width = ingredients.first().count(),
+                height = ingredients.count(),
+                ingredients = ingredients.copyOf(),
+                output = result,
+                allowMirroring = allowMirroring,
+                steppingFunction = steppingFunction,
+                recipeFunction = recipeFunction ?: this.noopRecipeFunction
             )
         }
-        this.recipesToAdd += action
     }
 
     @ZenMethod("registerShapeless")
     @JvmStatic
-    fun registerShapeless(name: ZenNameSpacedString, group: String?, ingredients: Array<IIngredient?>, result: IItemStack, steppingFunction: ZenSteppingFunction?,
-                          @Optional recipeFunction: IRecipeFunction?) {
+    fun registerShapeless(
+        name: ZenNameSpacedString,
+        group: String?,
+        ingredients: Array<IIngredient?>,
+        result: IItemStack,
+        steppingFunction: ZenSteppingFunction?,
+        @Optional recipeFunction: IRecipeFunction?
+    ) {
         if (steppingFunction == null) return CraftTweakerAPI.logError("Unable to register recipe '$name': no valid stepping function supplied -- check the logs")
         if (ingredients.isEmpty()) return CraftTweakerAPI.logError("Unable to register recipe '$name': ingredients array is empty")
         if (ingredients.any { it == null }) return CraftTweakerAPI.logError("Unable to register recipe '$name': shapeless recipes don't support 'null' ingredients")
@@ -100,24 +114,23 @@ internal object ZenMolecularAssemblerDevice {
         if (ingredients.filterNotNull().any { it.hasTransformers() }) CraftTweakerAPI.logWarning("Recipe '$name' is using the old transformer pipeline: transformers won't run")
         if (steppingFunction.isUnsafe) CraftTweakerAPI.logWarning("Recipe '$name' is being registered with an unsafe stepping function")
 
-        val action = AddShapelessRecipeAction(name.toNative(), result) {
+        this.recipesToAdd += AddShapelessMadRecipeAction(name.toNative()) {
             ZenShapelessMadRecipe(
-                    group = if (group != null && group.isEmpty()) null else group?.toNameSpacedString(),
-                    size = ingredients.filterNotNull().count(),
-                    ingredients = ingredients.filterNotNull().toTypedArray().copyOf(),
-                    output = result,
-                    steppingFunction = steppingFunction,
-                    recipeFunction = recipeFunction ?: this.noopRecipeFunction
+                group = if (group != null && group.isEmpty()) null else group?.toNameSpacedString(),
+                size = ingredients.filterNotNull().count(),
+                ingredients = ingredients.filterNotNull().toTypedArray().copyOf(),
+                output = result,
+                steppingFunction = steppingFunction,
+                recipeFunction = recipeFunction ?: this.noopRecipeFunction
             )
         }
-        this.recipesToAdd += action
     }
 
     @ZenMethod("unregister")
     @JvmStatic
     fun unregister(recipe: ZenMadRecipe) {
-        val action = RemoveTargetRecipeAction(
-                recipe = recipe.internal
+        val action = RemoveTargetMadRecipeAction(
+            recipe = recipe.internal
         )
         this.recipesToRemove += action
     }
@@ -125,28 +138,27 @@ internal object ZenMolecularAssemblerDevice {
     @ZenMethod("unregisterByName")
     @JvmStatic
     fun unregisterByName(name: ZenNameSpacedString) {
-        val action = RemoveNamedRecipeAction(
-                name = name.toNative()
+        this.recipesToRemove += RemoveNamedMadRecipeAction(
+            name = name.toNative()
         )
-        this.recipesToRemove += action
     }
 
     @ZenMethod("unregisterAll")
     @JvmStatic
     fun unregisterAll() {
         val actionSequence = ForgeRegistries.RECIPES.entries.asSequence()
-                .map { it.value }
-                .filter { it is MadRecipe }
-                .map { it as MadRecipe }
-                .map { RemoveTargetRecipeAction(it) }
-        val action = ScheduledActionGroupRemoveAction(
-                wrapped = ScheduledActionGroupAction(
-                        actions = actionSequence,
-                        info = "Unregistering all Molecular Assembler Device recipes",
-                        validator = { true }
-                )
+            .map { it.value }
+            .filter { it is MadRecipe }
+            .map { it as MadRecipe }
+            .map { RemoveTargetMadRecipeAction(it) }
+
+        this.recipesToRemove += ScheduledActionGroupRemoveAction(
+            wrapped = ScheduledActionGroupAction(
+                actions = actionSequence,
+                info = "Unregistering all Molecular Assembler Device recipes",
+                validator = { true }
+            )
         )
-        this.recipesToRemove += action
     }
 
     @ZenMethod("findAll")
@@ -158,14 +170,14 @@ internal object ZenMolecularAssemblerDevice {
     @ZenMethod("dump")
     @JvmStatic
     fun dump() {
-        CraftTweakerAPI.apply(DumpAction(this::findAll))
+        CraftTweakerAPI.apply(MadDumpAction(this::findAll))
     }
 
     @ZenMethod("scheduleDump")
     @JvmStatic
     fun scheduleDump() {
         if (this.dumpAction != null) CraftTweakerAPI.logError("Recipe dump has already been scheduled")
-        this.dumpAction = DumpAction(this::findAll)
+        this.dumpAction = MadDumpAction(this::findAll)
     }
 
     internal fun apply() {

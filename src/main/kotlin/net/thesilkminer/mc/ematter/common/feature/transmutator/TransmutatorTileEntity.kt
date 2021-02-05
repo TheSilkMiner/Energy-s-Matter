@@ -26,7 +26,7 @@ import net.thesilkminer.mc.boson.prefab.tag.isInTag
 import net.thesilkminer.mc.ematter.MOD_ID
 import net.thesilkminer.mc.ematter.common.Items
 import net.thesilkminer.mc.ematter.common.mole.*
-import net.thesilkminer.mc.ematter.common.recipe.transmutator.TransmutationInventoryCrafting
+import net.thesilkminer.mc.ematter.common.recipe.transmutator.TransmutationInventory
 import net.thesilkminer.mc.ematter.common.recipe.transmutator.TransmutationRecipe
 import net.thesilkminer.mc.ematter.common.temperature.TemperatureTables
 import net.thesilkminer.mc.ematter.common.temperature.createTemperatureContext
@@ -56,7 +56,7 @@ class TransmutatorTileEntity : TileEntity(), ITickable, Holder, Consumer {
 
     private var recalculationNeeded = true
 
-    private val inventory = TransmutationInventoryCrafting(ItemStack.EMPTY)
+    private val inventory = TransmutationInventory(ItemStack.EMPTY)
     private var output = null as TransmutationRecipe?
 
     private val powerNeeded get() = this.output?.power ?: 0UL
