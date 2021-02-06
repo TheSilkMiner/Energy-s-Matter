@@ -22,8 +22,13 @@ import net.thesilkminer.mc.ematter.common.mole.Moles
 import net.thesilkminer.mc.ematter.common.recipe.transmutator.TransmutationInventory
 import net.thesilkminer.mc.ematter.common.recipe.transmutator.TransmutationRecipe
 
-@ExperimentalUnsignedTypes
-internal open class ZenTransmutationRecipeImpl(private val group: NameSpacedString?, override val moles: Moles, override val power: ULong, private val result: IItemStack) :
+internal open class ZenTransmutationRecipeImpl @ExperimentalUnsignedTypes constructor(
+    private val group: NameSpacedString?,
+    override val moles: Moles,
+    override val power: ULong,
+    private val result: IItemStack,
+    private val wrap: TransmutationRecipe? = null
+) :
     IForgeRegistryEntry.Impl<IRecipe>(), TransmutationRecipe, ZenTransmutationRecipe {
 
     // TransmutationRecipe >>
@@ -41,7 +46,7 @@ internal open class ZenTransmutationRecipeImpl(private val group: NameSpacedStri
 
     // ZenTransmutationRecipe >>
     override val recipeName get() = this.registryName!!.toNameSpacedString().let { ZenNameSpacedString(it.nameSpace, it.path) }
-    override val internal get() = this
+    override val internal get() = wrap ?: this
 
     override fun matches(inventory: ICraftingInventory?) =
         (inventory?.internal as? InventoryCrafting)?.let { this.matches(it, inventory.player?.world?.toNative()) } ?: false
@@ -97,7 +102,11 @@ internal open class ZenTransmutationRecipeImpl(private val group: NameSpacedStri
         builder += ", "
 
         // result as IItemStack
-        builder += try { this.output.toCommandString() } catch (e: IllegalStateException) { "<unknown>" }
+        builder += try {
+            this.output.toCommandString()
+        } catch (e: IllegalStateException) {
+            "<unknown>"
+        }
         builder += ", "
 
         builder.append(");")
@@ -108,4 +117,4 @@ internal open class ZenTransmutationRecipeImpl(private val group: NameSpacedStri
 
 @ExperimentalUnsignedTypes
 internal fun TransmutationRecipe.toZen(): ZenTransmutationRecipe =
-    ZenTransmutationRecipeImpl(this.group.let { if (it.isEmpty()) null else it.toNameSpacedString() }, this.moles, this.power, this.recipeOutput.toZen()!!)
+    ZenTransmutationRecipeImpl(this.group.let { if (it.isEmpty()) null else it.toNameSpacedString() }, this.moles, this.power, this.recipeOutput.toZen()!!, this)

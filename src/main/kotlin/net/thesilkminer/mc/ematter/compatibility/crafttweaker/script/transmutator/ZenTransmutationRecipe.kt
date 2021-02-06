@@ -5,7 +5,6 @@ import net.thesilkminer.mc.boson.compatibility.crafttweaker.naming.ZenNameSpaced
 import net.thesilkminer.mc.ematter.common.recipe.transmutator.TransmutationRecipe
 import stanhebben.zenscript.annotations.ZenGetter
 
-@ExperimentalUnsignedTypes
 interface ZenTransmutationRecipe : ICraftingRecipe {
 
     @get:ZenGetter

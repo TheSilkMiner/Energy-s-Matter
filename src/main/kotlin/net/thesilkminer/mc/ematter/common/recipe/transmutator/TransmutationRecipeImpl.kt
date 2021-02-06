@@ -17,8 +17,12 @@ import net.thesilkminer.mc.boson.mod.common.recipe.RecipeLoadingProcessor
 import net.thesilkminer.mc.boson.prefab.naming.toNameSpacedString
 import net.thesilkminer.mc.ematter.common.mole.Moles
 
-@ExperimentalUnsignedTypes
-internal class TransmutationRecipeImpl(private val group: NameSpacedString?, override val moles: Moles, override val power: ULong, private val result: ItemStack) :
+internal class TransmutationRecipeImpl @ExperimentalUnsignedTypes constructor(
+    private val group: NameSpacedString?,
+    override val moles: Moles,
+    override val power: ULong,
+    private val result: ItemStack
+) :
     IForgeRegistryEntry.Impl<IRecipe>(), TransmutationRecipe {
 
     override fun getGroup() = this.group?.toString() ?: ""
@@ -34,9 +38,9 @@ internal class TransmutationRecipeImpl(private val group: NameSpacedString?, ove
 }
 
 @Suppress("unused")
-@ExperimentalUnsignedTypes
 internal class TransmutationRecipeSerializer : IRecipeFactory {
 
+    @ExperimentalUnsignedTypes
     override fun parse(context: JsonContext, json: JsonObject): IRecipe {
         val group = JsonUtils.getString(json, "group", "")
 

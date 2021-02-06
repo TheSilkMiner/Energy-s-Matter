@@ -17,13 +17,13 @@ import stanhebben.zenscript.annotations.ZenMethod
 @Suppress("unused")
 @ZenClass("mods.ematter.mt.MolecularTransmutator")
 @ZenRegister
-@ExperimentalUnsignedTypes
 internal object ZenMolecularTransmutator {
 
     private val recipesToRemove = mutableListOf<RemoveRecipeAction>()
     private val recipesToAdd = mutableListOf<AddRecipeAction>()
     private var dumpAction = null as DumpAction?
 
+    @ExperimentalUnsignedTypes
     @ZenMethod("register")
     @JvmStatic
     fun register(name: ZenNameSpacedString, group: String?, moles: Int, power: Long, result: IItemStack) {
@@ -77,6 +77,7 @@ internal object ZenMolecularTransmutator {
         )
     }
 
+    @Suppress("experimental_api_usage")
     @ZenMethod("findAll")
     @JvmStatic
     fun findAll(): ZenSequence<ZenTransmutationRecipe> {
