@@ -1,0 +1,14 @@
+{
+  "type": "forge:ore_shapeless",
+  "ingredients": [
+    {
+      "type": "boson:tag",
+      "item": "#forge:storage_blocks/copper"
+    }
+  ],
+  "result": {
+    "type": "minecraft:item",
+    "item": "ematter:copper_ingot",
+    "count": 9
+  }
+}

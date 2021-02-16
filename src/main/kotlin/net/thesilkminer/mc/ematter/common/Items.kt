@@ -48,9 +48,12 @@ private val itemRegistry = DeferredRegister(MOD_ID, ForgeRegistries.ITEMS).also 
 
 @Suppress("unused")
 internal object Items {
+    val copperIngot = register("copper_ingot") { Item().setCreativeTab(mainItemGroup).setTranslationKey("ematter.copper_ingot") }
+    val copperSheet = register("copper_sheet") { Item().setCreativeTab(mainItemGroup).setTranslationKey("ematter.copper_sheet") }
     val thermometer = register("thermometer") {
         ThermometerItem().setCreativeTab(mainItemGroup).setTranslationKey("ematter.thermometer").setMaxStackSize(1).setFull3D()
     }
+    val rawCopper = register("raw_copper") { Item().setCreativeTab(mainItemGroup).setTranslationKey("ematter.raw_copper") }
 }
 
 internal object ItemBlocks {

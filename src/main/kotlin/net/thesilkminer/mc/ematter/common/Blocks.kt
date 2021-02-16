@@ -30,6 +30,11 @@
 package net.thesilkminer.mc.ematter.common
 
 import net.minecraft.block.Block
+import net.minecraft.block.BlockOre
+import net.minecraft.block.SoundType
+import net.minecraft.block.material.Material
+import net.minecraft.block.state.IBlockState
+import net.minecraft.item.Item
 import net.minecraftforge.fml.common.eventhandler.EventBus
 import net.minecraftforge.fml.common.registry.ForgeRegistries
 import net.thesilkminer.mc.boson.api.registry.DeferredRegister
@@ -38,20 +43,41 @@ import net.thesilkminer.mc.ematter.MOD_ID
 import net.thesilkminer.mc.ematter.common.feature.cable.CableBlock
 import net.thesilkminer.mc.ematter.common.feature.mad.MadBlock
 import net.thesilkminer.mc.ematter.common.feature.seebeck.SeebeckBlock
+import java.util.Random
 
 private val blockList = mutableListOf<RegistryObject<out Block>>()
 private val blockRegistry = DeferredRegister(MOD_ID, ForgeRegistries.BLOCKS)
 
 @Suppress("unused")
 internal object Blocks {
+    val cable = register("cable") {
+        CableBlock().setCreativeTab(mainItemGroup).setTranslationKey("ematter.cable").setHardness(5.0F).apply { this.setHarvestLevel("pickaxe", 1) }
+    }
+    val copperBlock = register("copper_block") {
+        object : Block(Material.IRON) {
+            init {
+                this.setCreativeTab(mainItemGroup).setTranslationKey("ematter.copper_block").setHardness(5.0F).setResistance(10.0F)
+                this.blockSoundType = SoundType.METAL
+                this.setHarvestLevel("pickaxe", 1)
+            }
+        } as Block
+    }
+    val copperOre = register("copper_ore") {
+        object : BlockOre() {
+            init {
+                this.setCreativeTab(mainItemGroup).setTranslationKey("ematter.copper_ore").setHardness(3.0F).setResistance(5.0F)
+                this.setHarvestLevel("pickaxe", 1)
+            }
+
+            override fun getItemDropped(state: IBlockState, rand: Random, fortune: Int): Item = Items.rawCopper()
+            override fun quantityDropped(random: Random): Int = 1 + random.nextInt(2)
+        } as Block
+    }
     val molecularAssemblerDevice = register("molecular_assembler_device") {
         MadBlock().setCreativeTab(mainItemGroup).setTranslationKey("ematter.molecular_assembler_device").setHardness(8.0F).apply { this.setHarvestLevel("pickaxe", 2) }
     }
     val seebeckGenerator = register("seebeck_generator") {
         SeebeckBlock().setCreativeTab(mainItemGroup).setTranslationKey("ematter.seebeck_generator").setHardness(8.0F).apply { this.setHarvestLevel("pickaxe", 2) }
-    }
-    val cable = register("cable") {
-        CableBlock().setCreativeTab(mainItemGroup).setTranslationKey("ematter.cable").setHardness(5.0F).apply { this.setHarvestLevel("pickaxe", 1)}
     }
 }
 
