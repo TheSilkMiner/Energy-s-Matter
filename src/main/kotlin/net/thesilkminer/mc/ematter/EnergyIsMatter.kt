@@ -51,6 +51,7 @@ import net.thesilkminer.mc.ematter.common.recipe.mad.step.attachSteppingFunction
 import net.thesilkminer.mc.ematter.common.system.completeSystemLoading
 import net.thesilkminer.mc.ematter.common.system.handleSystemsSetup
 import net.thesilkminer.mc.ematter.common.system.loadSystems
+import net.thesilkminer.mc.ematter.common.world.registerWorldGenerationProviders
 import net.thesilkminer.mc.ematter.compatibility.CompatibilityProviderHandler
 
 @Mod(modid = MOD_ID, name = MOD_NAME, version = MOD_VERSION, dependencies = MOD_DEPENDENCIES,
@@ -96,6 +97,7 @@ object EnergyIsMatter {
         MadRecipeCapabilityHandler.registerCapability()
         NetworkManagerCapabilityHandler.registerCapability()
         setUpNetworkChannel()
+        registerWorldGenerationProviders()
         GuiHandler().register()
         onlyOn(Distribution.CLIENT) { SidedEventHandler::registerBlockEntityRenders }
         loadSystems()
