@@ -3,7 +3,7 @@
   "modList": [
     {
       "modid": "ematter",
-      "name": "Energy's Matter",
+      "name": "Energy's Matter - μ-Edition",
       "description": "A mod to convert matter to Ampere and back. Inspired by Einstein's Theorem of Conservation of Energy and Matter",
       "version": "${version}",
       "mcversion": "${mc_version}",

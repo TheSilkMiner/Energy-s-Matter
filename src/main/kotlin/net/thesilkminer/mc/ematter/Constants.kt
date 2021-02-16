@@ -33,7 +33,7 @@ import net.thesilkminer.mc.boson.api.modid.BOSON
 import net.thesilkminer.mc.boson.api.modid.ENERGY_IS_MATTER
 
 internal const val MOD_ID = ENERGY_IS_MATTER
-internal const val MOD_NAME = "Energy's Matter"
+internal const val MOD_NAME = "Energy's Matter - μ-Edition"
 internal const val MOD_VERSION = "@ENERGY_IS_MATTER_VERSION@"
 internal const val MOD_MC_VERSION = "1.12.2"
 internal const val MOD_CERTIFICATE_FINGERPRINT = "@FINGERPRINT@"
