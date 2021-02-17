@@ -38,8 +38,12 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries
 import net.thesilkminer.mc.boson.api.registry.DeferredRegister
 import net.thesilkminer.mc.boson.api.registry.RegistryObject
 import net.thesilkminer.mc.ematter.MOD_ID
+import net.thesilkminer.mc.ematter.common.feature.tool.hammer.HammerItem
 import net.thesilkminer.mc.ematter.common.feature.mad.MadTier
 import net.thesilkminer.mc.ematter.common.feature.thermometer.ThermometerItem
+import net.thesilkminer.mc.ematter.common.feature.tool.copperMaterialData
+import net.thesilkminer.mc.ematter.common.feature.tool.diamondMaterialData
+import net.thesilkminer.mc.ematter.common.feature.tool.ironMaterialData
 
 private val customItemBlocks = listOf<RegistryObject<out Block>>(Blocks.molecularAssemblerDevice)
 
@@ -48,12 +52,16 @@ private val itemRegistry = DeferredRegister(MOD_ID, ForgeRegistries.ITEMS).also 
 
 @Suppress("unused")
 internal object Items {
-    val copperIngot = register("copper_ingot") { Item().setCreativeTab(mainItemGroup).setTranslationKey("ematter.copper_ingot") }
-    val copperSheet = register("copper_sheet") { Item().setCreativeTab(mainItemGroup).setTranslationKey("ematter.copper_sheet") }
-    val thermometer = register("thermometer") {
-        ThermometerItem().setCreativeTab(mainItemGroup).setTranslationKey("ematter.thermometer").setMaxStackSize(1).setFull3D()
-    }
-    val rawCopper = register("raw_copper") { Item().setCreativeTab(mainItemGroup).setTranslationKey("ematter.raw_copper") }
+    val copperHammer = register("copper_hammer") { makeBasicItem("copper_hammer") { HammerItem(copperMaterialData) } }
+    val copperIngot = register("copper_ingot") { makeBasicItem("copper_ingot") }
+    val copperPlate = register("copper_plate") { makeBasicItem("copper_plate") }
+    val copperSheet = register("copper_sheet") { makeBasicItem("copper_sheet") }
+    val diamondHammer = register("diamond_hammer") { makeBasicItem("diamond_hammer") { HammerItem(diamondMaterialData, attackSpeedModifier = -4.8, durabilityModifier = -1261) } }
+    val ironHammer = register("iron_hammer") { makeBasicItem("iron_hammer") { HammerItem(ironMaterialData, attackSpeedModifier = -4.3) } }
+    val ironPlate = register("iron_plate") { makeBasicItem("iron_plate") }
+    val ironSheet = register("iron_sheet") { makeBasicItem("iron_sheet") }
+    val thermometer = register("thermometer") { makeBasicItem("thermometer", constructor = ::ThermometerItem).setMaxStackSize(1).setFull3D() }
+    val rawCopper = register("raw_copper") { makeBasicItem("raw_copper") }
 }
 
 internal object ItemBlocks {
@@ -67,6 +75,9 @@ internal val items get() = itemList.toList()
 
 private fun <T : Item> register(name: String, supplier: () -> T) = register(itemRegistry, name, supplier)
 private fun <T : Item> register(register: DeferredRegister<Item>, name: String, supplier: () -> T) = register.register(name, supplier).also { itemList += it }
+
+private inline fun makeBasicItem(key: String, constructor: () -> Item = ::Item): Item = constructor().applyItemDefaults(key)
+private fun Item.applyItemDefaults(key: String): Item = this.setCreativeTab(mainItemGroup).setTranslationKey("$MOD_ID.$key")
 
 private fun registerItemBlocks(registry: DeferredRegister<Item>) {
     // Loop for normal item blocks
