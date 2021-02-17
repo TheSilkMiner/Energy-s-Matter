@@ -8,7 +8,7 @@
   "key": {
     "I": {
       "type": "boson:tag",
-      "item": "#forge:ingots/copper"
+      "tag": "#forge:ingots/copper"
     }
   },
   "result": {

@@ -3,7 +3,7 @@
   "ingredients": [
     {
       "type": "boson:tag",
-      "item": "#forge:storage_blocks/copper"
+      "tag": "#forge:storage_blocks/copper"
     }
   ],
   "result": {
