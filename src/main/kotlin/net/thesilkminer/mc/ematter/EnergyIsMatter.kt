@@ -48,6 +48,7 @@ import net.thesilkminer.mc.ematter.common.network.GuiHandler
 import net.thesilkminer.mc.ematter.common.network.setUpNetworkChannel
 import net.thesilkminer.mc.ematter.common.recipe.mad.capability.MadRecipeCapabilityHandler
 import net.thesilkminer.mc.ematter.common.recipe.mad.step.attachSteppingFunctionListener
+import net.thesilkminer.mc.ematter.common.shared.registerAdditionalLifecycleEventHandlers
 import net.thesilkminer.mc.ematter.common.system.completeSystemLoading
 import net.thesilkminer.mc.ematter.common.system.handleSystemsSetup
 import net.thesilkminer.mc.ematter.common.system.loadSystems
@@ -72,6 +73,7 @@ object EnergyIsMatter {
             it.register(BlockEntityRegistration)
             it.register(CompatibilityProviderHandler)
             it.register(ConfigurationRegistrationHandler)
+            registerAdditionalLifecycleEventHandlers(it)
             onlyOn(Distribution.CLIENT) { { SidedEventHandler.setUpSidedHandlers(it) } }
         }
     }

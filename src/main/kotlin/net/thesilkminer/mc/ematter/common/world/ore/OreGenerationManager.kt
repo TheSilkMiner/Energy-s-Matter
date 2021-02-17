@@ -17,6 +17,9 @@ import net.minecraftforge.fml.common.registry.GameRegistry
 import net.thesilkminer.mc.ematter.common.Blocks
 import java.util.Random
 
+// OreGen: https://github.com/Su5eD/GregTech-Experimental/blob/forge-1.12.2/src/main/java/mods/gregtechmod/world/OreGenerator.java
+//         https://github.com/Su5eD/GregTech-Experimental/blob/forge-1.12.2/src/main/java/mods/gregtechmod/objects/WorldOre.java
+
 private const val ORE_GENERATION_WEIGHT = 5 // 4? 20? 42? 1? What the fuck?
 
 internal data class OreGenerationContext(val world: World, val chunkPos: ChunkPos, val biome: Biome, val dimensionType: DimensionType,

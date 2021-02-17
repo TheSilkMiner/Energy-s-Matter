@@ -1,2 +1,0 @@
-    // OreGen: https://github.com/Su5eD/GregTech-Experimental/blob/forge-1.12.2/src/main/java/mods/gregtechmod/world/OreGenerator.java
-    //         https://github.com/Su5eD/GregTech-Experimental/blob/forge-1.12.2/src/main/java/mods/gregtechmod/objects/WorldOre.java
