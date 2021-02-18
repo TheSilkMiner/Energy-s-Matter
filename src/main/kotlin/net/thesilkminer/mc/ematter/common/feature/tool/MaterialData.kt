@@ -1,3 +1,5 @@
+@file:JvmName("MD")
+
 package net.thesilkminer.mc.ematter.common.feature.tool
 
 import net.minecraft.init.Blocks

@@ -8,7 +8,7 @@ import net.thesilkminer.mc.boson.prefab.direction.offset
 import net.thesilkminer.mc.ematter.common.feature.cable.CableNetwork
 
 @Suppress("experimental_api_usage")
-internal class NetworkManagerCapability : INetworkManager {
+internal class NetworkManagerCapability : NetworkManager {
 
     // gets set by NetworkManagerCapabilityProvider
     override lateinit var world: World

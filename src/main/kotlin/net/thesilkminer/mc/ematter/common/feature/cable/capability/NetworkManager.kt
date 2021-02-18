@@ -1,3 +1,5 @@
+@file:JvmName("NM")
+
 package net.thesilkminer.mc.ematter.common.feature.cable.capability
 
 import net.minecraft.nbt.NBTTagCompound
@@ -10,11 +12,11 @@ import net.minecraftforge.common.util.INBTSerializable
 import net.thesilkminer.mc.boson.api.direction.Direction
 import net.thesilkminer.mc.ematter.common.feature.cable.CableNetwork
 
-@CapabilityInject(INetworkManager::class)
-internal lateinit var cableNetworkCapability: Capability<INetworkManager>
+@CapabilityInject(NetworkManager::class)
+internal lateinit var cableNetworkCapability: Capability<NetworkManager>
 
 @Suppress("experimental_api_usage")
-internal interface INetworkManager : INBTSerializable<NBTTagCompound> {
+internal interface NetworkManager : INBTSerializable<NBTTagCompound> {
 
     /** the world this capability is attached to */
     var world: World

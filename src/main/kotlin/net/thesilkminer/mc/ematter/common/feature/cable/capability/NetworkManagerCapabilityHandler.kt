@@ -38,15 +38,15 @@ object NetworkManagerCapabilityHandler {
             this.capabilityInstance.deserializeNBT(nbt)
     }
 
-    private class NetworkManagerCapabilityStorage : Capability.IStorage<INetworkManager> {
+    private class NetworkManagerCapabilityStorage : Capability.IStorage<NetworkManager> {
 
-        override fun writeNBT(capability: Capability<INetworkManager>?, instance: INetworkManager?, side: EnumFacing?): NBTBase? {
+        override fun writeNBT(capability: Capability<NetworkManager>?, instance: NetworkManager?, side: EnumFacing?): NBTBase? {
             if (capability != cableNetworkCapability) return null
             if (instance == null) throw IllegalArgumentException("Unable to write data into a null capability instance")
             return instance.serializeNBT()
         }
 
-        override fun readNBT(capability: Capability<INetworkManager>?, instance: INetworkManager?, side: EnumFacing?, nbt: NBTBase?) {
+        override fun readNBT(capability: Capability<NetworkManager>?, instance: NetworkManager?, side: EnumFacing?, nbt: NBTBase?) {
             if (capability != cableNetworkCapability) return
             if (instance == null) throw IllegalArgumentException("Unable to read data into from a null capability instance")
             if (nbt !is NBTTagCompound) throw IllegalArgumentException("The NBT type ${if (nbt == null) "null" else nbt::class.java.simpleName} isn't valid for this capability")
@@ -55,7 +55,7 @@ object NetworkManagerCapabilityHandler {
     }
 
     internal fun registerCapability() =
-        CapabilityManager.INSTANCE.register(INetworkManager::class.java, NetworkManagerCapabilityStorage(), ::NetworkManagerCapability)
+        CapabilityManager.INSTANCE.register(NetworkManager::class.java, NetworkManagerCapabilityStorage(), ::NetworkManagerCapability)
 
     @SubscribeEvent
     fun onWorldCapabilityAttach(e: AttachCapabilitiesEvent<World>) =
