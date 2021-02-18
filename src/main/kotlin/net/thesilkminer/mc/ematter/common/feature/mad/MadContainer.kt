@@ -46,6 +46,7 @@ import net.thesilkminer.mc.ematter.common.shared.bindPlayerInventory
 import net.thesilkminer.mc.ematter.common.recipe.mad.MadRecipe
 import net.thesilkminer.mc.ematter.common.recipe.mad.capability.craftedMadRecipesAmount
 import net.thesilkminer.mc.ematter.common.shared.CraftingInventoryWrapper
+import net.thesilkminer.mc.ematter.common.shared.isUsableByPlayer
 
 internal class MadContainer(private val te: MadBlockEntity, private val playerInventory: InventoryPlayer) : Container() {
     private class FakeSlot(inventory: IInventory, index: Int, x: Int, y: Int) : Slot(inventory, index, x, y) {

@@ -36,7 +36,6 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.common.capabilities.Capability
-import net.minecraftforge.common.util.Constants
 import net.minecraftforge.items.CapabilityItemHandler
 import net.minecraftforge.items.ItemStackHandler
 import net.thesilkminer.kotlin.commons.lang.uncheckedCast
@@ -47,6 +46,8 @@ import net.thesilkminer.mc.boson.api.energy.Consumer
 import net.thesilkminer.mc.boson.api.energy.Holder
 import net.thesilkminer.mc.boson.prefab.energy.consumerCapability
 import net.thesilkminer.mc.boson.prefab.energy.holderCapability
+import net.thesilkminer.mc.ematter.common.shared.sync
+import net.thesilkminer.mc.ematter.common.shared.withSync
 import kotlin.math.max
 import kotlin.math.min
 
@@ -58,9 +59,9 @@ internal class MadBlockEntity : TileEntity(), Consumer, Holder {
     }
 
     internal val inventory = object : ItemStackHandler(5 * 5) {
-        override fun onContentsChanged(slot: Int) = this@MadBlockEntity.andNotify {
+        override fun onContentsChanged(slot: Int) {
             super.onContentsChanged(slot)
-            this@MadBlockEntity.markDirty()
+            this@MadBlockEntity.sync()
         }
     }
 
@@ -98,20 +99,17 @@ internal class MadBlockEntity : TileEntity(), Consumer, Holder {
         return super.getCapability(capability, facing)
     }
 
-    internal fun isUsableByPlayer(player: EntityPlayer) =
-            this.world.getTileEntity(this.pos) === this && player.getDistanceSq(this.pos.add(0.5, 0.5, 0.5)) <=64.0
-
     @ExperimentalUnsignedTypes
-    override fun tryAccept(power: ULong, from: Direction) = this.andNotify {
-        if (from != Direction.DOWN) return@andNotify 0UL
+    override fun tryAccept(power: ULong, from: Direction) = this.withSync {
+        if (from != Direction.DOWN) return@withSync 0UL
         val after = this.currentPower + power
         if (after <= this.maxPower) {
             this.currentPower = after
-            return@andNotify power
+            return@withSync power
         }
         val diff = after - this.maxPower
         this.currentPower = this.maxPower
-        return@andNotify power - diff
+        return@withSync power - diff
     }
 
     override fun readFromNBT(compound: NBTTagCompound) {
@@ -145,7 +143,4 @@ internal class MadBlockEntity : TileEntity(), Consumer, Holder {
 
     override fun onDataPacket(net: NetworkManager, pkt: SPacketUpdateTileEntity) = this.handleUpdateTag(pkt.nbtCompound)
     override fun getUpdatePacket() = SPacketUpdateTileEntity(this.pos, -1, this.updateTag)
-
-    private inline fun <T> andNotify(block: () -> T) = block().also { this.markDirty() }.also { this.notifyUpdate() }
-    private fun notifyUpdate() = this.world.getBlockState(this.pos).let { this.world.notifyBlockUpdate(this.pos, it, it, Constants.BlockFlags.DEFAULT) }
 }

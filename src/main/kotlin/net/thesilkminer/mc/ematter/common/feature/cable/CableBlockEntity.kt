@@ -17,6 +17,7 @@ import net.thesilkminer.mc.boson.prefab.energy.hasEnergySupport
 import net.thesilkminer.mc.boson.prefab.energy.isEnergyConsumer
 import net.thesilkminer.mc.ematter.common.feature.cable.capability.networkManager
 import net.thesilkminer.mc.ematter.common.shared.DirectionsByte
+import net.thesilkminer.mc.ematter.common.shared.sync
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 internal class CableBlockEntity : TileEntity() {
@@ -43,7 +44,7 @@ internal class CableBlockEntity : TileEntity() {
         }
 
         this.onLoad() // ::onLoad gets called before this so we call it here again, after we added the cable
-        this.markAndNotify()
+        this.sync()
     }
 
     fun onRemove() {
@@ -85,13 +86,8 @@ internal class CableBlockEntity : TileEntity() {
             }
         }
 
-        if (this.connections != oldConnections) this.markAndNotify()
+        if (this.connections != oldConnections) this.sync()
         else if (this.consumers != oldConsumers) this.markDirty()
-    }
-
-    private fun markAndNotify() {
-        this.markDirty()
-        this.world.getBlockState(this.pos).let { this.world.notifyBlockUpdate(this.pos, it, it, 0) } // zero just because I can; actually notifies the client
     }
     // << reactions
 
