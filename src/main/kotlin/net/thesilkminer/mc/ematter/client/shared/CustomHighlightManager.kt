@@ -11,10 +11,11 @@ import net.minecraft.util.math.RayTraceResult
 import net.minecraftforge.client.event.DrawBlockHighlightEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.thesilkminer.mc.boson.api.registry.RegistryObject
+import net.thesilkminer.mc.boson.prefab.direction.toDirection
 import net.thesilkminer.mc.ematter.client.feature.cable.CableHighlightProvider
 import net.thesilkminer.mc.ematter.client.feature.mad.MadHighlightProvider
 import net.thesilkminer.mc.ematter.common.Blocks
-import net.thesilkminer.mc.ematter.common.feature.mad.MadBlock
+import net.thesilkminer.mc.ematter.common.feature.anvil.AnvilBlock
 import net.thesilkminer.mc.ematter.common.feature.seebeck.SeebeckBlock
 
 internal interface CustomHighlightProvider {
@@ -29,6 +30,7 @@ internal object CustomHighlightManager {
         this.highlightProviders += CableHighlightProvider()
         this.highlightProviders += DefaultCustomHighlightProvider(Blocks.seebeckGenerator, SeebeckBlock.volumes)
         this.highlightProviders += MadHighlightProvider()
+        this.highlightProviders += StateSensitiveCustomHighlightProvider(Blocks.anvil) { AnvilBlock.volumes[it.getValue(AnvilBlock.axis).toDirection()] ?: error("Invalid value") }
     }
 
     @SubscribeEvent
@@ -76,6 +78,16 @@ private class DefaultCustomHighlightProvider(block: RegistryObject<Block>, priva
 
     override fun renderHighlight(state: IBlockState, x: Double, y: Double, z: Double) {
         this.volumes.map { it.expandForHighlight().offset(x, y, z) }.forEach { it.renderDefaultHighlight() }
+    }
+}
+
+private class StateSensitiveCustomHighlightProvider(block: RegistryObject<Block>, private val lookup: (IBlockState) -> Sequence<AxisAlignedBB>) : CustomHighlightProvider {
+    private val block by lazy(block::get)
+
+    override fun matches(state: IBlockState): Boolean = state.block == this.block
+
+    override fun renderHighlight(state: IBlockState, x: Double, y: Double, z: Double) {
+        this.lookup(state).map { it.expandForHighlight().offset(x, y, z) }.forEach { it.renderDefaultHighlight() }
     }
 }
 

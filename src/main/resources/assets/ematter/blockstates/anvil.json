@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "axis=north": {
+      "model": "minecraft:anvil_undamaged"
+    },
+    "axis=east": {
+      "model": "minecraft:anvil_undamaged",
+      "y": 90
+    }
+  }
+}
