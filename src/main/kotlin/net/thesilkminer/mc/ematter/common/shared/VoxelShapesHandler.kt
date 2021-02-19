@@ -2,7 +2,11 @@
 
 package net.thesilkminer.mc.ematter.common.shared
 
+import net.minecraft.block.Block
 import net.minecraft.util.math.AxisAlignedBB
+import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.RayTraceResult
+import net.minecraft.util.math.Vec3d
 
 // TODO("All of this is literally bodged together to avoid repeating logic. Move this to proper Volume class, probably into Boson")
 
@@ -23,4 +27,31 @@ private class VoxelShapesBuilder : VolumeBuilder {
 
 internal val emptyVolume = AxisAlignedBB(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 
-internal fun volumes(builder: VolumeBuilder.() -> Unit): Sequence<AxisAlignedBB> = VoxelShapesBuilder().apply(builder).toSequence()
+internal fun volumes(builder: VolumeBuilder.() -> Unit): Iterable<AxisAlignedBB> = VoxelShapesBuilder().apply(builder).toSequence().asIterable()
+
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun handleCollisionVolumes(pos: BlockPos, entityBox: AxisAlignedBB, collidingBoxes: MutableList<AxisAlignedBB>, volumes: Iterable<AxisAlignedBB>) {
+    volumes.forEach { handleCollisionVolume(pos, entityBox, collidingBoxes, it) }
+}
+
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun handleCollisionVolume(pos: BlockPos, entityBox: AxisAlignedBB, collidingBoxes: MutableList<AxisAlignedBB>, volume: AxisAlignedBB) {
+    val translatedMinX = volume.minX + pos.x
+    val translatedMinY = volume.minY + pos.y
+    val translatedMinZ = volume.minZ + pos.z
+    val translatedMaxX = volume.maxX + pos.x
+    val translatedMaxY = volume.maxY + pos.y
+    val translatedMaxZ = volume.maxZ + pos.z
+    if (entityBox.intersects(translatedMinX, translatedMinY, translatedMinZ, translatedMaxX, translatedMaxY, translatedMaxZ)) {
+        collidingBoxes.add(AxisAlignedBB(translatedMinX, translatedMinY, translatedMinZ, translatedMaxX, translatedMaxY, translatedMaxZ))
+    }
+}
+
+internal inline fun performVolumeRayTrace(pos: BlockPos, start: Vec3d, end: Vec3d, rayTraceFunction: (BlockPos, Vec3d, Vec3d, AxisAlignedBB) -> RayTraceResult?,
+                                                volumes: Iterable<AxisAlignedBB>): RayTraceResult? {
+    volumes.forEach {
+        val trace = rayTraceFunction(pos, start, end, it)
+        if (trace != null) return trace
+    }
+    return null
+}

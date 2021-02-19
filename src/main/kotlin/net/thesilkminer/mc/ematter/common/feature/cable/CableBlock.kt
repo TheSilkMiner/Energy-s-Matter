@@ -16,11 +16,10 @@ import net.minecraft.world.IBlockAccess
 import net.minecraft.world.World
 import net.thesilkminer.mc.boson.api.direction.Direction
 import net.thesilkminer.mc.boson.prefab.direction.offset
+import net.thesilkminer.mc.ematter.common.shared.handleCollisionVolume
 
 internal class CableBlock : Block(MATERIAL_CABLE) {
-
     internal companion object {
-
         val MATERIAL_CABLE: Material = object : Material(MapColor.AIR) {
             init {
                 this.setRequiresTool()
@@ -52,6 +51,8 @@ internal class CableBlock : Block(MATERIAL_CABLE) {
             Direction.UP to AxisAlignedBB(rodMin, coreMax, rodMin, rodMax, 1.0, rodMax),
             Direction.DOWN to AxisAlignedBB(rodMin, 0.0, rodMin, rodMax, coreMin, rodMax)
         )
+
+        val directions = Direction.values().asIterable()
     }
 
     // TE >>
@@ -90,6 +91,7 @@ internal class CableBlock : Block(MATERIAL_CABLE) {
     override fun getMetaFromState(state: IBlockState) = 0 // mc expects us to override this; otherwise it crashes..
 
     override fun getActualState(state: IBlockState, world: IBlockAccess, pos: BlockPos) = (world.getTileEntity(pos) as? CableBlockEntity)?.connections?.let { directions ->
+        @Suppress("RedundantAsSequence")
         connections.asSequence().fold(state) { s, property -> s.withProperty(property.value, property.key in directions) }
     } ?: state // during world load te is null; we re render later, after te has loaded
     // << BlockState
@@ -111,14 +113,15 @@ internal class CableBlock : Block(MATERIAL_CABLE) {
         entityIn: Entity?,
         isActualState: Boolean
     ) {
-        if (entityBox.intersects(coreVolume.offset(pos))) collidingBoxes.add(coreVolume.offset(pos))
+        val offsetCore = coreVolume.offset(pos)
+        if (entityBox.intersects(offsetCore)) collidingBoxes.add(offsetCore)
 
         state.getActualState(worldIn, pos).let { actual ->
-            Direction.values().asSequence()
-                .filter { actual.getValue(connections.getValue(it)) }
-                .map { volumes.getValue(it).offset(pos) }
-                .filter { entityBox.intersects(it) }
-                .forEach { collidingBoxes.add(it) }
+            directions.forEach {
+                if (actual.getValue(connections.getValue(it))) {
+                    handleCollisionVolume(pos, entityBox, collidingBoxes, volumes.getValue(it))
+                }
+            }
         }
     }
 
@@ -126,9 +129,12 @@ internal class CableBlock : Block(MATERIAL_CABLE) {
         this.rayTrace(pos, start, end, coreVolume)?.let { return it }
 
         state.getActualState(worldIn, pos).let { actual ->
-            Direction.values().asSequence()
-                .filter { actual.getValue(connections.getValue(it)) }
-                .forEach { this.rayTrace(pos, start, end, volumes.getValue(it))?.let { target -> return target } }
+            directions.forEach {
+                if (actual.getValue(connections.getValue(it))) {
+                    val trace = this.rayTrace(pos, start, end, volumes.getValue(it))
+                    if (trace != null) return trace
+                }
+            }
         }
 
         return null

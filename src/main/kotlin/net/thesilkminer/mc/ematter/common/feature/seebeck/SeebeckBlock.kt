@@ -39,8 +39,9 @@ import net.minecraft.util.math.RayTraceResult
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.IBlockAccess
 import net.minecraft.world.World
-import net.thesilkminer.mc.ematter.common.feature.mad.MadBlock
 import net.thesilkminer.mc.ematter.common.shared.emptyVolume
+import net.thesilkminer.mc.ematter.common.shared.handleCollisionVolumes
+import net.thesilkminer.mc.ematter.common.shared.performVolumeRayTrace
 import net.thesilkminer.mc.ematter.common.shared.volumes
 
 internal class SeebeckBlock : Block(Material.IRON) {
@@ -67,11 +68,11 @@ internal class SeebeckBlock : Block(Material.IRON) {
 
     override fun addCollisionBoxToList(state: IBlockState, worldIn: World, pos: BlockPos, entityBox: AxisAlignedBB,
                                        collidingBoxes: MutableList<AxisAlignedBB>, entityIn: Entity?, isActualState: Boolean) {
-        collidingBoxes.addAll(volumes.map { it.offset(pos) }.filter { entityBox.intersects(it) })
+        handleCollisionVolumes(pos, entityBox, collidingBoxes, volumes)
     }
 
     override fun collisionRayTrace(blockState: IBlockState, worldIn: World, pos: BlockPos, start: Vec3d, end: Vec3d): RayTraceResult? =
-            MadBlock.volumes.map { this.rayTrace(pos, start, end, it) }.firstOrNull { it != null }
+            performVolumeRayTrace(pos, start, end, this::rayTrace, volumes)
 
     override fun isOpaqueCube(state: IBlockState) = false
     override fun isFullCube(state: IBlockState) = false
