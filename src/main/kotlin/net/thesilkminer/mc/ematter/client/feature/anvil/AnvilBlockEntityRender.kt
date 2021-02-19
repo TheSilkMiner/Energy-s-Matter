@@ -35,8 +35,8 @@ internal class AnvilBlockEntityRender : TileEntitySpecialRenderer<AnvilBlockEnti
                 val model = this.itemRenderer.getItemModelWithOverrides(stack, te.world, null)
                 val transformedModel = ForgeHooksClient.handleCameraTransforms(model, ItemCameraTransforms.TransformType.GROUND, false)
                 if (rotate) GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F)
-                GlStateManager.rotate(-90.0F, 1.0F, 0.0F, 0.0F) // Euler angles 🙄
-                // TODO("Rotations")
+                GlStateManager.rotate(te.stackRotation.toFloat(), 0.0F, 1.0F, 0.0F)
+                GlStateManager.rotate(-90.0F, 1.0F, 0.0F, 0.0F)
                 this.itemRenderer.renderItem(stack, transformedModel)
             }
         }

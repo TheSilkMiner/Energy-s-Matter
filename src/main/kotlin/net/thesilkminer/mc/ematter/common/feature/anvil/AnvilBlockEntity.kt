@@ -12,11 +12,18 @@ import net.minecraftforge.items.ItemStackHandler
 import net.thesilkminer.kotlin.commons.lang.uncheckedCast
 import net.thesilkminer.mc.ematter.common.shared.sync
 import net.thesilkminer.mc.ematter.common.shared.withSync
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.random.Random
 
 internal class AnvilBlockEntity : TileEntity() {
     private companion object {
         private const val INVENTORY_KEY = "content"
         private const val SMASHES_KEY = "smashes"
+        private const val ROTATION_KEY = "rotation"
+
+        // Create a new specific random that we are going to use as an offspring of the current system-wide one
+        private val random = Random(Random.nextLong())
     }
 
     private val inventory = object : ItemStackHandler(1) {
@@ -36,6 +43,8 @@ internal class AnvilBlockEntity : TileEntity() {
     private var recipeFound = false
 
     internal val clientStackToDisplay get() = this.stack
+    internal var stackRotation: Double = 0.0
+        private set(value) { field = min(max(0.0, value), 360.0) }
 
     override fun onLoad() {
         if (!this.world.isRemote) this.attemptToCraftRecipe()
@@ -46,10 +55,14 @@ internal class AnvilBlockEntity : TileEntity() {
 
         val copy = stack.copy()
         val remainder = this.inventory.insertItem(0, copy, false)
-        val insertionSuccessful = ItemStack.areItemStacksEqual(copy, remainder)
+        val insertionSuccessful = !ItemStack.areItemStacksEqual(copy, remainder)
 
         if (insertionSuccessful) {
-            this.withSync { this.smashes = 0 } // NOTE: This will also sync the inventory
+            this.withSync {
+                // NOTE: This will also sync the inventory
+                this.smashes = 0
+                this.stackRotation = random.nextDouble(from = 0.0, until = 360.0)
+            }
         }
 
         return insertionSuccessful to remainder
@@ -93,23 +106,27 @@ internal class AnvilBlockEntity : TileEntity() {
         super.readFromNBT(compound)
         this.inventory.deserializeNBT(compound.getCompoundTag(INVENTORY_KEY))
         this.smashes = compound.getByte(SMASHES_KEY)
+        this.stackRotation = compound.getDouble(ROTATION_KEY)
     }
 
     override fun writeToNBT(compound: NBTTagCompound): NBTTagCompound {
         val target = super.writeToNBT(compound)
         target.setTag(INVENTORY_KEY, this.inventory.serializeNBT())
         target.setByte(SMASHES_KEY, this.smashes)
+        target.setDouble(ROTATION_KEY, this.stackRotation)
         return target
     }
 
     override fun getUpdateTag(): NBTTagCompound = NBTTagCompound().apply {
         this.setTag(INVENTORY_KEY, this@AnvilBlockEntity.inventory.serializeNBT())
         this.setByte(SMASHES_KEY, this@AnvilBlockEntity.smashes)
+        this.setDouble(ROTATION_KEY, this@AnvilBlockEntity.stackRotation)
     }
 
     override fun handleUpdateTag(tag: NBTTagCompound) {
         this.inventory.deserializeNBT(tag.getCompoundTag(INVENTORY_KEY))
         this.smashes = tag.getByte(SMASHES_KEY)
+        this.stackRotation = tag.getDouble(ROTATION_KEY)
     }
 
     override fun onDataPacket(net: NetworkManager, pkt: SPacketUpdateTileEntity) = this.handleUpdateTag(pkt.nbtCompound)

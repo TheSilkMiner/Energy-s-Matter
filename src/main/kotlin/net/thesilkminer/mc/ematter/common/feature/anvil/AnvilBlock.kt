@@ -31,6 +31,8 @@ import net.thesilkminer.mc.boson.prefab.tag.isInTag
 import net.thesilkminer.mc.boson.prefab.tag.itemTagType
 import net.thesilkminer.mc.ematter.MOD_ID
 import net.thesilkminer.mc.ematter.common.shared.emptyVolume
+import net.thesilkminer.mc.ematter.common.shared.handleCollisionVolumes
+import net.thesilkminer.mc.ematter.common.shared.performVolumeRayTrace
 import net.thesilkminer.mc.ematter.common.shared.volumes
 
 internal class AnvilBlock : Block(Material.ANVIL) {
@@ -41,13 +43,13 @@ internal class AnvilBlock : Block(Material.ANVIL) {
         internal val axis = PropertyDirection.create("axis") { it != null && (it.toDirection() == Direction.NORTH || it.toDirection() == Direction.EAST) }
 
         // Recursive type checking? How?
-        private val northVolumes: Sequence<AxisAlignedBB> = volumes {
+        private val northVolumes: Iterable<AxisAlignedBB> = volumes {
             this.box(2, 0, 2, 14, 4, 14)
             this.box(4, 4, 3, 12, 5, 13)
             this.box(6, 5, 4, 10, 10, 12)
             this.box(3, 10, 0, 13, 16, 16)
         }
-        private val eastVolumes: Sequence<AxisAlignedBB> = volumes {
+        private val eastVolumes: Iterable<AxisAlignedBB> = volumes {
             this.box(2, 0, 2, 14, 4, 14)
             this.box(3, 4, 4, 13, 5, 12)
             this.box(4, 5, 6, 12, 10, 10)
@@ -101,11 +103,11 @@ internal class AnvilBlock : Block(Material.ANVIL) {
 
     override fun addCollisionBoxToList(state: IBlockState, worldIn: World, pos: BlockPos, entityBox: AxisAlignedBB,
                                        collidingBoxes: MutableList<AxisAlignedBB>, entityIn: Entity?, isActualState: Boolean) {
-        volumes[state.getValue(axis).toDirection()]?.map { it.offset(pos) }?.filter { entityBox.intersects(it) }?.let { collidingBoxes.addAll(it) }
+        volumes[state.getValue(axis).toDirection()]?.let { handleCollisionVolumes(pos, entityBox, collidingBoxes, it) }
     }
 
     override fun collisionRayTrace(blockState: IBlockState, worldIn: World, pos: BlockPos, start: Vec3d, end: Vec3d): RayTraceResult? =
-            volumes[blockState.getValue(axis).toDirection()]?.map { this.rayTrace(pos, start, end, it) }?.firstOrNull { it != null }
+            volumes[blockState.getValue(axis).toDirection()]?.let { performVolumeRayTrace(pos, start, end, this::rayTrace, it) }
 
     override fun hasTileEntity(state: IBlockState): Boolean = true
     override fun createTileEntity(world: World, state: IBlockState): TileEntity? = AnvilBlockEntity()
