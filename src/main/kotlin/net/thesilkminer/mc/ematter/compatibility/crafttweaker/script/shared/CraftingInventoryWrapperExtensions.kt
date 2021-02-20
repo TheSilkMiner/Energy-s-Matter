@@ -90,7 +90,7 @@ private val CraftingInventoryWrapper.eventHandler get() = eventHandlerField[this
 private val SlotCrafting.player get() = playerField[this].uncheckedCast<EntityPlayer>()
 
 private class ZenCraftingInventoryWrapper(private val wrapped: CraftingInventoryWrapper) : ICraftingInventory {
-    private val targetPlayer by lazy { this.wrapped.eventHandler.inventorySlots.find { it is SlotCrafting }?.let { (it as SlotCrafting).player }?.toZen() }
+    private val targetPlayer by lazy { this.wrapped.wrappedContainer.inventorySlots.find { it is SlotCrafting }?.let { (it as SlotCrafting).player }?.toZen() }
 
     override fun getPlayer(): IPlayer? = this.targetPlayer
     override fun setStack(row: Int, column: Int, stack: IItemStack?) = this.setStack(row * this.width + column, stack)

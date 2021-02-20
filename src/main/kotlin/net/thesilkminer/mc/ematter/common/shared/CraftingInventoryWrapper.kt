@@ -34,8 +34,8 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.items.ItemStackHandler
 import kotlin.reflect.KClass
 
-internal class CraftingInventoryWrapper(val containerClass: KClass<out Container>, private val eventHandler: Container, private val inventory: ItemStackHandler,
-                                        width: Int, height: Int) : InventoryCrafting(eventHandler, width, height) {
+internal class CraftingInventoryWrapper(val containerClass: KClass<out Container>, val wrappedContainer: Container, private val inventory: ItemStackHandler,
+                                        width: Int, height: Int) : InventoryCrafting(wrappedContainer, width, height) {
     override fun getStackInSlot(index: Int): ItemStack = if (index < 0 || index >= this.inventory.slots) ItemStack.EMPTY else this.inventory.getStackInSlot(index)
     override fun clear() = (0 until this.inventory.slots).forEach { this.inventory.setStackInSlot(it, ItemStack.EMPTY) }
     override fun removeStackFromSlot(index: Int) = this.getStackInSlot(index).also { this.setInventorySlotContents(index, ItemStack.EMPTY) }
@@ -46,12 +46,12 @@ internal class CraftingInventoryWrapper(val containerClass: KClass<out Container
 
     override fun decrStackSize(index: Int, count: Int): ItemStack {
         val split = this.getStackInSlot(index).let { if (it.isEmpty || count <= 0) ItemStack.EMPTY else it.splitStack(count) }
-        if (!split.isEmpty) this.eventHandler.onCraftMatrixChanged(this)
+        if (!split.isEmpty) this.wrappedContainer.onCraftMatrixChanged(this)
         return split
     }
 
     override fun setInventorySlotContents(index: Int, stack: ItemStack) {
         this.inventory.setStackInSlot(index, stack)
-        this.eventHandler.onCraftMatrixChanged(this)
+        this.wrappedContainer.onCraftMatrixChanged(this)
     }
 }
