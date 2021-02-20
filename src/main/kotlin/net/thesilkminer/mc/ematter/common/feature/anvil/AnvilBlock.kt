@@ -30,6 +30,7 @@ import net.thesilkminer.mc.boson.prefab.direction.toFacing
 import net.thesilkminer.mc.boson.prefab.tag.isInTag
 import net.thesilkminer.mc.boson.prefab.tag.itemTagType
 import net.thesilkminer.mc.ematter.MOD_ID
+import net.thesilkminer.mc.ematter.common.Items
 import net.thesilkminer.mc.ematter.common.shared.emptyVolume
 import net.thesilkminer.mc.ematter.common.shared.handleCollisionVolumes
 import net.thesilkminer.mc.ematter.common.shared.performVolumeRayTrace
@@ -134,7 +135,7 @@ internal class AnvilBlock : Block(Material.ANVIL) {
     }
 
     private fun AnvilBlockEntity.processSmash(player: EntityPlayer, heldItem: ItemStack, hand: EnumHand) {
-        if (this.iWonderWhoWantsToSmashMe()) {
+        if (this.iWonderWhoWantsToSmashMe(heldItem.item == Items.copperHammer())) {
             if (!player.isCreative) {
                 heldItem.damageItem(1, player)
             } else {

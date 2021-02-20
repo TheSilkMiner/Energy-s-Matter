@@ -87,13 +87,19 @@ internal class AnvilBlockEntity : TileEntity() {
         return true to stack
     }
 
-    internal fun iWonderWhoWantsToSmashMe(): Boolean {
+    internal fun iWonderWhoWantsToSmashMe(isCopper: Boolean): Boolean {
         this.world.playSound(null, this.pos, SoundEvents.BLOCK_ANVIL_PLACE, SoundCategory.BLOCKS, 0.3F, 1.0F)
 
         if (this.stack.isEmpty) return false // If no stack is on the anvil, we cannot smash
         if (this.recipeFound) return false // If we already crafted a recipe, we won't smash again
         withSync {
             this.stackRotation = this.stackRotation + random.nextDouble(from = -15.0, until = 15.0)
+        }
+        if (isCopper && this.smashes == 0.toByte()) {
+            // Bonus smash
+            this.smashes = 1
+            this.attemptToCraftRecipe(AnvilRecipe.Kind.SMASHING)
+            if (this.recipeFound) return true
         }
         ++this.smashes
         this.attemptToCraftRecipe(AnvilRecipe.Kind.SMASHING)
