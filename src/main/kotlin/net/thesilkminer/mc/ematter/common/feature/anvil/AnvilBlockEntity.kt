@@ -52,7 +52,7 @@ internal class AnvilBlockEntity : TileEntity() {
         private set(value) { field = min(max(0.0, value), 360.0) }
 
     override fun onLoad() {
-        if (!this.world.isRemote) this.attemptToCraftRecipe()
+        if (!this.world.isRemote) this.attemptToCraftRecipe(AnvilRecipe.Kind.SMASHING)
     }
 
     internal fun placeItem(stack: ItemStack): Pair<Boolean, ItemStack> {
@@ -96,12 +96,28 @@ internal class AnvilBlockEntity : TileEntity() {
             this.stackRotation = this.stackRotation + random.nextDouble(from = -15.0, until = 15.0)
         }
         ++this.smashes
-        this.attemptToCraftRecipe()
+        this.attemptToCraftRecipe(AnvilRecipe.Kind.SMASHING)
         return true
     }
 
-    private fun attemptToCraftRecipe() {
+    @Suppress("SameParameterValue")
+    private fun attemptToCraftRecipe(kind: AnvilRecipe.Kind) {
+        val context = AnvilRecipeContext(this, this.smashes, this.stack)
+        val wrapper = CraftingInventoryWrapper(AnvilRecipeContext.Wrapper::class, AnvilRecipeContext.Wrapper(context), this.inventory, 1, 1)
 
+        val matchingRecipe = CraftingManager.REGISTRY
+                .asSequence()
+                .filter { it.matches(wrapper, this.world) }
+                .filterIsInstance<AnvilRecipe>()
+                .filter { it.kind == kind }
+                .firstOrNull() ?: return
+
+        val result = matchingRecipe.getCraftingResult(wrapper)
+
+        withSync {
+            this.inventory.setStackInSlot(0, result)
+            this.recipeFound = true
+        }
     }
 
     override fun hasCapability(capability: Capability<*>, facing: EnumFacing?): Boolean {

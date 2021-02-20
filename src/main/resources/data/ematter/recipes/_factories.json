@@ -1,6 +1,7 @@
 {
   "recipes": {
     "mad_shaped": "net.thesilkminer.mc.ematter.common.recipe.mad.ShapedMadRecipeSerializer",
-    "mad_shapeless": "net.thesilkminer.mc.ematter.common.recipe.mad.ShapelessMadRecipeSerializer"
+    "mad_shapeless": "net.thesilkminer.mc.ematter.common.recipe.mad.ShapelessMadRecipeSerializer",
+    "smashing": "net.thesilkminer.mc.ematter.common.recipe.anvil.SmashingRecipeSerializer"
   }
 }
