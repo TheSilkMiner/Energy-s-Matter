@@ -1,15 +1,20 @@
 package net.thesilkminer.mc.ematter.common.feature.anvil
 
+import net.minecraft.init.SoundEvents
 import net.minecraft.item.ItemStack
+import net.minecraft.item.crafting.CraftingManager
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.network.NetworkManager
 import net.minecraft.network.play.server.SPacketUpdateTileEntity
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
+import net.minecraft.util.SoundCategory
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.items.CapabilityItemHandler
 import net.minecraftforge.items.ItemStackHandler
 import net.thesilkminer.kotlin.commons.lang.uncheckedCast
+import net.thesilkminer.mc.ematter.common.recipe.anvil.AnvilRecipe
+import net.thesilkminer.mc.ematter.common.shared.CraftingInventoryWrapper
 import net.thesilkminer.mc.ematter.common.shared.sync
 import net.thesilkminer.mc.ematter.common.shared.withSync
 import kotlin.math.max
@@ -62,6 +67,7 @@ internal class AnvilBlockEntity : TileEntity() {
                 // NOTE: This will also sync the inventory
                 this.smashes = 0
                 this.stackRotation = random.nextDouble(from = 0.0, until = 360.0)
+                this.recipeFound = false
             }
         }
 
@@ -75,14 +81,20 @@ internal class AnvilBlockEntity : TileEntity() {
         this.withSync {
             this.stack = ItemStack.EMPTY
             this.smashes = 0
+            this.recipeFound = false
         }
 
         return true to stack
     }
 
     internal fun iWonderWhoWantsToSmashMe(): Boolean {
+        this.world.playSound(null, this.pos, SoundEvents.BLOCK_ANVIL_PLACE, SoundCategory.BLOCKS, 0.3F, 1.0F)
+
         if (this.stack.isEmpty) return false // If no stack is on the anvil, we cannot smash
         if (this.recipeFound) return false // If we already crafted a recipe, we won't smash again
+        withSync {
+            this.stackRotation = this.stackRotation + random.nextDouble(from = -15.0, until = 15.0)
+        }
         ++this.smashes
         this.attemptToCraftRecipe()
         return true
