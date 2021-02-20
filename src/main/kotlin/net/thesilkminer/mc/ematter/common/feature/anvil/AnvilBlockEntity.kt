@@ -4,12 +4,15 @@ import net.minecraft.init.SoundEvents
 import net.minecraft.item.ItemStack
 import net.minecraft.item.crafting.CraftingManager
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.nbt.NBTTagDouble
+import net.minecraft.nbt.NBTTagList
 import net.minecraft.network.NetworkManager
 import net.minecraft.network.play.server.SPacketUpdateTileEntity
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.SoundCategory
 import net.minecraftforge.common.capabilities.Capability
+import net.minecraftforge.common.util.Constants
 import net.minecraftforge.items.CapabilityItemHandler
 import net.minecraftforge.items.ItemStackHandler
 import net.thesilkminer.kotlin.commons.lang.uncheckedCast
@@ -27,6 +30,7 @@ internal class AnvilBlockEntity : TileEntity() {
         private const val SMASHES_KEY = "smashes"
         private const val ROTATION_KEY = "rotation"
         private const val POSITION_KEY = "position"
+        private const val FRAME_TIME_KEY = "ft"
 
         // Create a new specific random that we are going to use as an offspring of the current system-wide one
         private val random = Random(Random.nextLong())
@@ -51,10 +55,12 @@ internal class AnvilBlockEntity : TileEntity() {
     internal val clientStackToDisplay get() = this.stack
     internal var stackRotation: Double = 0.0
         private set(value) { field = min(max(0.0, value), 360.0) }
-    internal var stackPositionX: Int = 0
-        private set(value) { field = min(max(-4, value), 4) }
-    internal var stackPositionY: Int = 0
-        private set(value) { field = min(max(-2, value), 2) }
+    internal var stackPositionX: Double = 0.0
+        private set(value) { field = min(max(-4.0, value), 4.0) }
+    internal var stackPositionY: Double = 0.0
+        private set(value) { field = min(max(-2.0, value), 2.0) }
+
+    internal var clientFrameTime: Byte = 0
 
     override fun onLoad() {
         if (!this.world.isRemote) this.attemptToCraftRecipe(AnvilRecipe.Kind.SMASHING)
@@ -72,8 +78,8 @@ internal class AnvilBlockEntity : TileEntity() {
                 // NOTE: This will also sync the inventory
                 this.smashes = 0
                 this.stackRotation = random.nextDouble(from = 0.0, until = 360.0)
-                this.stackPositionX = random.nextInt(from = -4, until = 4)
-                this.stackPositionY = random.nextInt(from = -2, until = 2)
+                this.stackPositionX = random.nextDouble(from = -4.0, until = 4.0)
+                this.stackPositionY = random.nextDouble(from = -2.0, until = 2.0)
                 this.recipeFound = false
             }
         }
@@ -101,8 +107,9 @@ internal class AnvilBlockEntity : TileEntity() {
         if (this.recipeFound) return false // If we already crafted a recipe, we won't smash again
         withSync {
             this.stackRotation = this.stackRotation + random.nextDouble(from = -15.0, until = 15.0)
-            this.stackPositionX = this.stackPositionX + random.nextInt(from = -4, until = 4)
-            this.stackPositionY = this.stackPositionY + random.nextInt(from = -2, until = 2)
+            this.stackPositionX = this.stackPositionX + random.nextDouble(from = -4.0, until = 4.0)
+            this.stackPositionY = this.stackPositionY + random.nextDouble(from = -2.0, until = 2.0)
+            this.clientFrameTime = 6
         }
         if (isCopper && this.smashes == 0.toByte()) {
             // Bonus smash
@@ -150,9 +157,9 @@ internal class AnvilBlockEntity : TileEntity() {
         this.inventory.deserializeNBT(compound.getCompoundTag(INVENTORY_KEY))
         this.smashes = compound.getByte(SMASHES_KEY)
         this.stackRotation = compound.getDouble(ROTATION_KEY)
-        compound.getIntArray(POSITION_KEY).let {
-            this.stackPositionX = it[1]
-            this.stackPositionY = it[0]
+        compound.getTagList(POSITION_KEY, Constants.NBT.TAG_DOUBLE).let {
+            this.stackPositionX = it.getDoubleAt(1)
+            this.stackPositionY = it.getDoubleAt(0)
         }
     }
 
@@ -161,7 +168,10 @@ internal class AnvilBlockEntity : TileEntity() {
         target.setTag(INVENTORY_KEY, this.inventory.serializeNBT())
         target.setByte(SMASHES_KEY, this.smashes)
         target.setDouble(ROTATION_KEY, this.stackRotation)
-        target.setIntArray(POSITION_KEY, intArrayOf(this.stackPositionY, this.stackPositionX))
+        target.setTag(POSITION_KEY, NBTTagList().apply {
+            this.appendTag(NBTTagDouble(this@AnvilBlockEntity.stackPositionY))
+            this.appendTag(NBTTagDouble(this@AnvilBlockEntity.stackPositionX))
+        })
         return target
     }
 
@@ -169,17 +179,22 @@ internal class AnvilBlockEntity : TileEntity() {
         this.setTag(INVENTORY_KEY, this@AnvilBlockEntity.inventory.serializeNBT())
         this.setByte(SMASHES_KEY, this@AnvilBlockEntity.smashes)
         this.setDouble(ROTATION_KEY, this@AnvilBlockEntity.stackRotation)
-        this.setIntArray(POSITION_KEY, intArrayOf(this@AnvilBlockEntity.stackPositionY, this@AnvilBlockEntity.stackPositionX))
+        this.setTag(POSITION_KEY, NBTTagList().apply {
+            this.appendTag(NBTTagDouble(this@AnvilBlockEntity.stackPositionY))
+            this.appendTag(NBTTagDouble(this@AnvilBlockEntity.stackPositionX))
+        })
+        this.setByte(FRAME_TIME_KEY, this@AnvilBlockEntity.clientFrameTime)
     }
 
     override fun handleUpdateTag(tag: NBTTagCompound) {
         this.inventory.deserializeNBT(tag.getCompoundTag(INVENTORY_KEY))
         this.smashes = tag.getByte(SMASHES_KEY)
         this.stackRotation = tag.getDouble(ROTATION_KEY)
-        tag.getIntArray(POSITION_KEY).let {
-            this.stackPositionX = it[1]
-            this.stackPositionY = it[0]
+        tag.getTagList(POSITION_KEY, Constants.NBT.TAG_DOUBLE).let {
+            this.stackPositionX = it.getDoubleAt(1)
+            this.stackPositionY = it.getDoubleAt(0)
         }
+        this.clientFrameTime = tag.getByte(FRAME_TIME_KEY)
     }
 
     override fun onDataPacket(net: NetworkManager, pkt: SPacketUpdateTileEntity) = this.handleUpdateTag(pkt.nbtCompound)
