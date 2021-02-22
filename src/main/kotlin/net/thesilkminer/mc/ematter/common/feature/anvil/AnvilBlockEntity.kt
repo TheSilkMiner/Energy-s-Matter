@@ -105,6 +105,7 @@ internal class AnvilBlockEntity : TileEntity() {
 
         if (this.stack.isEmpty) return false // If no stack is on the anvil, we cannot smash
         if (this.recipeFound) return false // If we already crafted a recipe, we won't smash again
+        if (this.smashes == Byte.MAX_VALUE) return false // If someone smashed an anvil 127 times already...
         withSync {
             this.stackRotation = this.stackRotation + random.nextDouble(from = -15.0, until = 15.0)
             this.stackPositionX = this.stackPositionX + random.nextDouble(from = -4.0, until = 4.0)
