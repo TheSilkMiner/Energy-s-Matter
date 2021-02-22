@@ -1,0 +1,29 @@
+{
+  "type": "ematter:mad_shapeless",
+  "ingredients": [
+    {
+      "type": "minecraft:item",
+      "item": "ematter:iron_hammer"
+    },
+    {
+      "type": "boson:tag",
+      "tag": "#forge:gems/diamond"
+    },
+    {
+      "type": "boson:tag",
+      "tag": "#forge:gems/diamond"
+    },
+    {
+      "type": "boson:tag",
+      "tag": "#forge:gems/diamond"
+    }
+  ],
+  "result": {
+    "type": "minecraft:item",
+    "item": "ematter:diamond_hammer"
+  },
+  "stepping_function": {
+    "type": "ematter:constant",
+    "value": 13
+  }
+}

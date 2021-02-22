@@ -1,0 +1,22 @@
+{
+  "type": "mad_shapeless",
+  "ingredients": [
+    {
+      "type": "boson:tag",
+      "tag": "#forge:plates/iron"
+    },
+    {
+      "type": "boson:tag",
+      "tag": "#ematter:anvil_hammers"
+    }
+  ],
+  "result": {
+    "type": "minecraft:item",
+    "item": "ematter:iron_sheet",
+    "count": 3
+  },
+  "stepping_function": {
+    "type": "ematter:constant",
+    "value": 3
+  }
+}

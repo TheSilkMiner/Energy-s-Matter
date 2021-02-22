@@ -1,0 +1,22 @@
+{
+  "type": "forge:ore_shaped",
+  "pattern": [
+    " II",
+    " SI",
+    "S  "
+  ],
+  "key": {
+    "I": {
+      "type": "boson:tag",
+      "tag": "#forge:ingots/iron"
+    },
+    "S": {
+      "type": "boson:tag",
+      "tag": "#forge:rods/wooden"
+    }
+  },
+  "result": {
+    "type": "minecraft:item",
+    "item": "ematter:iron_hammer"
+  }
+}

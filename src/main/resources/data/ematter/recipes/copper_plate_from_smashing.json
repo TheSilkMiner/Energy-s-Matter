@@ -1,0 +1,12 @@
+{
+  "type": "ematter:smashing",
+  "ingredient": {
+    "type": "boson:tag",
+    "tag": "#forge:ingots/copper"
+  },
+  "result": {
+    "type": "minecraft:item",
+    "item": "ematter:copper_plate"
+  },
+  "hits": 6
+}

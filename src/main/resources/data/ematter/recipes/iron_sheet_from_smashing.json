@@ -1,0 +1,12 @@
+{
+  "type": "ematter:smashing",
+  "ingredient": {
+    "type": "boson:tag",
+    "tag": "#forge:plates/iron"
+  },
+  "result": {
+    "type": "minecraft:item",
+    "item": "ematter:iron_sheet"
+  },
+  "hits": 4
+}

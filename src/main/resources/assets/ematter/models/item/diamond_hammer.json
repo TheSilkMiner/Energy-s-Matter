@@ -1,0 +1,6 @@
+{
+  "parent": "ematter:item/hammer",
+  "textures": {
+    "hammery_thingy": "ematter:items/diamond_hammer"
+  }
+}
