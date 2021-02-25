@@ -28,8 +28,8 @@
 package net.thesilkminer.mc.ematter.common.feature.mad
 
 import net.minecraft.client.Minecraft
-import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
+import net.minecraft.item.crafting.IRecipe
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.network.NetworkManager
 import net.minecraft.network.play.server.SPacketUpdateTileEntity
@@ -46,6 +46,7 @@ import net.thesilkminer.mc.boson.api.energy.Consumer
 import net.thesilkminer.mc.boson.api.energy.Holder
 import net.thesilkminer.mc.boson.prefab.energy.consumerCapability
 import net.thesilkminer.mc.boson.prefab.energy.holderCapability
+import net.thesilkminer.mc.ematter.common.recipe.mad.MadRecipe
 import net.thesilkminer.mc.ematter.common.shared.sync
 import net.thesilkminer.mc.ematter.common.shared.withSync
 import kotlin.math.max
@@ -65,7 +66,8 @@ internal class MadBlockEntity : TileEntity(), Consumer, Holder {
         }
     }
 
-    internal var clientPossibleRecipe: ItemStack = ItemStack.EMPTY
+    @Suppress("EXPERIMENTAL_UNSIGNED_LITERALS")
+    internal var clientPossibleRecipe: Pair<ItemStack, ULong> = ItemStack.EMPTY to 0UL
         private set
 
     private var currentPower: ULong = 0.toULong()
@@ -137,10 +139,13 @@ internal class MadBlockEntity : TileEntity(), Consumer, Holder {
             // Let's try to compute a possible recipe
             val fakeContainer = MadContainer(this, onlyOn(Distribution.CLIENT) { { Minecraft.getMinecraft().player } }!!.inventory)
             val probableRecipe = fakeContainer.currentRecipe
-            this.clientPossibleRecipe = probableRecipe?.recipeOutput ?: ItemStack.EMPTY
+            @Suppress("EXPERIMENTAL_UNSIGNED_LITERALS")
+            this.clientPossibleRecipe = (probableRecipe?.recipeOutput ?: ItemStack.EMPTY) to (probableRecipe?.power ?: 0UL)
         }
     }
 
     override fun onDataPacket(net: NetworkManager, pkt: SPacketUpdateTileEntity) = this.handleUpdateTag(pkt.nbtCompound)
     override fun getUpdatePacket() = SPacketUpdateTileEntity(this.pos, -1, this.updateTag)
+
+    private val IRecipe.power get() = if (this is MadRecipe) this.getPowerRequiredFor(onlyOn(Distribution.CLIENT) { { Minecraft.getMinecraft().player } }!!) else null
 }

@@ -3,18 +3,27 @@ package net.thesilkminer.mc.ematter.client.feature.mad
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
+import net.minecraft.client.renderer.block.model.IBakedModel
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms
 import net.minecraft.client.renderer.texture.TextureMap
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
+import net.minecraft.item.ItemStack
 import net.minecraftforge.client.ForgeHooksClient
+import net.thesilkminer.mc.ematter.client.clientConfiguration
 import net.thesilkminer.mc.ematter.client.shared.withMatrix
 import net.thesilkminer.mc.ematter.common.feature.mad.MadBlock
 import net.thesilkminer.mc.ematter.common.feature.mad.MadBlockEntity
 
 internal class MadBlockEntityRender : TileEntitySpecialRenderer<MadBlockEntity>() {
+    private enum class SpinMeaning {
+        NONE,
+        CHARGE,
+        RECIPE
+    }
+
     private companion object {
         private const val Y_OFFSET = -0.02083
-        private const val ROTATION_SPEED_BASE_MULTIPLIER = 12.0F // TODO("Make faster spin the more expensive the recipe? Or depending on how charged the MAD is?")
+        private const val ROTATION_SPEED = 60.0F
 
         private val reshuffleArray = intArrayOf(0, 1, 2, 3, 4, 15, 16, 17, 18, 5, 14, 23, 24, 19, 6, 13, 22, 21, 20, 7, 12, 11, 10, 9, 8)
         private val slotsOffsets by lazy {
@@ -25,6 +34,8 @@ internal class MadBlockEntityRender : TileEntitySpecialRenderer<MadBlockEntity>(
                     .reshuffle()
         }
         private val resultOffset = doubleArrayOf(0.5, 0.6666667, 0.5)
+
+        private val spinMeaning by lazy { SpinMeaning.values()[clientConfiguration["behavior", "molecular_assembler_device"]["spin_meaning"]().int] }
 
         private fun List<DoubleArray>.reshuffle(): Array<DoubleArray> = reshuffleArray.map { this[it] }.toTypedArray()
     }
@@ -39,7 +50,7 @@ internal class MadBlockEntityRender : TileEntitySpecialRenderer<MadBlockEntity>(
                     .map { it to this.itemRenderer.getItemModelWithOverrides(it, te.world, null) }
                     .toList()
         }
-        val output = te.clientPossibleRecipe
+        val output = te.clientPossibleRecipe.first
 
         withState {
             RenderHelper.enableStandardItemLighting()
@@ -60,20 +71,23 @@ internal class MadBlockEntityRender : TileEntitySpecialRenderer<MadBlockEntity>(
 
             if (!output.isEmpty) {
                 withMatrix {
-                    // TODO("Add holo ray")
-                }
-                withMatrix {
-                    // TODO("Render more than one item if needed")
                     val renderTime = te.world.totalWorldTime + partialTicks
                     val yOffset = resultOffset[1] // TODO("Sine wave motion")
                     GlStateManager.translate(x + resultOffset[0], y + yOffset, z + resultOffset[2])
-                    GlStateManager.rotate(renderTime * ROTATION_SPEED_BASE_MULTIPLIER, 0.0F, 1.0F, 0.0F)
+                    GlStateManager.rotate(renderTime * this.findSpinFactor(te, spinMeaning), 0.0F, 1.0F, 0.0F)
                     val bakedModel = this.itemRenderer.getItemModelWithOverrides(output, te.world, null)
                     val model = ForgeHooksClient.handleCameraTransforms(bakedModel, ItemCameraTransforms.TransformType.GROUND, false)
                     this.itemRenderer.renderItem(output, model)
                 }
             }
         }
+    }
+
+    @Suppress("EXPERIMENTAL_API_USAGE")
+    private fun findSpinFactor(be: MadBlockEntity, spinMeaning: SpinMeaning): Float = when (spinMeaning) {
+        SpinMeaning.NONE -> ROTATION_SPEED / 5.0F
+        SpinMeaning.CHARGE -> (be.storedPower.toFloat() / be.maximumCapacity.toFloat()) * ROTATION_SPEED + 1.0F
+        SpinMeaning.RECIPE -> (be.clientPossibleRecipe.second.toFloat() / be.maximumCapacity.toFloat()) * ROTATION_SPEED + 1.0F
     }
 
     private inline fun withState(block: () -> Unit) {
