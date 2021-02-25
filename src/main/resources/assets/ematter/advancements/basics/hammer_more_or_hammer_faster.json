@@ -1,0 +1,37 @@
+{
+  "parent": "ematter:basics/stop_its_hammer_time",
+  "display": {
+    "title": {
+      "translate": "advancement.ematter.basics.hammer_more_or_hammer_faster.title",
+      "color": "gray"
+    },
+    "description": {
+      "translate": "advancement.ematter.basics.hammer_more_or_hammer_faster.description",
+      "color": "dark_gray"
+    },
+    "icon": {
+      "item": "ematter:iron_hammer"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "rewards": {
+    "recipes": [
+      "ematter:diamond_hammer"
+    ]
+  },
+  "criteria": {
+    "craft_iron_hammer": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "ematter:iron_hammer"
+          }
+        ]
+      }
+    }
+  }
+}

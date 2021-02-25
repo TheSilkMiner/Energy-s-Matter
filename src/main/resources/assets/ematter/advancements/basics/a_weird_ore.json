@@ -1,0 +1,39 @@
+{
+  "parent": "ematter:basics/back_to_basics",
+  "display": {
+    "title": {
+      "translate": "advancement.ematter.basics.a_weird_ore.title",
+      "color": "white"
+    },
+    "description": {
+      "translate": "advancement.ematter.basics.a_weird_ore.description",
+      "color": "gray"
+    },
+    "icon": {
+      "item": "ematter:copper_ore"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "rewards": {
+    "recipes": [
+      "ematter:copper_block",
+      "ematter:copper_hammer",
+      "ematter:copper_ingot_from_deconstructing"
+    ]
+  },
+  "criteria": {
+    "so_were_back_in_the_mine_got_my_pick_axe_swinging_from_side_to_side": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "ematter:raw_copper"
+          }
+        ]
+      }
+    }
+  }
+}

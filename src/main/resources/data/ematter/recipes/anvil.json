@@ -1,0 +1,19 @@
+{
+  "__comment": "This recipe is still WIP, so... don't expect that much consistency",
+  "type": "forge:ore_shapeless",
+  "ingredients": [
+    {
+      "type": "minecraft:item",
+      "item": "minecraft:anvil",
+      "data": 0
+    },
+    {
+      "type": "minecraft:item",
+      "item": "ematter:iron_hammer"
+    }
+  ],
+  "result": {
+    "type": "minecraft:item",
+    "item": "ematter:anvil"
+  }
+}

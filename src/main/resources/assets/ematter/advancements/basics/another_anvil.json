@@ -1,0 +1,32 @@
+{
+  "parent": "ematter:basics/a_weird_ore",
+  "display": {
+    "title": {
+      "translate": "advancement.ematter.basics.another_anvil.title",
+      "color": "white"
+    },
+    "description": {
+      "translate": "advancement.ematter.basics.another_anvil.description",
+      "color": "gray"
+    },
+    "icon": {
+      "item": "ematter:anvil"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "crafting_the_anvil": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "ematter:anvil"
+          }
+        ]
+      }
+    }
+  }
+}

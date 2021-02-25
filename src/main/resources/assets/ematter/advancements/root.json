@@ -1,0 +1,26 @@
+{
+  "display": {
+    "title": {
+      "translate": "advancement.ematter.root.title",
+      "color": "dark_green"
+    },
+    "description": {
+      "translate": "advancement.ematter.root.description",
+      "color": "gray"
+    },
+    "icon": {
+      "item": "ematter:molecular_assembler_device",
+      "data": 3
+    },
+    "background": "ematter:textures/gui/advancement/root.png",
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "automatic_grant_on_player_join": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

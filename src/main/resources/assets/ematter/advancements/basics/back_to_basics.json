@@ -1,0 +1,32 @@
+{
+  "parent": "ematter:root",
+  "display": {
+    "title": {
+      "translate": "advancement.ematter.basics.back_to_basics.title",
+      "color": "gray"
+    },
+    "description": {
+      "translate": "advancement.ematter.basics.back_to_basics.description",
+      "color": "dark_gray"
+    },
+    "icon": {
+      "item": "minecraft:stone_pickaxe"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "get_stone_pick": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "minecraft:stone_pickaxe"
+          }
+        ]
+      }
+    }
+  }
+}

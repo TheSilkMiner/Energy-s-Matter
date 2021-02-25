@@ -41,6 +41,7 @@ import net.thesilkminer.mc.boson.api.log.L
 import net.thesilkminer.mc.ematter.client.SidedEventHandler
 import net.thesilkminer.mc.ematter.common.BlockEntityRegistration
 import net.thesilkminer.mc.ematter.common.ConfigurationRegistrationHandler
+import net.thesilkminer.mc.ematter.common.advancement.AdvancementManager
 import net.thesilkminer.mc.ematter.common.attachBlocksListener
 import net.thesilkminer.mc.ematter.common.attachItemsListener
 import net.thesilkminer.mc.ematter.common.feature.cable.capability.NetworkManagerCapabilityHandler
@@ -83,6 +84,7 @@ object EnergyIsMatter {
         l.info("Pre-initialization")
         MinecraftForge.EVENT_BUS.let {
             l.info("Setting up additional event handlers")
+            it.register(AdvancementManager)
             it.register(MadRecipeCapabilityHandler)
             it.register(NetworkManagerCapabilityHandler)
         }

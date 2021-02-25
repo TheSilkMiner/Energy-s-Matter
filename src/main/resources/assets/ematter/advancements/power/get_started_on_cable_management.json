@@ -1,0 +1,32 @@
+{
+  "parent": "ematter:basics/squash",
+  "display": {
+    "title": {
+      "translate": "advancement.ematter.power.get_started_on_cable_management.title",
+      "color": "light_purple"
+    },
+    "description": {
+      "translate": "advancement.ematter.power.get_started_on_cable_management.description",
+      "color": "white"
+    },
+    "icon": {
+      "item": "ematter:cable"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "crafting_the_cables": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "ematter:cable"
+          }
+        ]
+      }
+    }
+  }
+}

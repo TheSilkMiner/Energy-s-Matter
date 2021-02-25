@@ -1,0 +1,38 @@
+{
+  "parent": "ematter:basics/a_weird_ore",
+  "display": {
+    "title": {
+      "translate": "advancement.ematter.basics.stop_its_hammer_time.title",
+      "color": "white"
+    },
+    "description": {
+      "translate": "advancement.ematter.basics.stop_its_hammer_time.description",
+      "color": "gray"
+    },
+    "icon": {
+      "item": "ematter:copper_hammer"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "rewards": {
+    "recipes": [
+      "ematter:anvil",
+      "ematter:iron_hammer"
+    ]
+  },
+  "criteria": {
+    "craft_your_first_hammer": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "ematter:copper_hammer"
+          }
+        ]
+      }
+    }
+  }
+}

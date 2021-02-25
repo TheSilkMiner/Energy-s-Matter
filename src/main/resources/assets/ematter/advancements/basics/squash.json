@@ -1,0 +1,32 @@
+{
+  "parent": "ematter:basics/another_anvil",
+  "display": {
+    "title": {
+      "translate": "advancement.ematter.basics.squash.title",
+      "color": "white"
+    },
+    "description": {
+      "translate": "advancement.ematter.basics.squash.description",
+      "color": "gray"
+    },
+    "icon": {
+      "item": "ematter:copper_plate"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "squashing": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "ematter:copper_plate"
+          }
+        ]
+      }
+    }
+  }
+}

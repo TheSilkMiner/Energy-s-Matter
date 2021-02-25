@@ -1,0 +1,32 @@
+{
+  "parent": "ematter:basics/hammer_more_or_hammer_faster",
+  "display": {
+    "title": {
+      "translate": "advancement.ematter.basics.why_would_you_do_that.title",
+      "color": "light_purple"
+    },
+    "description": {
+      "translate": "advancement.ematter.basics.why_would_you_do_that.description",
+      "color": "white"
+    },
+    "icon": {
+      "item": "ematter:diamond_hammer"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "this_is_literally_wasting_time": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "ematter:diamond_hammer"
+          }
+        ]
+      }
+    }
+  }
+}
